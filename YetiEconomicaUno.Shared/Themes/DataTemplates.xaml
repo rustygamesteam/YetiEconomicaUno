@@ -1,0 +1,32 @@
+﻿<ResourceDictionary x:Class="YetiEconomicaUno.Themes.DataTemplatesResourceDictionary"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:resourceControls="using:YetiEconomicaUno.Controls.Resources"
+                    xmlns:dataCore="using:RustyDTO"
+                    xmlns:local="using:YetiEconomicaUno.Themes">
+
+    <DataTemplate x:Key="YetiGroupObjectsTreeItemTemplate">
+        <TreeViewItem ItemsSource="{Binding Children}" IsExpanded="True" 
+                      CanDrag="False">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <SymbolIcon Width="20" Symbol="{Binding Icon}" />
+                <TextBlock Text="{Binding DisplayName}" />
+            </StackPanel>
+        </TreeViewItem>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="YetiObjectTreeItemTemplate">
+        <TreeViewItem IsExpanded="True"
+                      CanDrag="False">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <SymbolIcon Width="20" Symbol="Document" />
+                <TextBlock Text="{Binding DisplayNameWithTear, Mode=OneWay}" />
+            </StackPanel>
+        </TreeViewItem>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ResourceStackViewTemplate" x:DataType="dataCore:ResourceStack">
+        <resourceControls:ResourceStackView Model="{x:Bind}"/>
+    </DataTemplate>
+
+</ResourceDictionary>

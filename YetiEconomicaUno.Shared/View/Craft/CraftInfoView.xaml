@@ -1,0 +1,27 @@
+﻿<UserControl
+    x:Class="YetiEconomicaUno.View.Craft.CraftInfoView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.Craft"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Margin="0, 10">
+        <StackPanel.ContextFlyout>
+            <CommandBarFlyout ShowMode="Transient">
+                <CommandBarFlyout.SecondaryCommands>
+                    <AppBarButton x:Name="RemoveBtn" Icon="Remove" Label="Remove" />
+                </CommandBarFlyout.SecondaryCommands>
+            </CommandBarFlyout>
+        </StackPanel.ContextFlyout>
+        <TextBlock x:Name="FullName"
+                   Style="{StaticResource SubtitleTextBlockStyle}"/>
+        <TextBlock x:Name="Duration"
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+        <TextBlock x:Name="CraftCount"
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+        <TextBlock x:Name="ResourcesForCrafting"
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+    </StackPanel>
+</UserControl>

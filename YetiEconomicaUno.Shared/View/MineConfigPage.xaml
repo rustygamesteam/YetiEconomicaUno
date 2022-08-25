@@ -1,0 +1,38 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.MineConfigPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cutomControls="using:CommunityToolkit.WinUI.UI.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel Margin="10" Spacing="5">
+        <cutomControls:HeaderedContentControl Header="Cells">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <NumberBox x:Name="SizeX_Box" 
+                           Minimum="1" Maximum="10" 
+                           ValidationMode="InvalidInputOverwritten" />
+                <NumberBox x:Name="SizeY_Box" 
+                           Minimum="1" Maximum="10" 
+                           ValidationMode="InvalidInputOverwritten" />
+            </StackPanel>
+        </cutomControls:HeaderedContentControl>
+
+        <cutomControls:HeaderedContentControl Header="Proportions">
+            <StackPanel Spacing="5" Orientation="Horizontal">
+                <NumberBox x:Name="GroundBox" 
+                           Minimum="1" Maximum="50" 
+                           ValidationMode="InvalidInputOverwritten" />
+                <NumberBox x:Name="StoneBox" 
+                           Minimum="1" Maximum="50" 
+                           ValidationMode="InvalidInputOverwritten" />
+                <NumberBox x:Name="OreBox" 
+                           Minimum="1" Maximum="50" 
+                           ValidationMode="InvalidInputOverwritten" />
+            </StackPanel>
+        </cutomControls:HeaderedContentControl>
+    </StackPanel>
+</Page>

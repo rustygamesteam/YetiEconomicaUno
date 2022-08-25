@@ -1,0 +1,266 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.CalculateBalance.CalculateBalancePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.CalculateBalance"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:helper="using:YetiEconomicaUno.Helpers" 
+    xmlns:reactiveui="using:ReactiveUI"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <DataTemplate x:Key="ResourceInfo">
+            <Border Padding="10, 5" 
+                    CornerRadius="5"
+                    Background="{ThemeResource AppBarItemDisabledForegroundThemeBrush}">
+                <TextBlock Text="{Binding Mode=OneTime}" />
+            </Border>
+        </DataTemplate>
+        
+        <Flyout x:Key="AddSessionFlyout"
+                 Placement="BottomEdgeAlignedLeft">
+            <Grid ColumnSpacing="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <NumberBox x:Name="NewSessionHours" 
+                           VerticalAlignment="Center"
+                           Header="Hours" HeaderTemplate="{StaticResource SmallHeaderDataTemplate}" 
+                           Value="10"
+                           ValidationMode="InvalidInputOverwritten"
+                           AllowFocusOnInteraction="True"
+                           Minimum="0" Maximum="23" />
+                <Button VerticalAlignment="Center" 
+                        Margin="0, 20, 0, 0"
+                        Grid.Column="1"
+                        Content="Add" 
+                        helper:FlyoutAttach.CanCloseFlyout="True"
+                        Click="{x:Bind AddSessionTime_OnClick}" />
+            </Grid>
+        </Flyout>
+    </Page.Resources>
+    
+    <Grid RowSpacing="10" ColumnSpacing="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition MaxWidth="200"/>
+            <ColumnDefinition MaxWidth="150"/>
+            <ColumnDefinition MaxWidth="38"/>
+        </Grid.ColumnDefinitions>
+        
+        <MenuBar Grid.ColumnSpan="10" Grid.Row="0">
+            <MenuBar.Background>
+                <SolidColorBrush Color="{ThemeResource SystemAltMediumHighColor}"
+                                 Opacity="0.5"/>
+            </MenuBar.Background>
+            <MenuBarItem Title="Export">
+                <MenuFlyoutItem Text="Export to file..."/>
+            </MenuBarItem>
+        </MenuBar>
+
+        <ScrollViewer Grid.Row="1" Grid.Column="0"
+                      Margin="10, 0, 0, 0">
+            <ItemsRepeater
+                  ItemTemplate="{StaticResource ResourceInfo}"
+                  ItemsSource="{x:Bind ViewModel.WalletForSelectedItem, Mode=OneWay}">
+                <ItemsRepeater.Layout>
+                    <controls:WrapLayout VerticalSpacing="5" HorizontalSpacing="5"/>
+                </ItemsRepeater.Layout>
+            </ItemsRepeater>
+        </ScrollViewer>
+        
+        <StackPanel Grid.Row="1" Grid.Column="1"
+                    VerticalAlignment="Stretch">
+            <StackPanel.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="12"/>
+                </Style>
+            </StackPanel.Resources>
+            <TextBlock x:Name="FarmCells_InfoBox"/>
+            <TextBlock x:Name="MineCells_InfoBox"/>
+            <MenuFlyoutSeparator Margin="10, 0" />
+            <TextBlock x:Name="AxeTool_InfoBox"/>
+            <TextBlock x:Name="PickTool_InfoBox" />
+            <TextBlock x:Name="ShovelTool_InfoBox" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="2"
+                    Margin="10, 0"
+                    Spacing="5"
+                    HorizontalAlignment="Stretch">
+
+            <TextBox Header="Time target" 
+                     Text="{x:Bind Service.TimeTarget.ResultInfo, Mode=OneWay}" 
+                     HeaderTemplate="{StaticResource SmallHeaderDataTemplate}" 
+                     FontSize="12"
+                     IsReadOnly="True" >
+                <TextBox.ContextFlyout>
+                    <Flyout Placement="BottomEdgeAlignedRight">
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <NumberBox Header="Days" HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                                       ValidationMode="InvalidInputOverwritten"
+                                       Minimum="0"
+                                       Maximum="10000"
+                                       Value="{x:Bind Service.TimeTarget.Days, Mode=TwoWay}"/>
+                            <NumberBox Header="Hours" HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                                       ValidationMode="InvalidInputOverwritten"
+                                       Minimum="0"
+                                       Maximum="23"
+                                       Value="{x:Bind Service.TimeTarget.Hours, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </Flyout>
+                </TextBox.ContextFlyout>
+            </TextBox>
+            <TextBox Header="Time result" 
+                     Text="{x:Bind ViewModel.TimeResult, Mode=OneWay, Converter={StaticResource DurationLabelConverter}}"
+                     HeaderTemplate="{StaticResource SmallHeaderDataTemplate}" IsReadOnly="True" />
+        </StackPanel>
+        
+        <controls:HeaderedContentControl Grid.Column="3" Grid.Row="1"
+                                         Margin="0, -7, 0, 0"
+                                         HorizontalContentAlignment="Stretch"
+                                         Header="Sessions"
+                                         HeaderTemplate="{StaticResource SmallHeaderForComboBoxDataTemplate}">
+            <ListView x:Name="SessionList"
+                      Height="120"
+                      BorderBrush="{ThemeResource ButtonBorderThemeBrush}"
+                      BorderThickness="1" />
+        </controls:HeaderedContentControl>
+
+        <Viewbox Width="40" Grid.Column="4" Grid.Row="1"
+                 VerticalAlignment="Top">
+            <StackPanel Margin="0, 25, 5, 0"
+                        Orientation="Vertical">
+                <AppBarButton Icon="Add" 
+                              HorizontalAlignment="Center"
+                              LabelPosition="Collapsed" 
+                              Width="50"
+                              Flyout="{StaticResource AddSessionFlyout}" />
+                <MenuFlyoutSeparator Margin="8, 0"/>
+                <AppBarButton Icon="Remove" 
+                              Width="50"
+                              HorizontalAlignment="Center"
+                              LabelPosition="Collapsed"
+                              x:Name="SessionRemoveBtn"
+                              Click="{x:Bind RemoveSessionTime_OnClick}"/>
+            </StackPanel>
+        </Viewbox>
+        
+        
+        <Grid Grid.Row="2" Grid.ColumnSpan="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <ListView Grid.Column="0"
+                      x:Name="ListView"
+                      Margin="5"
+                      BorderBrush="{ThemeResource ButtonBorderThemeBrush}"
+                      BorderThickness="1"
+                      SelectionMode="Single">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush Opacity="0.3">
+                                    <GradientStop Color="Black" Offset="0.4" />
+                                    <GradientStop Color="DarkGreen" Offset="1" />
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListViewItem">
+                                    <ListViewItemPresenter
+                                        ContentTransitions="{TemplateBinding ContentTransitions}"
+                                        SelectionCheckMarkVisualEnabled="True"
+                                        CheckBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                                        CheckBoxBrush="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                                        DragBackground="{ThemeResource ListViewItemDragBackgroundThemeBrush}"
+                                        DragForeground="{ThemeResource ListViewItemDragForegroundThemeBrush}"
+                                        FocusBorderBrush="{ThemeResource SystemControlForegroundAltHighBrush}"
+                                        FocusSecondaryBorderBrush="{ThemeResource SystemControlForegroundBaseHighBrush}"
+                                        PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}"
+                                        PointerOverBackground="{ThemeResource SystemControlHighlightListLowBrush}"
+                                        PointerOverForeground="{ThemeResource SystemControlHighlightAltBaseHighBrush}"
+                                        SelectedBackground="{ThemeResource SystemControlHighlightListAccentLowBrush}"
+                                        SelectedForeground="{ThemeResource SystemControlHighlightAltBaseHighBrush}"
+                                        SelectedPointerOverBackground="{ThemeResource SystemControlHighlightListAccentMediumBrush}"
+                                        PressedBackground="{ThemeResource SystemControlHighlightListMediumBrush}"
+                                        SelectedPressedBackground="{ThemeResource SystemControlHighlightListAccentHighBrush}"
+                                        DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
+                                        DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
+                                        ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        ContentMargin="{TemplateBinding Padding}"
+                                        CheckMode="Inline"/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <reactiveui:ViewModelViewHost ViewModel="{Binding}" HorizontalContentAlignment="Stretch" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Viewbox Grid.Column="1"
+                     VerticalAlignment="Top"
+                     Width="40"
+                     Margin="5, 40">
+                <StackPanel
+                    x:Name="ControlPanel"
+                    Spacing="3"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    CornerRadius="7"
+                    Background="{ThemeResource CardBackgroundFillColorDefault}">
+                    <AppBarButton Icon="Add"
+                              LabelPosition="Collapsed"
+                              Click="{x:Bind OnCreateDialog_Invoke}"
+                              Width="60" Height="60" />
+                    <AppBarButton x:Name="InsertItemBtn"
+                              Icon="OpenWith"
+                              IsEnabled="False"
+                              Click="{x:Bind InsertItemBtn_Click}"
+                              Width="60" Height="60" />
+                    <MenuFlyoutSeparator Margin="8, 0"/>
+                    <AppBarButton FontSize="18" Icon="Remove"
+                              LabelPosition="Collapsed"
+                              x:Name="RemoveItemBtn"
+                              IsEnabled="False"
+                              Click="{x:Bind RemoveItemBtn_Click}"
+                              Width="60" Height="60" />
+                    <MenuFlyoutSeparator Margin="8, 0"/>
+                    <AppBarButton Icon="Upload" 
+                              x:Name="ToUpItemBtn"
+                              LabelPosition="Collapsed"
+                              IsEnabled="False"
+                              Click="{x:Bind TryMoveToUp_OnClick}"
+                              Width="60" Height="60" />
+                    <AppBarButton x:Name="ToDonwItemBtn" Icon="Download"
+                              LabelPosition="Collapsed"
+                              IsEnabled="False"
+                              Click="{x:Bind TryMoveToDown_OnClick}"
+                              Width="60" Height="60" />
+                </StackPanel>
+            </Viewbox>
+        </Grid>
+
+    </Grid>
+</Page>

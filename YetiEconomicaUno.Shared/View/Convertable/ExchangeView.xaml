@@ -1,0 +1,22 @@
+﻿<UserControl
+    x:Class="YetiEconomicaUno.View.Convertable.ExchangeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.Convertable"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+	<Grid Margin="0, 10">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+		<TextBlock Grid.Column="0"
+				   x:Name="NameBox"/>
+        <NumberBox Grid.Column="1"
+                   x:Name="CountBox"
+		           Minimum="0.01"
+		           Maximum="1000000.0"
+		           ValidationMode="InvalidInputOverwritten"/>
+	</Grid>
+</UserControl>

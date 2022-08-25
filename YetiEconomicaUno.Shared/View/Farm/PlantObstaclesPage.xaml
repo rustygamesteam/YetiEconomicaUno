@@ -1,0 +1,46 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.Farm.PlantObstaclesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.Farm"
+    xmlns:userControls="using:YetiEconomy.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:yetiobjects="using:YetiEconomicaUno.View.YetiObjects" 
+    xmlns:dataCore="using:RustyDTO.Interfaces"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <NumberBox x:Name="DefaultCountBox" 
+                   Margin="10"
+                   HorizontalAlignment="Left"
+                   Header="Default cells"
+                   HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                   ValidationMode="InvalidInputOverwritten"
+                   Minimum="1"
+                   Maximum="100"/>
+        <userControls:AdvancedListView Grid.Row="1"
+                                       x:Name="ObstaclesList"
+                                       VisibleAddPanel="Collapsed"
+                                       Header="Obstacles">
+	        <userControls:AdvancedListView.ItemTemplate>
+		        <DataTemplate x:DataType="dataCore:IRustyEntity">
+                    <yetiobjects:YetiGradeObjectView ViewModel="{x:Bind}" IsAutoInitialize="True" />
+		        </DataTemplate>
+	        </userControls:AdvancedListView.ItemTemplate>
+	        <userControls:AdvancedListView.RightPanel>
+                <AppBarButton Icon="Add" Label="Add" Click="Add_OnClick"/>
+	        </userControls:AdvancedListView.RightPanel>
+	        <userControls:AdvancedListView.RightSelectedPanel>
+		        <AppBarButton Icon="Remove" Label="Remove" x:Name="RemoveBtn" 
+		                      IsEnabled="False"
+		                      Click="Remove_OnClick" />
+	        </userControls:AdvancedListView.RightSelectedPanel>
+        </userControls:AdvancedListView>
+    </Grid>
+</Page>

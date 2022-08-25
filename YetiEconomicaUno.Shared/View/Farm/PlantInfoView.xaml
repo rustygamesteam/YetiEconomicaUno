@@ -1,0 +1,25 @@
+﻿<UserControl
+    x:Class="YetiEconomicaUno.View.Farm.PlantInfoView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.Farm"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Margin="0, 10">
+        <StackPanel.ContextFlyout>
+            <CommandBarFlyout ShowMode="Transient">
+                <CommandBarFlyout.SecondaryCommands>
+                    <AppBarButton Icon="Remove" Label="Remove" Click="RemoveFarm_OnClick" />
+                </CommandBarFlyout.SecondaryCommands>
+            </CommandBarFlyout>
+        </StackPanel.ContextFlyout>
+        <TextBlock x:Name="FullName"
+                   Style="{StaticResource SubtitleTextBlockStyle}"/>
+        <TextBlock x:Name="Duration"
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+        <TextBlock x:Name="Harvest"
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,463 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6279c845-92f8-4333-ab99-3d213163593c</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>YetiEconomicaUno</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="$(MSBuildThisFileDirectory)App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)AppBootstrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\AdvancedListView.xaml.cs">
+      <DependentUpon>AdvancedListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourcePriceListView.xaml.cs">
+      <DependentUpon>ResourcePriceListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceStackListView.xaml.cs">
+      <DependentUpon>ResourceStackListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceStackView.xaml.cs">
+      <DependentUpon>ResourceStackView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Farm\PlantObstaclesViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\Convertable\ExchangeView.xaml.cs">
+      <DependentUpon>ExchangeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Farm\PlantObstaclesPage.xaml.cs">
+      <DependentUpon>PlantObstaclesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Flyouts\FlyoutWithBtn.xaml.cs">
+      <DependentUpon>FlyoutWithBtn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\BaseBlobView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\LinkGraph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\AttachPropertyBlobView.xaml.cs">
+      <DependentUpon>AttachPropertyBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\DependentsBlobView.xaml.cs">
+      <DependentUpon>DependentsBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceView.xaml.cs">
+      <DependentUpon>ResourceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceWithCount.xaml.cs">
+      <DependentUpon>ResourceWithCount.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\SelectResourceFlyout.xaml.cs">
+      <DependentUpon>SelectResourceFlyout.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\DurationLabelConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Converters\PriceLabelConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\BsonMapperExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\XAMLExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\BDHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\FlyoutAttach.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\SimpleResources.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\ToolsHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Resources\ResourceStatistics.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CalculateBalanceService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CalculateMinigamesService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Themes\DataTemplates.xaml.cs">
+      <DependentUpon>DataTemplates.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BaseViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Resources\ResourcesBy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\CalculateBalanceViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\ChankData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Internal\ResourceDependenciesTree.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\CollectBaseResourcesTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\ConvertTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\CraftTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\CreateYetiObjectTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\FarmPlantTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\ProgressTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\ProgressTaskExtension.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\ProgressType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\RecycleResourcesTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\ResourceGiftTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\SessionTimeRecord.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\TimeTarget.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\ToolsEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\UserData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Controls\Resources\ResourceSelectorViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Controls\Resources\ResourceStackListViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Controls\Resources\SelectResourceFlyoutViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Convertables\ConvertableViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Crafts\CraftViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Farm\PlantInfoViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Farm\PlantsPageViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\FirstViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Convertables\ResourcesConvertiblePageViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MineConfigViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\ResourcesViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Controls\Resources\ResourceViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\YetiObjects\YetiGroupSelectorViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\YetiObjects\YetiObjectSelectorViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\YetiObjects\YetiObjectsPageViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\CalculateBalancePage.xaml.cs">
+      <DependentUpon>CalculateBalancePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\CreateUserTargetDialogPopup.xaml.cs">
+      <DependentUpon>CreateUserTargetDialogPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\ConvertTaskView.xaml.cs">
+      <DependentUpon>ConvertTaskView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\CraftTaskView.xaml.cs">
+      <DependentUpon>CraftTaskView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\FarmPlantTaskView.xaml.cs">
+      <DependentUpon>FarmPlantTaskView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\RecycleResourcesTaskView.xaml.cs">
+      <DependentUpon>RecycleResourcesTaskView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\ResourceGiftView.xaml.cs">
+      <DependentUpon>ResourceGiftView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\PriceBoxInfoControl.xaml.cs">
+      <DependentUpon>PriceBoxInfoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\TimeBoxInfoControl.xaml.cs">
+      <DependentUpon>TimeBoxInfoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\YetiObjectTaskView.xaml.cs">
+      <DependentUpon>YetiObjectTaskView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Convertable\ConvertableDetalsView.xaml.cs">
+      <DependentUpon>ConvertableDetalsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Convertable\ConvertableInfo.xaml.cs">
+      <DependentUpon>ConvertableInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Craft\CraftsPage.xaml.cs">
+      <DependentUpon>CraftsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Craft\CraftDetalInfoView.xaml.cs">
+      <DependentUpon>CraftDetalInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Craft\CraftInfoView.xaml.cs">
+      <DependentUpon>CraftInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Farm\PlantDetalInfoView.xaml.cs">
+      <DependentUpon>PlantDetalInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Farm\PlantInfoView.xaml.cs">
+      <DependentUpon>PlantInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Farm\PlantsPage.xaml.cs">
+      <DependentUpon>PlantsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\FirstPage.xaml.cs">
+      <DependentUpon>FirstPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\Convertable\ResourcesConvertiblePage.xaml.cs">
+      <DependentUpon>ResourcesConvertiblePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\ResourcesPage.xaml.cs">
+      <DependentUpon>ResourcesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\MineConfigPage.xaml.cs">
+      <DependentUpon>MineConfigPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml.cs">
+      <DependentUpon>FarmExpansionBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml.cs">
+      <DependentUpon>InBuildBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\LongExecutionBlobView.xaml.cs">
+      <DependentUpon>LongExecutionBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\MineSizeBlobView.xaml.cs">
+      <DependentUpon>MineSizeBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml.cs">
+      <DependentUpon>RewardCountBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml.cs">
+      <DependentUpon>SpeedBootBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\TearBlobView.xaml.cs">
+      <DependentUpon>TearBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\ToolInfoBlobView.xaml.cs">
+      <DependentUpon>ToolInfoBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiGradeObjectView.xaml.cs">
+      <DependentUpon>YetiGradeObjectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiGroupSelector.xaml.cs">
+      <DependentUpon>YetiGroupSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectDetalInfo.xaml.cs">
+      <DependentUpon>YetiObjectDetalInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectInfo.xaml.cs">
+      <DependentUpon>YetiObjectInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectSelector.xaml.cs">
+      <DependentUpon>YetiObjectSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectsPage.xaml.cs">
+      <DependentUpon>YetiObjectsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)TemplateSelectors\YetiObjectTreeItemTemplateSelector.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\AdvancedListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourcePriceListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceStackListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceStackView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceWithCount.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Controls\Resources\SelectResourceFlyout.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Themes\DataTemplates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\CalculateBalancePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\CreateUserTargetDialogPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\ConvertTaskView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\CraftTaskView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\FarmPlantTaskView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\RecycleResourcesTaskView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\ResourceGiftView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\PriceBoxInfoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\TimeBoxInfoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\CalculateBalance\Tasks\Impl\YetiObjectTaskView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Convertable\ConvertableDetalsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Convertable\ConvertableInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Convertable\ExchangeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Craft\CraftDetalInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Craft\CraftsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Craft\CraftInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Farm\PlantDetalInfoView.xaml">
+      <XamlRuntime>WinUI</XamlRuntime>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Farm\PlantInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Farm\PlantsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Farm\PlantObstaclesPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\FirstPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Convertable\ResourcesConvertiblePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\Flyouts\FlyoutWithBtn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\ResourcesPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\MineConfigPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\AttachPropertyBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\DependentsBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\LongExecutionBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\MineSizeBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\TearBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\ToolInfoBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiGradeObjectView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiGroupSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectDetalInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\YetiObjectsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Assets\SharedAssets.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <PRIResource Include="$(MSBuildThisFileDirectory)Strings\en\Resources.resw" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+		 Add files present in the shared project folder, excluding the ones
+		 explicitly included in the projitem, so files can be added from vscode
+		 without manipulating the projitem file.
+	-->
+    <_Globbled_Page Include="$(MSBuildThisFileDirectory)**/*.xaml" Exclude="@(Page);@(ApplicationDefinition)">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </_Globbled_Page>
+    <_Globbed_Compile Include="$(MSBuildThisFileDirectory)**/*.xaml.cs" Exclude="@(Compile)">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </_Globbed_Compile>
+    <_Globbed_Compile Include="$(MSBuildThisFileDirectory)**/*.cs" Exclude="@(Compile);@(_Globbed_Compile)" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Crafts\CraftsViewModel.cs" />
+    <_Globbed_PRIResource Include="$(MSBuildThisFileDirectory)**/*.resw" Exclude="@(PRIResource)" />
+    <PRIResource Include="@(_Globbed_PRIResource)" />
+    <_Globbed_Content Include="$(MSBuildThisFileDirectory)Assets/**/*.*" Exclude="@(Content)" />
+    <Content Include="@(_Globbed_Content)" />
+    <!-- Mark the files from this folder as being part of WinUI -->
+    <Page Update="$(MSBuildThisFileDirectory)**/*.xaml" XamlRuntime="WinUI" />
+    <ApplicationDefinition Update="$(MSBuildThisFileDirectory)**/*.xaml" XamlRuntime="WinUI" />
+    <!-- Make sure XAML files force reevaluation of up-to-date checks -->
+    <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)**/*.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Styles\" />
+  </ItemGroup>
+</Project>

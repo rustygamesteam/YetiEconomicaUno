@@ -1,0 +1,26 @@
+﻿<local:BaseBlobView
+    x:Class="YetiEconomicaUno.View.YetiObjects.PropertyBlobls.FarmExpansionBlobView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:flyouts="using:YetiEconomicaUno.View.Flyouts"
+    mc:Ignorable="d">
+	<Button.ContextFlyout>
+		<flyouts:FlyoutWithBtn Label="Remove"
+		                       Icon="Remove"
+		                       Opened="Flyout_OnOpened" 
+		                       Closing="Flyout_OnClosing">
+			<NumberBox x:Name="CellsBox"
+			           Minimum="1"
+			           Maximum="1000"
+					   Header="Plant cells"
+			           HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+			           AllowFocusWhenDisabled="True"
+			           Value="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+			           ValidationMode="InvalidInputOverwritten"/>
+		</flyouts:FlyoutWithBtn>
+	</Button.ContextFlyout>
+	<TextBlock x:Name="InfoBox" />
+</local:BaseBlobView>

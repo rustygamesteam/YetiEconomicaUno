@@ -1,0 +1,58 @@
+﻿<UserControl
+    x:Class="YetiEconomicaUno.View.YetiObjects.YetiGradeObjectView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:resourceControls="using:YetiEconomicaUno.Controls.Resources" 
+    xmlns:reactiveui="using:ReactiveUI"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects" 
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    Margin="0, 5, 0, 0"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <MenuFlyout x:Name="ActionMenuFlyout">
+            <MenuFlyoutItem Text="Remove" Click="MenuFlyoutItem_Click" />
+        </MenuFlyout>
+    </UserControl.Resources>
+    <StackPanel Background="Transparent">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <TextBox x:Name="NameBox"
+                     Visibility="Collapsed"
+                     Width="160"
+                     Margin="0, 0, 10, 0"
+                     Header="Name"
+                     HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"/>
+        </StackPanel>
+        <controls:HeaderedContentControl x:Name="PropertiesBlockHeader"
+	                                     Visibility="Collapsed" 
+	                                     Header="Properties"
+	                                     HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+	                                     Margin="0, 5, 0, 0">
+            <ItemsRepeaterScrollHost x:Name="PropertiesBox">
+                <ScrollViewer x:Name="WrapScrollParent" MaxHeight="100">
+                    <ItemsRepeater x:Name="PropertiesRepeater">
+                        <ItemsRepeater.Layout>
+                            <controls:WrapLayout x:Name="Wrap"
+                                                 VerticalSpacing="5"
+                                                 HorizontalSpacing="5"/>
+                        </ItemsRepeater.Layout>
+                    </ItemsRepeater>
+                </ScrollViewer>
+            </ItemsRepeaterScrollHost>
+	    </controls:HeaderedContentControl>
+        <controls:HeaderedContentControl x:Name="InfoBlockHeader"
+                                         Visibility="Collapsed" 
+                                         Header="Info"
+                                         HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                                         Margin="0, 5, 0, 0">
+            <TextBlock x:Name="InfoBlock" />
+        </controls:HeaderedContentControl>
+        <resourceControls:ResourcePriceListView x:Name="PriceList" 
+                                                Visibility="Collapsed" />
+        <resourceControls:ResourceStackListView x:Name="RewardsList" 
+                                                Header="Rewards"
+                                                Visibility="Collapsed" />
+
+    </StackPanel>
+</UserControl>

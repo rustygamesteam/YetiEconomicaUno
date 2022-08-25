@@ -1,0 +1,104 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.ResourcesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:dataCore="using:RustyDTO.Interfaces"
+    xmlns:controls="using:YetiEconomy.Controls" 
+    xmlns:resourceControls="using:YetiEconomy.Controls.Resources"
+    mc:Ignorable="d"
+    Unloaded="Page_OnUnload"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid Margin="2" RowSpacing="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+
+        <MenuBar Grid.Row="0" Grid.ColumnSpan="2" 
+                 Margin="-2">
+            <MenuBar.Background>
+                <SolidColorBrush Color="{ThemeResource SystemAltMediumHighColor}"
+                                 Opacity="0.5"/>
+            </MenuBar.Background>
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="Import..." Click="{x:Bind OnImportClicked}"/>
+            </MenuBarItem>
+        </MenuBar>
+
+        <controls:AdvancedListView Grid.Column="0" Grid.Row="1" Items="{x:Bind ViewModel.Groups}"
+                                   x:Name="GroupList"
+                                   Header="Resource groups">
+            <controls:AdvancedListView.NewItem>
+                <TextBox Header="New group name" 
+                         Text="{x:Bind ViewModel.NewGroupName, Mode=TwoWay}" />
+            </controls:AdvancedListView.NewItem>
+            <controls:AdvancedListView.RightSelectedPanel>
+                <AppBarButton x:Name="RemoveGroupBtn"  HorizontalAlignment="Center" Icon="Remove" Label="Remove" />
+            </controls:AdvancedListView.RightSelectedPanel>
+            <controls:AdvancedListView.ItemTemplate>
+                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                    <StackPanel Orientation="Vertical" Padding="2, 7, 5, 12">
+                        <TextBlock  Margin="10, 0, 0, 0"
+                                    Text="{x:Bind Index, Converter={StaticResource StringFormatConverter}, ConverterParameter='Index: {0}'}"
+                                    FontSize="10"
+                                    Foreground="{ThemeResource TextBoxDisabledForegroundThemeBrush}"/>
+                        <TextBox Text="{x:Bind DisplayName, Mode=TwoWay}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </controls:AdvancedListView.ItemTemplate>
+        </controls:AdvancedListView>
+        <controls:AdvancedListView Grid.Column="1" Grid.Row="1" 
+                                   Items="{x:Bind ViewModel.Resources}"
+                                   x:Name="ResourcesList"
+                                   Header="Resources">
+            <controls:AdvancedListView.HeaderRightPanel>
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <SymbolIcon Symbol="Filter" />
+                    <SplitButton Content="{x:Bind ViewModel.FilterContent, Mode=OneWay}" MinWidth="160" FontSize="11" HorizontalContentAlignment="Left">
+                        <SplitButton.Flyout>
+                            <Flyout Placement="Bottom">
+                                <ListView SelectionMode="Multiple" ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}"
+                                          x:Name="ResourcesFilter"
+                                          DisplayMemberPath="DisplayName" />
+
+                            </Flyout>
+                        </SplitButton.Flyout>
+                    </SplitButton>
+                </StackPanel>
+            </controls:AdvancedListView.HeaderRightPanel>
+            <controls:AdvancedListView.NewItem>
+                <Grid ColumnSpacing="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0"
+                             VerticalAlignment="Bottom"
+                             Header="New resource name" Text="{x:Bind ViewModel.NewResourceName, Mode=TwoWay}" />
+                    <ComboBox Grid.Column="1"
+                              VerticalAlignment="Bottom"
+                              Header="Group"
+                              ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}"
+                              DisplayMemberPath="DisplayName"
+                              SelectedValue="{x:Bind ViewModel.NewResourceGroup, Mode=TwoWay}"/>
+                </Grid>
+            </controls:AdvancedListView.NewItem>
+            <controls:AdvancedListView.RightSelectedPanel>
+                <AppBarButton x:Name="RemoveResourceBtn" HorizontalAlignment="Center" Icon="Remove" Label="Remove" />
+            </controls:AdvancedListView.RightSelectedPanel>
+            <controls:AdvancedListView.ItemTemplate>
+                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                    <resourceControls:ResourceView Model="{x:Bind}" />
+                </DataTemplate>
+            </controls:AdvancedListView.ItemTemplate>
+        </controls:AdvancedListView>
+    </Grid>
+</Page>

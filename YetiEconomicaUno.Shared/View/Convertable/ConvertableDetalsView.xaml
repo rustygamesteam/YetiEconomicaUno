@@ -1,0 +1,35 @@
+﻿<UserControl
+    x:Class="YetiEconomicaUno.View.Convertable.ConvertableDetalsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.Convertable"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:userControls="using:YetiEconomy.Controls" 
+    xmlns:dataCore="using:RustyDTO.Interfaces" xmlns:resourceControls="using:YetiEconomicaUno.Controls.Resources"
+    mc:Ignorable="d">
+    <userControls:AdvancedListView Header="Exchanges" 
+                                   x:Name="AdvancedList"
+                                   VisibleAddPanel="Collapsed">
+        <userControls:AdvancedListView.ItemTemplate>
+            <DataTemplate x:DataType="dataCore:IRustyEntity">
+                <local:ExchangeView ViewModel="{x:Bind}" />
+            </DataTemplate>
+        </userControls:AdvancedListView.ItemTemplate>
+        <userControls:AdvancedListView.RightPanel>
+            <AppBarButton Icon="Add" Label="Add">
+                <AppBarButton.Flyout>
+                    <resourceControls:SelectResourceFlyout x:Name="Flyout"
+                                                           InvokeItemEvent="{x:Bind SelectResourceFlyout_OnItemInvoked}"
+                                                           Height="360"
+                                                           MinWidth="240"/>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+        </userControls:AdvancedListView.RightPanel>
+        <userControls:AdvancedListView.RightSelectedPanel>
+            <AppBarButton Icon="Remove" Label="Remove" x:Name="RemoveBtn" 
+                          IsEnabled="False"
+                          Click="{x:Bind RemoveExchagne_OnClicked}" />
+        </userControls:AdvancedListView.RightSelectedPanel>
+    </userControls:AdvancedListView>
+</UserControl>

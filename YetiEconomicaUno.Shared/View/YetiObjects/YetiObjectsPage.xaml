@@ -1,0 +1,98 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.YetiObjects.YetiObjectsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+    xmlns:dataCore="using:RustyDTO.Interfaces" 
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <DataTemplate x:Key="DataTemplateResourceSelector">
+            <Grid ColumnSpacing="5" Margin="0, 8, 0, 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="80" />
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Column="0" 
+                         Loaded="NewName_OnLoaded" 
+                         HorizontalAlignment="Stretch"/>
+                <ComboBox Grid.Column="1" 
+                         Width="80"
+                         Loaded="NewType_OnLoaded" />
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0"
+                    Height="45"
+                    HorizontalAlignment="Stretch">
+            <Grid.Background>
+                <SolidColorBrush Color="{ThemeResource SystemAltMediumHighColor}"
+                                 Opacity="0.5"/>
+            </Grid.Background>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <MenuBar>
+	            <MenuBarItem Title="Graph">
+                    <MenuFlyoutItem Text="Show by dependents" Click="ShowGraphByDependents_OnClick"/>
+                    <MenuFlyoutItem Text="Show by product" Click="ShowGraphByProduct_OnClick"/>
+	            </MenuBarItem>
+            </MenuBar>
+            <StackPanel Grid.Column="1"
+                        Spacing="5"
+                        Orientation="Horizontal">
+	            <AppBarButton Icon="Refresh" LabelPosition="Collapsed" Click="{x:Bind RefrashView}" Width="50" Margin="0, 0, -5, 0" />
+                <AppBarSeparator />
+                <SymbolIcon Symbol="Find" Margin="5, 0" />
+                <TextBox x:Name="SearchBox"
+                         VerticalAlignment="Center"
+                         Width="200"
+                         Margin="0, 0, 10, 0"/>
+            </StackPanel>
+        </Grid>
+
+        <controls:ListDetailsView  Grid.Row="1"
+            x:Name="DetailsView"
+            CompactModeThresholdWidth="0"
+            ListPaneBackground="{ThemeResource SystemControlBackgroundAltMediumLowBrush}"
+            ListHeader="Objects">
+            <controls:ListDetailsView.ListHeaderTemplate>
+                <DataTemplate>
+                    <GridViewHeaderItem>
+                        <TextBlock Text="{Binding}" />
+                    </GridViewHeaderItem>
+                </DataTemplate>
+            </controls:ListDetailsView.ListHeaderTemplate>
+            <controls:ListDetailsView.ItemTemplate>
+                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                    <local:YetiObjectInfo ViewModel="{x:Bind}" />
+                </DataTemplate>
+            </controls:ListDetailsView.ItemTemplate>
+            <controls:ListDetailsView.DetailsTemplate>
+                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                    <local:YetiObjectDetalInfo Name="Detals" ViewModel="{x:Bind}" />
+                </DataTemplate>
+            </controls:ListDetailsView.DetailsTemplate>
+            <controls:ListDetailsView.ListCommandBar>
+                <CommandBar 
+                    OverflowButtonVisibility="Collapsed"
+                    IsDynamicOverflowEnabled="False"
+                    HorizontalContentAlignment="Stretch"
+                    ContentTemplate="{StaticResource DataTemplateResourceSelector}">
+                    <AppBarButton x:Name="AddReceiptBtn" Icon="Add" Label="Add" Click="{x:Bind Add_OnClicked}"/>
+                </CommandBar>
+            </controls:ListDetailsView.ListCommandBar>
+
+        </controls:ListDetailsView>
+    </Grid>
+</Page>

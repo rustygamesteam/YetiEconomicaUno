@@ -1,0 +1,38 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno"
+    xmlns:vm="using:YetiEconomicaUno.ViewModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:rxui="using:ReactiveUI"
+    mc:Ignorable="d"    
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <NavigationView IsSettingsVisible="False"
+                    IsPaneToggleButtonVisible="False"
+                    SelectionChanged="NavView_OnSelected"
+                    IsBackButtonVisible="Collapsed">
+        <NavigationView.PaneHeader>
+            <TextBlock  Margin="10, 20"
+                        Text="YETI Economica" />
+        </NavigationView.PaneHeader>
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="Resources" Tag="Resources" IsSelected="true" />
+            <NavigationViewItem Content="Crafts" Tag="Crafts" />
+            <NavigationViewItem Content="Convertable" Tag="Convertable" />
+            <NavigationViewItem Content="Plants" Tag="Plants" />
+            <NavigationViewItem Content="Plant obstacles" Tag="PlantObstacles" /> 
+            <NavigationViewItem Content="Mine configs" Tag="MineConfigs" />
+            <NavigationViewItem Content="Yeti objects" Tag="YetiObjects" />
+            <NavigationViewItem Content="Calculate balance" Tag="CalculateBalance" />
+        </NavigationView.MenuItems>
+
+        <rxui:RoutedViewHost x:Name="RoutedViewHost"
+                             Router="{x:Bind Router}"
+                             HorizontalContentAlignment="Stretch"
+                             VerticalContentAlignment="Stretch">
+        </rxui:RoutedViewHost>
+    </NavigationView>
+</Page>

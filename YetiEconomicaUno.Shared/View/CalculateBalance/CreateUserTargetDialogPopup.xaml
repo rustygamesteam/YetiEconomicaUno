@@ -1,0 +1,107 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.CalculateBalance.CreateUserTargetDialogPopup"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.CalculateBalance"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
+    xmlns:resources="using:YetiEconomicaUno.Controls.Resources" 
+    xmlns:builds="using:YetiEconomicaUno.View.YetiObjects"
+    MinWidth="420"
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ComboBox x:Name="TypeComboBox" 
+                  SelectedIndex="0"
+                  HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                  Header="Type">
+            <x:String>Build/Tech/PVE</x:String>
+            <x:String>Craft</x:String>
+            <x:String>Plants farm</x:String>
+	        <x:String>Plants cells expansion</x:String>
+            <x:String>Convert resource</x:String>
+            <x:String>Upgrade tool</x:String>
+            <x:String>Gift resources</x:String>
+            <x:String>Recycle resources</x:String>
+        </ComboBox>
+        <controls:SwitchPresenter x:Name="SwitchPresenter" 
+                                  Grid.Row="1" Value="{Binding SelectedItem, ElementName=TypeComboBox}">
+            <controls:Case Value="Build/Tech/PVE">
+                <builds:YetiObjectSelector x:Name="BuildOrTechSelector" 
+                                           HorizontalAlignment="Left"
+                                           Header="Target"
+                                           Mask="RequiredInDependencies"
+                                           Loaded="YetiObjectSelector_Loaded" />
+            </controls:Case>
+            <controls:Case Value="Craft">
+                <StackPanel Spacing="10">
+                    <resources:ResourceWithCount Grid.Column="0"
+                                                 x:Name="CraftBox"
+                                                 Loaded="CraftResourceBox_Loaded"
+                                                 Header="Resource"/>
+                    <ListView x:Name="CraftPriceBox"    
+                              SelectionMode="None"
+                              Header="GetPrice" HeaderTemplate="{StaticResource SmallHeaderDataTemplate}" />
+                </StackPanel>
+            </controls:Case>
+            <controls:Case Value="Gift resources">
+                <resources:ResourceStackListView ItemsSource="{x:Bind _giftExchanges}" />
+            </controls:Case>
+            <controls:Case Value="Recycle resources">
+                <resources:ResourceStackListView ItemsSource="{x:Bind _recycleExchanges}" />
+            </controls:Case>
+            <controls:Case Value="Plants farm">
+                <resources:ResourceStackListView Loaded="FarmPlantList_Loaded"
+                                                 x:Name="FarmPlantList" 
+                                                 ItemsSource="{x:Bind _plantExchanges}" />
+            </controls:Case>
+            <controls:Case Value="Plants cells expansion">
+                <TextBlock x:Name="PlantCellsExpansionInfo" Loaded="PlantCellsExpainsion_OnLoad" />
+            </controls:Case>
+            <controls:Case Value="Convert resource">
+                <Grid ColumnSpacing="10"
+                      RowSpacing="10"
+                      Loaded="ConvertArea_Loaded">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <builds:YetiObjectSelector Grid.Column="0" Grid.Row="0"
+                                       x:Name="ConvertToBox"
+                                       Mask="Resources"
+                                       Header="To"/>
+                    <NumberBox Grid.Column="1" Grid.Row="0"
+                               x:Name="ConvertToCountBox"
+                               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                               Header="Count"/>
+                    <builds:YetiObjectSelector Grid.Column="2" Grid.Row="0"
+                                               x:Name="ConvertFromBox" 
+                                               Mask="Resources"
+                                               Header="From" />
+
+                    <ListView Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
+                              x:Name="ConvertPriceBox"
+                              SelectionMode="None"
+                              Header="Price" HeaderTemplate="{StaticResource SmallHeaderDataTemplate}" />
+                </Grid>
+            </controls:Case>
+            <controls:Case Value="Upgrade tool">
+                <builds:YetiObjectSelector x:Name="ToolSelector" 
+                                           HorizontalAlignment="Left"
+                                           Header="Tool"
+                                           Mask="Tools"
+                                           Loaded="YetiObjectSelector_Loaded" />
+            </controls:Case>
+        </controls:SwitchPresenter>
+    </Grid>
+</Page>

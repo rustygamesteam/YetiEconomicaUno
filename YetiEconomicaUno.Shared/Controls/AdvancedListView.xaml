@@ -1,0 +1,96 @@
+﻿<UserControl
+    x:Class="YetiEconomy.Controls.AdvancedListView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomy.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    Unloaded="UserControl_Unloaded"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid ColumnSpacing="8" Margin="5" RowSpacing="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <GridViewHeaderItem HorizontalContentAlignment="Stretch">
+            <Grid ColumnSpacing="10" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ContentPresenter VerticalContentAlignment="Center"
+                                   Content="{x:Bind HeaderActionElement}"
+                                   Visibility="{x:Bind HeaderActionElementVisible}" />
+                <TextBlock Grid.Column="1" Text="{x:Bind Header}" />
+                <ContentPresenter Grid.Column="2" VerticalContentAlignment="Center"
+                                  HorizontalAlignment="Right"
+                                   Content="{x:Bind HeaderRightPanel}"
+                                   Visibility="{x:Bind HeaderRightPanelVisible}" />
+            </Grid>
+        </GridViewHeaderItem>
+        <ListView Grid.Row="1" Grid.Column="0"
+                  SelectedItem="{x:Bind SelectedItem, Mode=TwoWay}"
+                   x:Name="ListView" ItemsSource="{x:Bind Items, Mode=OneWay}" ItemTemplate="{x:Bind ItemTemplate}" SelectionMode="Single">
+            <ListView.Resources>
+                <ResourceDictionary Source="ms-appx:///Microsoft.UI.Xaml/DensityStyles/Compact.xaml" />
+            </ListView.Resources>
+        </ListView>
+
+        <StackPanel Grid.Row="1" Grid.Column="1"
+                     Orientation="Vertical"
+                     VerticalAlignment="Top"
+                     Padding="0, 5, 0, 7"
+                     Margin="0, -5, -17, 0"
+                     CornerRadius="7" >
+            <StackPanel.RenderTransform>
+                <ScaleTransform ScaleX="0.7" ScaleY="0.7"/>
+            </StackPanel.RenderTransform>
+            <StackPanel.Background>
+                <SolidColorBrush 
+                    Color="{ThemeResource SystemBaseHighColor}"
+                    Opacity="0.1"/>
+            </StackPanel.Background>
+            <ItemsControl
+                          ItemsSource="{x:Bind RightPanel}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <MenuFlyoutSeparator Padding="5, 0" Visibility="{x:Bind RightPanelSeparatorVisible}" />
+            <ItemsControl
+                          IsEnabled="{x:Bind IsRightSelectedPanelEnable, Mode=OneWay}"
+                          ItemsSource="{x:Bind RightSelectedPanel}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StackPanel>
+
+        <Grid Grid.Row="2" Grid.Column="0"
+              Visibility="{x:Bind VisibleAddPanel, Mode=OneWay}"
+              VerticalAlignment="Center"
+              ColumnSpacing="10"
+              HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ContentPresenter Content="{x:Bind NewItem, Mode=OneWay}"
+                              HorizontalContentAlignment="Stretch"/>
+            <Button Grid.Column="1" VerticalAlignment="Bottom" Click="{x:Bind OnAddClicked}">
+                <SymbolIcon Symbol="Add"/>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

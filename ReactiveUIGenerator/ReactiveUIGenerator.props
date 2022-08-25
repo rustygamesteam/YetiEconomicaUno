@@ -1,0 +1,28 @@
+<Project>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ReactiveUIGenerator_DebuggerBreak"/>
+    <CompilerVisibleProperty Include="ReactiveUIGenerator_DefineConstants"/>
+    <CompilerVisibleProperty Include="UseWinUI"/>
+    <CompilerVisibleProperty Include="BuildingProject" />
+    <CompilerVisibleProperty Include="DesignTimeBuild" />
+  </ItemGroup>
+
+  <Target Name="CreateDefineConstants" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun;GenerateMSBuildEditorConfigFileCore">
+
+    <PropertyGroup>
+      <ReactiveUIGenerator_DefineConstants>$(DefineConstants.Replace(';',','))</ReactiveUIGenerator_DefineConstants>
+    </PropertyGroup>
+
+  </Target>
+
+  <PropertyGroup>
+    <ReactiveUIGenerator_EmbedAttributes>false</ReactiveUIGenerator_EmbedAttributes>
+    <ReactiveUIGenerator_EmbeddedAttributesVisible>true</ReactiveUIGenerator_EmbeddedAttributesVisible>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(ReactiveUIGenerator_EmbedAttributes)">
+    <Compile Include="$(MSBuildThisFileDirectory)*.cs" Visible="$(ReactiveUIGenerator_EmbeddedAttributesVisible)" />
+  </ItemGroup>
+  
+</Project>

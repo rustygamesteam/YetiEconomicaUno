@@ -1,0 +1,29 @@
+﻿<UserControl
+    x:Class="YetiEconomicaUno.View.YetiObjects.YetiObjectInfo"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Margin="0, 5, 0, 10">
+	    <StackPanel.ContextFlyout>
+		    <CommandBarFlyout ShowMode="Transient">
+			    <CommandBarFlyout.SecondaryCommands>
+				    <AppBarButton Icon="Remove" Label="Remove" Click="Remove_OnClick" />
+			    </CommandBarFlyout.SecondaryCommands>
+		    </CommandBarFlyout>
+	    </StackPanel.ContextFlyout>
+        <TextBlock Text="{x:Bind ViewModel.DisplayName, Mode=OneWay}" 
+                   Style="{StaticResource SubtitleTextBlockStyle}"/>
+        <TextBlock Text="{x:Bind ViewModel.Index, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='Index: {0}'}" 
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+        <TextBlock Text="{x:Bind ViewModel.Type, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='Type: {0}'}" 
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+
+        <TextBlock x:Name="SpecialLine" 
+                   Visibility="Collapsed"
+                   Style="{StaticResource CaptionTextBlockStyle}"/>
+    </StackPanel>
+</UserControl>

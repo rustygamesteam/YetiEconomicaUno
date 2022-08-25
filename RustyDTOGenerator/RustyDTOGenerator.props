@@ -1,0 +1,27 @@
+﻿<Project>
+
+	<ItemGroup>
+		<CompilerVisibleProperty Include="RustyDTOGenerator_DebuggerBreak"/>
+		<CompilerVisibleProperty Include="RustyDTOGenerator_DefineConstants"/>
+		<CompilerVisibleProperty Include="BuildingProject" />
+		<CompilerVisibleProperty Include="DesignTimeBuild" />
+	</ItemGroup>
+
+	<Target Name="CreateDefineConstants" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun;GenerateMSBuildEditorConfigFileCore">
+
+		<PropertyGroup>
+			<RustyDTOGenerator_DefineConstants>$(DefineConstants.Replace(';',','))</RustyDTOGenerator_DefineConstants>
+		</PropertyGroup>
+
+	</Target>
+
+	<PropertyGroup>
+		<RustyDTOGenerator_EmbedAttributes>false</RustyDTOGenerator_EmbedAttributes>
+		<RustyDTOGenerator_EmbeddedAttributesVisible>true</RustyDTOGenerator_EmbeddedAttributesVisible>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(RustyDTOGenerator_EmbedAttributes)">
+		<Compile Include="$(MSBuildThisFileDirectory)*.cs" Visible="$(RustyDTOGenerator_EmbeddedAttributesVisible)" />
+	</ItemGroup>
+  
+</Project>

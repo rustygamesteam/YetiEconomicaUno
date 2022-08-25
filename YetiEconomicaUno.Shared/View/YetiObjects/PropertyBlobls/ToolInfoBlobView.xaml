@@ -1,0 +1,41 @@
+﻿<local:BaseBlobView
+    x:Class="YetiEconomicaUno.View.YetiObjects.PropertyBlobls.ToolInfoBlobView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:flyouts="using:YetiEconomicaUno.View.Flyouts"
+    mc:Ignorable="d">
+    <Button.ContextFlyout>
+        <flyouts:FlyoutWithBtn Label="Remove"
+	                           Icon="Remove"
+	                           Opened="Flyout_OnOpened" 
+	                           Closing="Flyout_OnClosing">
+            <StackPanel Orientation="Vertical">
+                <NumberBox x:Name="EfficiencyBox"
+			               Minimum="0.01" 
+			               Maximum="100"
+			               Value="{Binding Efficiency, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+			               ValidationMode="InvalidInputOverwritten"
+			               Header="Efficiency"
+			               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"/>
+                <NumberBox x:Name="StrengthBox"
+			               Minimum="1" 
+			               Maximum="5000"
+			               Value="{Binding Strength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+			               ValidationMode="InvalidInputOverwritten"
+			               Header="Strength"
+			               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"/>
+                <NumberBox x:Name="RechargeBox"
+			               Minimum="1" 
+			               Maximum="10"
+			               Value="{Binding RechargeEvery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+			               ValidationMode="InvalidInputOverwritten"
+			               Header="Recharge every hours"
+			               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"/>
+            </StackPanel>
+        </flyouts:FlyoutWithBtn>
+    </Button.ContextFlyout>
+    <TextBlock x:Name="InfoBox" />
+</local:BaseBlobView>
