@@ -1,6 +1,7 @@
 ﻿using RustyDTO.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using YetiEconomicaCore.Database;
 
@@ -10,6 +11,7 @@ internal record struct ChankData
 {
     public ResourceStackRecord[] Wallet { get; }
     public KeyValuePair<ToolsEnum, ToolProgressInfo>[] Tools { get; }
+    public ImmutableHashSet<int> UserBag { get; }
 
     public DateTime Time { get; }
 
@@ -40,26 +42,27 @@ internal record struct ChankData
         Tools = Array.Empty<KeyValuePair<ToolsEnum, ToolProgressInfo>>();
     }
 
-    public ChankData(Dictionary<IRustyEntity, double> wallet, Dictionary<ToolsEnum, ToolProgressInfo> tools, DateTime time, int sessionIndex, int farmSize, (int x, int y) mineSize)
+    public ChankData(Dictionary<IRustyEntity, double> wallet, Dictionary<ToolsEnum, ToolProgressInfo> tools, HashSet<int> userBag, DateTime time, int sessionIndex, int farmSize, (int x, int y) mineSize)
     {
         Time = time;
         SessionIndex = sessionIndex;
 
         Wallet = wallet.Select(static pair => new ResourceStackRecord(pair.Key, pair.Value)).ToArray();
         Tools = tools.ToArray();
+        UserBag = userBag.ToImmutableHashSet();
 
         FarmCells = farmSize;
         MineSize = mineSize;
     }
 
-    public ChankData(UserData userData) : this(userData.Wallet, userData.Tools, userData.Time, userData.SessionIndex, userData.FarmCells, userData.MineSize)
+    public ChankData(UserData userData) : this(userData.Wallet, userData.Tools, userData.UserBag, userData.Time, userData.SessionIndex, userData.FarmCells, userData.MineSize)
     {
 
     }
 
     internal UserData ToUserData()
     {
-        return new UserData(Time, SessionIndex, FarmCells, MineSize, CalculateBalanceViewModel.TakeWallet(GetWallet()), GetTools().ToDictionary(static pair => pair.Key, static pair => pair.Value));
+        return new UserData(Time, SessionIndex, FarmCells, MineSize, CalculateBalanceViewModel.TakeWallet(GetWallet()), GetTools().ToDictionary(static pair => pair.Key, static pair => pair.Value), UserBag.ToHashSet());
     }
 
 }

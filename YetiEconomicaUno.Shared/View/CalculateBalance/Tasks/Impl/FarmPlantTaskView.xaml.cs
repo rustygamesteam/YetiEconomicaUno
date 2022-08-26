@@ -1,24 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using ReactiveUIGenerator;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
-using YetiEconomicaUno.Controls.Resources;
-using YetiEconomicaCore;
 using ReactiveUI;
 using YetiEconomicaCore.Services;
+using RustyDTO.Interfaces;
+using RustyDTO.PropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -26,17 +14,57 @@ using YetiEconomicaCore.Services;
 namespace YetiEconomicaUno.View.CalculateBalance.Tasks;
 
 [ViewFor<FarmPlantTask>]
-public sealed partial class FarmPlantTaskView : UserControl
+public sealed partial class FarmPlantTaskView : UserControl, IDisposable
 {
+    private CompositeDisposable _taskDisposable;
+
     public FarmPlantTaskView()
     {
         this.InitializeComponent();
 
         this.WhenActivated(disposables =>
         {
-            ResourcesList.Filter = PlantsService.Instance.IsPlant;
+            ResourcesList.Filter = CanPlanting;
+
+            this.WhenAnyValue(static view => view.ViewModel)
+                .Subscribe(OnInjectTask)
+                .DisposeWith(disposables);
+
             Disposable.Create(ResourcesList, static view => view.Filter = null)
                 .DisposeWith(disposables);
+
+            this.DisposeWith(disposables);
         });
+    }
+
+    private void OnInjectTask(FarmPlantTask task)
+    {
+        _taskDisposable?.Dispose();
+        _taskDisposable = new CompositeDisposable();
+
+        task.EvaluteObservable.Subscribe(args =>
+        {
+            ResourcesList.Filter = CanPlanting;
+        }).DisposeWith(_taskDisposable);
+    }
+
+    private bool CanPlanting(IRustyEntity resource)
+    {
+        if (PlantsService.Instance.TryGetPlant(resource, out var plant))
+        {
+            var dependents = plant.GetUnsafe<IHasDependents>();
+            if (dependents.Required is null && dependents.VisibleAfter is null)
+                return true;
+
+            ViewModel.HasInBag(plant);
+        }
+
+        return false;
+    }
+
+    public void Dispose()
+    {
+        _taskDisposable?.Dispose();
+        _taskDisposable = null;
     }
 }

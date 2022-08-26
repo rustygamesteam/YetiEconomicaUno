@@ -6,6 +6,7 @@ using ReactiveUI.Fody.Helpers;
 using RustyDTO.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -29,6 +30,8 @@ public class CalculateBalanceViewModel : BaseViewModel
     public static DateTime BeginTime { get; } = new DateTime().AddHours(CalculateBalanceService.Instance.Sessions[0].Hour);
     public static Dictionary<IRustyEntity, double> Wallet = new();
     public static Dictionary<ToolsEnum, ToolProgressInfo> ToolCache = new();
+    public static HashSet<int> UserBag = new(64);
+
     private static readonly UserDataDump _emptyDump;
 
     private bool _isRecalculate;
@@ -37,6 +40,8 @@ public class CalculateBalanceViewModel : BaseViewModel
 
     public ReadOnlyObservableCollection<ProgressTask> Progress => _progress;
 
+    [Reactive]
+    public UserDataDump PreSelectDataDump { get; private set; }
     [Reactive]
     public UserDataDump SelectDataDump { get; private set; }
     [Reactive]
@@ -70,6 +75,7 @@ public class CalculateBalanceViewModel : BaseViewModel
 
         _emptyDump = new UserDataDump(Wallet.ToDictionary(static pair => pair.Key, static pair => pair.Value),
             ToolCache.ToDictionary(static pair => pair.Key, static pair => pair.Value),
+            UserBag.ToImmutableHashSet(),
             PlantsService.Instance.DefaultCellsCount, CalculateMinigamesService.Instance.DefaultMineCells,
             BeginTime, BeginTime);
     }
@@ -78,6 +84,7 @@ public class CalculateBalanceViewModel : BaseViewModel
     {
         Wallet.Clear();
         ToolCache.Clear();
+        UserBag.Clear();
 
         foreach (var toolProgressInfo in _emptyDump.Tools)
             ToolCache.Add(toolProgressInfo.Key, toolProgressInfo.Value);
@@ -126,7 +133,7 @@ public class CalculateBalanceViewModel : BaseViewModel
             {
                 Array.Resize(ref _chanks, chunkCount);
                 for (int i = oldCount; i < chunkCount; i++)
-                    _chanks[i] = new ChankData(Wallet, ToolCache, _emptyDump.StartTime, 0, _emptyDump.FarmCells, _emptyDump.MineSize);
+                    _chanks[i] = new ChankData(Wallet, ToolCache, UserBag, _emptyDump.StartTime, 0, _emptyDump.FarmCells, _emptyDump.MineSize);
             }
         }
     }
@@ -170,6 +177,7 @@ public class CalculateBalanceViewModel : BaseViewModel
 
             if (Progress.Count == 0)
             {
+                PreSelectDataDump = _emptyDump;
                 SelectDataDump = _emptyDump;
                 LastDataDump = _emptyDump;
             }
@@ -262,6 +270,18 @@ public class CalculateBalanceViewModel : BaseViewModel
                 var entity = ((CreateYetiObjectTask)up).Target;
                 return IsRequestEntity(entity, build);
             }
+            else if (down.Type is ProgressType.FarmPlant)
+            {
+                foreach (var resourceStack in ((FarmPlantTask)down).Targets)
+                {
+                    if (PlantsService.Instance.TryGetPlant(resourceStack.Resource, out var plant) && plant.TryGetProperty(out IHasDependents dependents))
+                    {
+                        if (build == dependents.Required || build == dependents.VisibleAfter)
+                            return false;
+                    }
+                }
+                return true;
+            }
         }
         return true;
     }
@@ -294,10 +314,20 @@ public class CalculateBalanceViewModel : BaseViewModel
         WalletForSelectedItem.Clear();
         if (index == -1)
         {
+            PreSelectDataDump = _emptyDump;
             SelectDataDump = _emptyDump;
             return;
         }
 
+        bool preSelectResolve = false;
+        var preSelect = index - 1;
+        if (preSelect == -1)
+        {
+            preSelectResolve = true;
+            PreSelectDataDump = _emptyDump;
+        }
+
+        var preSelectChunkIndex = preSelect / ChunkSize;
         var chunkIndex = index / ChunkSize;
 
         static void WriteResource(ICollection<ResourceStackRecord> list, IRustyEntity resource, double count)
@@ -308,11 +338,16 @@ public class CalculateBalanceViewModel : BaseViewModel
             list.Add(new ResourceStackRecord(resource, count));
         }
 
+        if (preSelect % ChunkSize == 0)
+        {
+            preSelectResolve = true;
+            PreSelectDataDump = _chanks[preSelectChunkIndex].ToUserData().GetDump();
+        }
+
         if (index % ChunkSize == 0)
         {
             foreach (var exhcange in _chanks[chunkIndex].Wallet)
                 WriteResource(WalletForSelectedItem, exhcange.Resource, exhcange.Value);
-
 
             SelectDataDump = _chanks[chunkIndex].ToUserData().GetDump();
             TimeResult = (int)(_chanks[chunkIndex].Time - BeginTime).TotalSeconds;
@@ -320,10 +355,24 @@ public class CalculateBalanceViewModel : BaseViewModel
         else
         {
             var user = _chanks[chunkIndex].ToUserData();
-            for (int i = chunkIndex * ChunkSize + 1, iMax = Math.Min(index + 1, _progress.Count); i < iMax; i++)
-                _progress[i].Evalute(ref user);
 
-            SelectDataDump = user.GetDump();
+            if (preSelectResolve is false)
+            {
+                var target = Math.Min(index, _progress.Count);
+                for (int i = chunkIndex * ChunkSize + 1; i < target; i++)
+                    _progress[i].Evalute(ref user);
+                PreSelectDataDump = user.GetDump();
+                for (int i = target, iMax = Math.Min(target + 1, _progress.Count); i < iMax; i++)
+                    _progress[i].Evalute(ref user);
+                SelectDataDump = user.GetDump();
+            }
+            else
+            {
+                for (int i = chunkIndex * ChunkSize + 1, iMax = Math.Min(index + 1, _progress.Count); i < iMax; i++)
+                    _progress[i].Evalute(ref user);
+                SelectDataDump = user.GetDump();
+            }
+
 
             foreach (var pair in Wallet)
                 WriteResource(WalletForSelectedItem, pair.Key, pair.Value);

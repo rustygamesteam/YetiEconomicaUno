@@ -33,6 +33,12 @@ public class CreateYetiObjectTask : ProgressTask
         if (updateStatistics)
             Statistics.Clear();
 
+        if (Target.HasSpecialMask(EntitySpecialMask.IsInstance))
+        {
+            userData.UserBag.Add(Target.Index);
+            if (Target.TryGetProperty(out IHasOwner ownerInfo) && ownerInfo.Owner.HasSpecialMask(EntitySpecialMask.IsInstance))
+                userData.UserBag.Add(ownerInfo.Owner.Index);
+        }
 
         foreach (var exchange in Price)
             userData.Wallet.PayWallet(exchange);

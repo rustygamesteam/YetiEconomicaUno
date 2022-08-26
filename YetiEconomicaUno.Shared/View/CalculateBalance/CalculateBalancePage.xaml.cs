@@ -89,8 +89,7 @@ public sealed partial class CalculateBalancePage : Page, IDisposable
 
         Service.RemoveSessionTime((SessionTimeRecord)SessionList.SelectedValue);
     }
-
-    private static readonly HashSet<int> _progressIndexes = new(50);
+    
     private async void OnCreateDialog(int toIndex)
     {
         ContentDialog dialog = new ContentDialog();
@@ -98,23 +97,11 @@ public sealed partial class CalculateBalancePage : Page, IDisposable
 
         var isLast = toIndex == ViewModel.Progress.Count;
         var progress = ViewModel.Progress.Take(toIndex).Where(static x => x.Type == ProgressType.YetiObject);
-        var dump = isLast ? ViewModel.LastDataDump : ViewModel.SelectDataDump;
+        var dump = isLast ? ViewModel.LastDataDump : ViewModel.PreSelectDataDump;
 
         var service = RustyEntityService.Instance;
-        var hashSet = _progressIndexes;
-        hashSet.Clear();
 
-        foreach (CreateYetiObjectTask task in progress)
-        {
-            hashSet.Add(task.Index);
-            if (task.Target.TryGetProperty<IHasOwner>(out var owner))
-                hashSet.Add(owner.Owner.Index);
-        }
-
-        foreach (var progressInfo in dump.Tools.Values)
-            hashSet.Add(progressInfo.Index);
-
-        var content = new CreateUserTargetDialogPopup(hashSet, dump);
+        var content = new CreateUserTargetDialogPopup(dump);
         dialog.Content = content;
         dialog.Title = "Create user target";
         dialog.PrimaryButtonText = "Create";

@@ -9,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using System.Collections.Specialized;
+using Microsoft.UI.Xaml.Data;
 using YetiEconomicaUno.View.YetiObjects;
 using RustyDTO.Interfaces;
 
@@ -38,11 +39,9 @@ namespace YetiEconomicaUno.View
                 Observable.FromEventPattern(this.ViewModel.ItemSource, nameof(INotifyCollectionChanged.CollectionChanged))
                         .Subscribe(_ => _onFilter.OnNext(_onFilter.Value))
                         .DisposeWith(disposable);
-
-                this.OneWayBind(ViewModel, static vm => vm.ItemSource, static view => view.DetailsView.ItemsSource)
-                    .DisposeWith(disposable);
-
+                
                 this.Bind(ViewModel, static vm => vm.SearchMask, static view => view.SearchBox.Text).DisposeWith(disposable);
+                this.OneWayBind(ViewModel, static vm => vm.ItemSource, static view => view.DetailsView.ItemsSource).DisposeWith(disposable);
 
                 _disposable = disposable;
             });
@@ -56,13 +55,25 @@ namespace YetiEconomicaUno.View
         private void ResourceSelector_OnLoaded(object sender, RoutedEventArgs e)
         {
             var selector = (YetiObjectSelector)sender;
-            selector.WhenAnyValue(static selector => selector.SelectedValue)
-                .BindTo(ViewModel, static vm => vm.NewConvrtable)
-                .DisposeWith(_disposable);
+            selector.Loaded -= ResourceSelector_OnLoaded;
+
+            selector.SetBinding(YetiObjectSelector.SelectedValueProperty, new Binding
+            {
+                Source = ViewModel,
+                Path = new PropertyPath(nameof(ViewModel.NewConvrtable)),
+                Mode = BindingMode.TwoWay
+            });
 
             selector.Filter = _onFilter;
 
-            selector.Loaded -= ResourceSelector_OnLoaded;
+            if (_disposable != null)
+            {
+                Disposable.Create(selector, static selector => {
+                    selector.ClearValue(YetiObjectSelector.SelectedValueProperty);
+                    selector.Filter = null;
+                }).DisposeWith(_disposable);
+            }
+
         }
 
         private void AddItem_OnClicked()

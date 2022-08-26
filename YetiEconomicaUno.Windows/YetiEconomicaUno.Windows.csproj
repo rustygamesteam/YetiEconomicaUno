@@ -16,7 +16,7 @@
 		<StartupObject>YetiEconomicaUno.Program</StartupObject>
 		<AutoGenerateBindingRedirects>False</AutoGenerateBindingRedirects>
 		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
-		
+
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>

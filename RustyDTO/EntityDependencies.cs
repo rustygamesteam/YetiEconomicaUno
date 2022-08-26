@@ -88,7 +88,7 @@ public static partial class EntityDependencies
         //Plant
         builder.For(RustyEntityType.Plant)
             .Mask(taskMask)
-            .Required(EntityPropertyType.LongExecution, EntityPropertyType.HasSingleReward);
+            .Required(EntityPropertyType.LongExecution, EntityPropertyType.HasSingleReward, EntityPropertyType.HasDependents);
 
 
         //Exchage

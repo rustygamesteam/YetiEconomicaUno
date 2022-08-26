@@ -4,6 +4,7 @@ using ReactiveUI;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
@@ -70,7 +71,11 @@ public class FarmPlantTask : ProgressTask, IDisposable
         if (updateStatistics)
             Statistics.Clear();
 
+        CopyBag(ref userData);
+
         FarmResources(ref userData, Targets.Select(static x => (ResourceStackRecord)x), updateStatistics ? Statistics : null);
+
+        EvaluteObservable.OnNext(Unit.Default);
     }
 
     internal override bool OnYetiObjectRemove(IRustyEntity rustyEntity)

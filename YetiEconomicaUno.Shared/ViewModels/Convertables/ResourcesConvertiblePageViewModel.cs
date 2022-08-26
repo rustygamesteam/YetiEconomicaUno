@@ -17,10 +17,10 @@ public class ResourcesConvertiblePageViewModel : BaseViewModel
     private static ConvertablesService Service { get; } = ConvertablesService.Instance;
 
     [Reactive]
-    public IRustyEntity NewConvrtable { get; set; }
+    public string SearchMask { get; set; }
 
     [Reactive]
-    public string SearchMask { get; set; }
+    public IRustyEntity NewConvrtable { get; set; }
 
     internal ObservableCollectionExtended<ConvertableViewModel> ItemSource { get; } = new();
 
@@ -35,9 +35,15 @@ public class ResourcesConvertiblePageViewModel : BaseViewModel
             .ThenBy(static resource => resource.GetUnsafe<IHasOwner>().Tear)
             .ThenBy(static resource => resource.DisplayName, StringComparer.OrdinalIgnoreCase);
 
-        Service.ExchangesTo.AsObservableChangeSet()
+        var filter = this
+            .WhenValueChanged(static x => x.SearchMask)
+            .Select(_ => (Func<IRustyEntity, bool>)OnFilter);
+
+        Service.ExchangesTo.ToObservableChangeSet()
             .Sort(sort)
-            .Transform(entity => new ConvertableViewModel(entity))
+            .Filter(filter)
+            .Transform(static entity => new ConvertableViewModel(entity))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Bind(ItemSource)
             .Subscribe()
             .DisposeWith(disposable);
@@ -51,6 +57,6 @@ public class ResourcesConvertiblePageViewModel : BaseViewModel
 
     private bool OnFilter(IRustyEntity data)
     {
-        return string.IsNullOrWhiteSpace(SearchMask) || data.GetUnsafe<ILinkTo>().Entity.FullName.Contains(SearchMask, StringComparison.OrdinalIgnoreCase);
+        return string.IsNullOrWhiteSpace(SearchMask) || data.FullName.Contains(SearchMask, StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -52,6 +52,7 @@ public sealed partial class PlantsPage : Page
     private void ResourceSelector_OnLoaded(object sender, RoutedEventArgs e)
     {
         var selector = (YetiObjectSelector)sender;
+        selector.Loaded -= ResourceSelector_OnLoaded;
 
         selector.SetBinding(YetiObjectSelector.SelectedValueProperty, new Binding
         {
@@ -61,9 +62,8 @@ public sealed partial class PlantsPage : Page
         });
 
         selector.Filter = _onFilter;
-        selector.Loaded -= ResourceSelector_OnLoaded;
 
-        Disposable.Create(selector, selector => {
+        Disposable.Create(selector, static selector => {
             selector.ClearValue(YetiObjectSelector.SelectedValueProperty);
             selector.Filter = null;
         }).DisposeWith(_disposable);

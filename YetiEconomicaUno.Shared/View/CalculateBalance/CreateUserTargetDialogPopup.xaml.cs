@@ -40,14 +40,12 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
     private ObservableCollectionExtended<ResourceStack> _recycleExchanges = new();
     private ObservableCollectionExtended<ResourceStack> _plantExchanges = new();
 
-    private readonly HashSet<int> _yetiObjectsHashSet;
     private readonly UserDataDump UserDataDump;
     private IReadOnlyList<IRustyEntity> _plantObstacles;
     private int _nextPlantObstable = -1;
 
-    public CreateUserTargetDialogPopup(HashSet<int> yetiObjectsHashSet, UserDataDump userDataDump)
+    public CreateUserTargetDialogPopup(UserDataDump userDataDump)
     {
-        _yetiObjectsHashSet = yetiObjectsHashSet;
         UserDataDump = userDataDump;
 
         this.InitializeComponent();
@@ -63,7 +61,7 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
             Result.Gift => new ResourceGiftTask(_giftExchanges),
             Result.Recycle => new RecycleResourcesTask(_recycleExchanges),
             Result.FarmPlants => new FarmPlantTask(_plantExchanges),
-            Result.UpgradeTool => new CreateYetiObjectTask(BuildOrTechSelector.SelectedValue.Index),
+            Result.UpgradeTool => new CreateYetiObjectTask(ToolSelector.SelectedValue.Index),
             Result.PlantCellsExpansion => new CreateYetiObjectTask(_plantObstacles[_nextPlantObstable].Index),
             _ => null,
         };
@@ -144,7 +142,7 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
             for (var index = 0; index < _plantObstacles.Count; index++)
             {
                 var obstacle = _plantObstacles[index];
-                if (_yetiObjectsHashSet.Contains(obstacle.Index))
+                if (UserDataDump.UserBag.Contains(obstacle.Index))
                     continue;
                 _nextPlantObstable = index;
                 break;
@@ -227,14 +225,22 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
 
     private void FarmPlantList_Loaded(object sender, RoutedEventArgs e)
     {
-        FarmPlantList.Filter = PlantsService.Instance.IsPlant;
+        FarmPlantList.Filter = CanPlanting;
+    }
+
+    private bool CanPlanting(IRustyEntity resource)
+    {
+        if (PlantsService.Instance.TryGetPlant(resource, out var plant))
+            return IsDependentsTest(plant);
+
+        return false;
     }
 
     private void YetiObjectSelector_Loaded(object sender, RoutedEventArgs e)
     {
         ((YetiObjectSelector)sender).Filter = Observable.Return<Func<IRustyEntity, bool>>(entity =>
         {
-            if (_yetiObjectsHashSet.Contains(entity.Index))
+            if (UserDataDump.UserBag.Contains(entity.Index))
                 return false;
             if (entity.Type is RustyEntityType.Tech && entity.TryGetProperty(out IInBuildProcess inBuild) && !HasEntity(inBuild.Build))
                 return false;
@@ -245,7 +251,7 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
 
     private bool HasEntity(IRustyEntity entity)
     {
-        return entity is null || _yetiObjectsHashSet.Contains(entity.Index);
+        return entity is null || UserDataDump.UserBag.Contains(entity.Index);
     }
 
     public void Dispose()

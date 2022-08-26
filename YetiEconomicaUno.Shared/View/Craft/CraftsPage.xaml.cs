@@ -62,7 +62,7 @@ namespace YetiEconomicaUno.View
 
             selector.Filter = _onFilter;
 
-            Disposable.Create(selector, selector => {
+            Disposable.Create(selector, static selector => {
                 selector.ClearValue(YetiObjectSelector.SelectedValueProperty);
                 selector.Filter = null;
             }).DisposeWith(_disposable);

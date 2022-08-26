@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Subjects;
 using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Experemental;
@@ -20,6 +22,9 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
 {
     protected static readonly Dictionary<IRustyEntity, double> PriceHelper = new();
 
+    [BsonIgnore]
+    public Subject<Unit> EvaluteObservable { get; } = new Subject<Unit>();
+ 
     #region IDatabaseOrderEntity
     private BsonValue _id;
 
@@ -30,6 +35,8 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
         _id = id;
     }
     #endregion
+
+    private HashSet<int> _bag;
 
     public record struct StatisticLine(StatisticInfo Type, int Value)
     {
@@ -56,6 +63,21 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
 
     [BsonIgnore]
     internal abstract IEnumerable<ResourceStackRecord> Price { get; }
+
+
+    public bool HasInBag(IRustyEntity entity)
+    {
+        return _bag?.Contains(entity.Index) ?? false;
+    }
+
+    protected void CopyBag(ref UserData userData)
+    {
+        _bag ??= new HashSet<int>(32);
+
+        _bag.Clear();
+        foreach (var index in userData.UserBag)
+            _bag.Add(index);
+    }
 
     public abstract void Evalute(ref UserData userData, bool updateStatistics = false);
 

@@ -1,4 +1,6 @@
-﻿#if REACTIVE
+﻿using RustyDTO.Interfaces;
+
+#if REACTIVE
 namespace RustyDTO;
 
 public enum EntityBuildKeys
@@ -24,6 +26,11 @@ public record EntityBuildOptions
     public static EntityBuildOptions CreateWithOwner(int index, int tear = 0)
     {
         return Create().Add(EntityBuildKeys.OwnerIndex, index).Add(EntityBuildKeys.Tear, tear);
+    }
+
+    public static EntityBuildOptions CreateWithEntity(IRustyEntity entity, int tear = 0)
+    {
+        return Create().Add(EntityBuildKeys.Entity, entity);
     }
 
     private EntityBuildOptions()

@@ -1,6 +1,8 @@
 ﻿using RustyDTO.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using YetiEconomicaUno.Services;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 
@@ -14,6 +16,8 @@ public ref struct UserData
     public Dictionary<IRustyEntity, double> Wallet { get; }
     public Dictionary<ToolsEnum, ToolProgressInfo> Tools { get; }
 
+    public HashSet<int> UserBag { get; }
+
     public int SessionIndex;
     public TimeSpan Offset = TimeSpan.Zero;
     public DateTime Time => Begin + Offset;
@@ -21,7 +25,7 @@ public ref struct UserData
     public int FarmCells { get; set; }
     public (int x, int y) MineSize { get; set; }
 
-    public UserData(DateTime begin, int session, int farmCells, (int x, int y) mineSize, Dictionary<IRustyEntity, double> wallet, Dictionary<ToolsEnum, ToolProgressInfo> tools)
+    public UserData(DateTime begin, int session, int farmCells, (int x, int y) mineSize, Dictionary<IRustyEntity, double> wallet, Dictionary<ToolsEnum, ToolProgressInfo> tools, HashSet<int> userBag)
     {
         Begin = begin;
         SessionIndex = session;
@@ -29,6 +33,7 @@ public ref struct UserData
         Tools = tools;
         FarmCells = farmCells;
         MineSize = mineSize;
+        UserBag = userBag;
     }
 
     public void Next()
@@ -92,10 +97,10 @@ public ref struct UserData
         }
     }
 
-    internal UserDataDump GetDump() => new UserDataDump(Wallet, Tools, FarmCells, MineSize, Begin, Time);
+    internal UserDataDump GetDump() => new UserDataDump(Wallet.ToImmutableDictionary(), Tools.ToImmutableDictionary(), UserBag.ToImmutableHashSet(), FarmCells, MineSize, Begin, Time);
 }
 
-public record struct UserDataDump(IReadOnlyDictionary<IRustyEntity, double> Wallet, IReadOnlyDictionary<ToolsEnum, ToolProgressInfo> Tools, int FarmCells, (int X, int Y) MineSize, DateTime StartTime, DateTime EndTime)
+public record struct UserDataDump(IReadOnlyDictionary<IRustyEntity, double> Wallet, IReadOnlyDictionary<ToolsEnum, ToolProgressInfo> Tools, IReadOnlySet<int> UserBag, int FarmCells, (int X, int Y) MineSize, DateTime StartTime, DateTime EndTime)
 {
     internal bool TryGetTool(ToolsEnum toolsEnum, out ToolProgressInfo toolInfo)
     {
