@@ -14,6 +14,7 @@ using System.Threading;
 using ReactiveUIGenerator;
 using RustyDTO;
 using RustyDTO.Interfaces;
+using YetiEconomicaCore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -78,7 +79,7 @@ public sealed partial class ResourceStackListView : UserControl, IDisposable
 
             InsertFlyout.Filter = _onItemsUpdated.Select(list => (Func<IRustyEntity, bool>)(resource =>
             {
-                var result = (Filter is null || Filter.Invoke(resource)) && list.Contains(resource.Index) is false;
+                var result = (Filter is null || Filter.Invoke(resource)) && list.Contains(resource.GetIndex()) is false;
                 return result;
             }));
 
@@ -100,14 +101,14 @@ public sealed partial class ResourceStackListView : UserControl, IDisposable
                 {
                     _filterIndexes.Clear();
                     foreach (var item in ItemsSource)
-                        _filterIndexes.Add(item.Resource.Index);
+                        _filterIndexes.Add(item.Resource.GetIndex());
                 }
                 break;
             case CollectionChange.ItemInserted:
                 lock (_filterIndexes)
                 {
                     if (sender[(int)@event.Index] is ResourceStack stack)
-                        _filterIndexes.Add(stack.Resource.Index);
+                        _filterIndexes.Add(stack.Resource.GetIndex());
                 }
                 break;
             case CollectionChange.ItemRemoved:
@@ -129,7 +130,7 @@ public sealed partial class ResourceStackListView : UserControl, IDisposable
 
         if (ItemsSource.Remove(item))
         {
-            _filterIndexes.Remove(item.Resource.Index);
+            _filterIndexes.Remove(item.Resource.GetIndex());
             _onItemsUpdated.OnNext(_filterIndexes);
         }
     }

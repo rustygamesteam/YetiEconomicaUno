@@ -4,7 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveUI;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -20,7 +20,7 @@ public sealed partial class FarmExpansionBlobView : BaseBlobView
 
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.FarmExpansion);
+            Initialize(ViewModel.Index, DescPropertyType.FarmExpansion);
 
             ViewModel.WhenAnyValue(static x => x.Count)
                 .Select(static count => $"Plant cells: {count}")

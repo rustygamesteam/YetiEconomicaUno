@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using ReactiveUI;
 using ReactiveUIGenerator;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -24,7 +24,7 @@ public sealed partial class DependentsBlobView : BaseBlobView
 
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.HasDependents);
+            Initialize(ViewModel.Index, DescPropertyType.HasDependents);
             _filter = new DeepFilter(ViewModel);
 
             ViewModel.WhenAnyValue(dependents => dependents.Required)
@@ -44,7 +44,7 @@ public sealed partial class DependentsBlobView : BaseBlobView
 
         private static bool OnFilterDeep(IHasDependents me, IRustyEntity other)
         {
-            if (me.Index == other.Index)
+            if (me.Index == other.ID.Index)
                 return false;
 
             if (other.TryGetProperty<IHasDependents>(out var otherDependents))

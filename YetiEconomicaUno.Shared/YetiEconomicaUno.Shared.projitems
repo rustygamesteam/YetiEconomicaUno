@@ -43,8 +43,14 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\BaseBlobView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\LinkGraph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Abstract\SingleNumberBlob.xaml.cs">
+      <DependentUpon>SingleNumberBlob.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\AttachPropertyBlobView.xaml.cs">
       <DependentUpon>AttachPropertyBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\CitySizeBlobView.xaml.cs">
+      <DependentUpon>CitySizeBlobView.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\DependentsBlobView.xaml.cs">
       <DependentUpon>DependentsBlobView.xaml</DependentUpon>
@@ -178,6 +184,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml.cs">
       <DependentUpon>FarmExpansionBlobView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\CraftingQueueBlobView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\PrestigeBlobView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\TakeSpaceBlob.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml.cs">
       <DependentUpon>InBuildBlobView.xaml</DependentUpon>
     </Compile>
@@ -192,6 +201,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml.cs">
       <DependentUpon>SpeedBootBlobView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SubGroupBlobView.xaml.cs">
+      <DependentUpon>SubGroupBlobView.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\TearBlobView.xaml.cs">
       <DependentUpon>TearBlobView.xaml</DependentUpon>
@@ -361,7 +373,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Abstract\SingleNumberBlob.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\AttachPropertyBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\CitySizeBlobView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -390,6 +410,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SubGroupBlobView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

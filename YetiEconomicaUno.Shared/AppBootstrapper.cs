@@ -2,20 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reflection;
 using LiteDB;
 using ReactiveUI;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using Splat;
 using YetiEconomicaCore;
 using YetiEconomicaCore.Database;
-using YetiEconomicaCore.Descriptions;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Extensions;
-using YetiEconomicaUno.Helpers;
 using YetiEconomicaUno.Services;
 using YetiEconomicaUno.View;
 using YetiEconomicaUno.View.CalculateBalance;
@@ -23,6 +20,7 @@ using YetiEconomicaUno.View.CalculateBalance.Tasks;
 using YetiEconomicaUno.View.Farm;
 using YetiEconomicaUno.View.YetiObjects;
 using YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
+using YetiEconomicaUno.View.YetiObjects.PropertyBlobls.Impls;
 using YetiEconomicaUno.ViewModels;
 using YetiEconomicaUno.ViewModels.CalculateBalance;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
@@ -46,7 +44,7 @@ public static class AppBootstrapper
 
         Locator.CurrentMutable.RegisterConstant(new DatabaseRepository(database));
         Locator.CurrentMutable.RegisterConstant(RustyEntityService.Instance);
-        RustyEntityService.Instance.Initialize();
+        RustyEntityService.Instance.Initialize(null);
 
         Locator.CurrentMutable.RegisterConstant(ResourceService.Instance);
         Locator.CurrentMutable.RegisterConstant(CraftService.Instance);
@@ -80,15 +78,20 @@ public static class AppBootstrapper
         Locator.CurrentMutable.Register(static () => new RecycleResourcesTaskView(), typeof(IViewFor<RecycleResourcesTask>));
         Locator.CurrentMutable.Register(static () => new ResourceGiftView(), typeof(IViewFor<ResourceGiftTask>));
 
-        RegisterPropertyView<DependentsBlobView, IHasDependents>(EntityPropertyType.HasDependents);
-        RegisterPropertyView<InBuildBlobView, IInBuildProcess>(EntityPropertyType.InBuildProcess);
-        RegisterPropertyView<MineSizeBlobView, IMineSizeProperty>(EntityPropertyType.MineSize);
-        RegisterPropertyView<SpeedBootBlobView, IBoostSpeed>(EntityPropertyType.BoostSpeed);
-        RegisterPropertyView<ToolInfoBlobView, IToolInfo>(EntityPropertyType.ToolSettings);
-        RegisterPropertyView<TearBlobView, IHasOwner >(EntityPropertyType.HasOwner);
-        RegisterPropertyView<LongExecutionBlobView, ILongExecution>(EntityPropertyType.LongExecution);
-        RegisterPropertyView<RewardCountBlobView, IHasSingleReward>(EntityPropertyType.HasSingleReward);
-        RegisterPropertyView<FarmExpansionBlobView, IFarmExpansion>(EntityPropertyType.FarmExpansion);
+        RegisterPropertyView<DependentsBlobView, IHasDependents>(DescPropertyType.HasDependents);
+        RegisterPropertyView<InBuildBlobView, IInBuildProcess>(DescPropertyType.InBuildProcess);
+        RegisterPropertyView<MineSizeBlobView, IMineSize>(DescPropertyType.MineSize);
+        RegisterPropertyView<SpeedBootBlobView, IBoostSpeed>(DescPropertyType.BoostSpeed);
+        RegisterPropertyView<ToolInfoBlobView, IToolSettings>(DescPropertyType.ToolSettings);
+        RegisterPropertyView<TearBlobView, IHasOwner >(DescPropertyType.HasOwner);
+        RegisterPropertyView<LongExecutionBlobView, ILongExecution>(DescPropertyType.LongExecution);
+        RegisterPropertyView<RewardCountBlobView, IHasSingleReward>(DescPropertyType.HasSingleReward);
+        RegisterPropertyView<FarmExpansionBlobView, IFarmExpansion>(DescPropertyType.FarmExpansion);
+        RegisterPropertyView<TakeSpaceBlob, ITakeSpace>(DescPropertyType.TakeSpace);
+        RegisterPropertyView<CraftingQueueBlobView, IHasCraftingQueue>(DescPropertyType.HasCraftingQueue);
+        RegisterPropertyView<PrestigeBlobView, IHasPrestige>(DescPropertyType.HasPrestige);
+        RegisterPropertyView<CitySizeBlobView, ICitySize>(DescPropertyType.CitySize);
+        
 
     }
 
@@ -103,11 +106,11 @@ public static class AppBootstrapper
         var mapper = BsonMapper.Global;
 
         mapper.RegisterType(
-                static value => new BsonDocument(new Dictionary<string, BsonValue> { {"Index", value.Resource.Index }, { "Value", value.Value } }),
+                static value => new BsonDocument(new Dictionary<string, BsonValue> { {"Index", value.Resource.GetIndex() }, { "Value", value.Value } }),
                 static doc => new ResourceStackRecord(RustyEntityService.Instance.GetEntity(doc["Index"].AsInt32), doc["Value"].AsDouble));
 
         mapper.RegisterType(
-            static value => new BsonDocument(new Dictionary<string, BsonValue> { { "Index", value.Resource.Index }, { "Value", value.Value } }),
+            static value => new BsonDocument(new Dictionary<string, BsonValue> { { "Index", value.Resource.GetIndex() }, { "Value", value.Value } }),
             static doc => new ResourceStack(RustyEntityService.Instance.GetEntity(doc["Index"].AsInt32), doc["Value"].AsDouble));
 
         mapper.RegisterType(
@@ -200,9 +203,9 @@ public static class AppBootstrapper
 
     #region MVVM
 
-    public static void RegisterPropertyView<TView, TViewModel>(EntityPropertyType type) 
+    public static void RegisterPropertyView<TView, TViewModel>(DescPropertyType type) 
         where TView : IViewFor<TViewModel>, new()
-        where TViewModel : class, IRustyEntityProperty
+        where TViewModel : class, IDescProperty
     {
         Locator.CurrentMutable.Register(static () => new TView(), PropertyViewerType, type.ToString());
     }

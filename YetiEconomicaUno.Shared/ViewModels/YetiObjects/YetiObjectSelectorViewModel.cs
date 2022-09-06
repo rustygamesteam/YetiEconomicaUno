@@ -12,10 +12,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.View.YetiObjects;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.YetiObjects;
 
@@ -40,9 +41,9 @@ public class YetiObjectSelectorViewModel : ReactiveObject, IObservable<Func<IRus
         { RustyEntityType.Tool, YetiObjectTypeMask.Tools },
         { RustyEntityType.UniqueTool, YetiObjectTypeMask.Tools },
         { RustyEntityType.Tech, YetiObjectTypeMask.Techs },
-        { RustyEntityType.Craft, YetiObjectTypeMask.Crafts },
-        { RustyEntityType.Plant, YetiObjectTypeMask.Plants },
-        { RustyEntityType.Exchage, YetiObjectTypeMask.Exchages },
+        { RustyEntityType.CraftTask, YetiObjectTypeMask.Crafts },
+        { RustyEntityType.PlantTask, YetiObjectTypeMask.Plants },
+        { RustyEntityType.ExchageTask, YetiObjectTypeMask.Exchages },
         { RustyEntityType.Resource, YetiObjectTypeMask.Resources },
         { RustyEntityType.ResourceGroup, YetiObjectTypeMask.Resources },
     };
@@ -73,7 +74,7 @@ public class YetiObjectSelectorViewModel : ReactiveObject, IObservable<Func<IRus
         Source = new (_source);
 
         var sort = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(static obj => obj.HasProperty(EntityPropertyType.HasOwner) ? 0 : 1);
+            .OrderBy(static obj => obj.HasProperty(DescPropertyType.HasOwner) ? 0 : 1);
 
         RustyEntityService.Instance.ConnectToEntity(FilterByMask)
             .Filter(this)
@@ -182,11 +183,11 @@ public class YetiObjectSelectorViewModel : ReactiveObject, IObservable<Func<IRus
 
     private YetiObjectNode GetGroup(IRustyEntity owner)
     {
-        if(!_groups.TryGetValue(owner.Index, out var result))
+        if(!_groups.TryGetValue(owner.GetIndex(), out var result))
         {
             var childs = new ObservableCollectionExtended<IRustyEntity>();
 
-            _groups[owner.Index] = result = new YetiObjectNode(owner, true, childs);
+            _groups[owner.GetIndex()] = result = new YetiObjectNode(owner, true, childs);
             _tmpDisposables.Add(childs.SuspendNotifications());
         }
 
@@ -209,7 +210,7 @@ public class YetiObjectSelectorViewModel : ReactiveObject, IObservable<Func<IRus
         if (!entity.HasSpecialMask(EntitySpecialMask.HasChild))
             return false;
 
-        var index = entity.Index;
+        var index = entity.GetIndex();
         foreach (var child in RustyEntityService.Instance.GetItemsFor(index))
         {
             if (child.FullName?.Contains(searchMask, StringComparison.OrdinalIgnoreCase) ?? false)

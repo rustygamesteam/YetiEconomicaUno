@@ -14,8 +14,9 @@ using System.Text;
 using YetiEconomicaUno.View.YetiObjects;
 using DynamicData.Binding;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
+using YetiEconomicaCore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -55,14 +56,14 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
     {
         return (Result)TypeComboBox.SelectedIndex switch
         {
-            Result.RequiredInDependencies => new CreateYetiObjectTask(BuildOrTechSelector.SelectedValue.Index),
-            Result.Craft => new CraftTask(CraftService.Instance.GetCraftFor(CraftBox.ResourceBox.SelectedValue).Index, CraftBox.Count),
+            Result.RequiredInDependencies => new CreateYetiObjectTask(BuildOrTechSelector.SelectedValue.GetIndex()),
+            Result.Craft => new CraftTask(CraftService.Instance.GetCraftFor(CraftBox.ResourceBox.SelectedValue).GetIndex(), CraftBox.Count),
             Result.Convert => new ConvertTask(ConvertFromBox.SelectedValue, (int)ConvertToCountBox.Value),
             Result.Gift => new ResourceGiftTask(_giftExchanges),
             Result.Recycle => new RecycleResourcesTask(_recycleExchanges),
             Result.FarmPlants => new FarmPlantTask(_plantExchanges),
-            Result.UpgradeTool => new CreateYetiObjectTask(ToolSelector.SelectedValue.Index),
-            Result.PlantCellsExpansion => new CreateYetiObjectTask(_plantObstacles[_nextPlantObstable].Index),
+            Result.UpgradeTool => new CreateYetiObjectTask(ToolSelector.SelectedValue.GetIndex()),
+            Result.PlantCellsExpansion => new CreateYetiObjectTask(_plantObstacles[_nextPlantObstable].GetIndex()),
             _ => null,
         };
     }
@@ -142,7 +143,7 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
             for (var index = 0; index < _plantObstacles.Count; index++)
             {
                 var obstacle = _plantObstacles[index];
-                if (UserDataDump.UserBag.Contains(obstacle.Index))
+                if (UserDataDump.UserBag.Contains(obstacle.GetIndex()))
                     continue;
                 _nextPlantObstable = index;
                 break;
@@ -153,11 +154,11 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
             else
             {
                 var entity = _plantObstacles[_nextPlantObstable];
-                var price = entity.GetUnsafe<IPayable>().Price;
+                var price = entity.GetDescUnsafe<IPayable>().Price;
 
                 var sb = new StringBuilder();
                 sb.Append("Next plant cells expanded: ");
-                sb.Append(entity.GetUnsafe<IFarmExpansion>().Count);
+                sb.Append(entity.GetDescUnsafe<IFarmExpansion>().Count);
                 if (price.Count > 0)
                 {
 
@@ -187,14 +188,14 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
                 if (resourceTo == null)
                     return static enity => false;
 
-                foreach (var rustyEntity in RustyEntityService.Instance.EntitesWhereType(RustyEntityType.Exchage))
+                foreach (var rustyEntity in RustyEntityService.Instance.EntitesWhereType(RustyEntityType.ExchageTask))
                 {
-                    var exchange = rustyEntity.GetUnsafe<IHasExchange>();
+                    var exchange = rustyEntity.GetDescUnsafe<IHasExchange>();
                     if (exchange.ToEntity == resourceTo)
-                        fromFilter.Add(exchange.FromEntity.Index);
+                        fromFilter.Add(exchange.FromEntity.GetIndex());
                 }
 
-                return (Func<IRustyEntity, bool>)(entity => fromFilter.Contains(entity.Index));
+                return (Func<IRustyEntity, bool>)(entity => fromFilter.Contains(entity.GetIndex()));
             });
 
         ConvertFromBox.Filter = filterFrom;
@@ -240,7 +241,7 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
     {
         ((YetiObjectSelector)sender).Filter = Observable.Return<Func<IRustyEntity, bool>>(entity =>
         {
-            if (UserDataDump.UserBag.Contains(entity.Index))
+            if (UserDataDump.UserBag.Contains(entity.GetIndex()))
                 return false;
             if (entity.Type is RustyEntityType.Tech && entity.TryGetProperty(out IInBuildProcess inBuild) && !HasEntity(inBuild.Build))
                 return false;
@@ -251,7 +252,7 @@ public sealed partial class CreateUserTargetDialogPopup : Page, IDisposable
 
     private bool HasEntity(IRustyEntity entity)
     {
-        return entity is null || UserDataDump.UserBag.Contains(entity.Index);
+        return entity is null || UserDataDump.UserBag.Contains(entity.GetIndex());
     }
 
     public void Dispose()

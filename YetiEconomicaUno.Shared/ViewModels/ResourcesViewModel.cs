@@ -11,8 +11,9 @@ using Nito.Comparers;
 using YetiEconomicaCore.Services;
 using System.Reactive;
 using System.Collections.Generic;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels;
 
@@ -107,8 +108,8 @@ public class ResourcesViewModel : BaseViewModel
             .Select(BuildFilter);
 
         var resourceComparer = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(static x => x.GetUnsafe<IHasOwner>().Owner.DisplayName, StringComparer.Ordinal)
-            .ThenBy(static x => x.GetUnsafe<IHasOwner>().Tear)
+            .OrderBy(static x => x.GetDescUnsafe<IHasOwner>().Owner.DisplayName, StringComparer.Ordinal)
+            .ThenBy(static x => x.GetDescUnsafe<IHasOwner>().Tear)
             .ThenBy(static x => x.DisplayName, StringComparer.Ordinal);
 
         ResourceService.Instance.ObservableResources.Connect().Filter(filter).Sort(resourceComparer).Bind(Resources).Subscribe().DisposeWith(disposable);
@@ -125,6 +126,6 @@ public class ResourcesViewModel : BaseViewModel
         if (count == 0)
             return static _ => true;
 
-        return resource => GroupsFilter.Any(group => group.Index == resource.GetUnsafe<IHasOwner>().Owner.Index);
+        return resource => GroupsFilter.Any(group => group.GetIndex() == resource.GetDescUnsafe<IHasOwner>().Owner.GetIndex());
     }
 }

@@ -6,8 +6,8 @@ using System.Reactive.Disposables;
 using Nito.Comparers;
 using System.Reactive.Linq;
 using DynamicData;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 
 namespace YetiEconomicaUno.ViewModels.Farm;
 
@@ -48,6 +48,6 @@ public class PlantsPageViewModel : BaseViewModel
 
     private bool OnFilter(IRustyEntity data)
     {
-        return string.IsNullOrWhiteSpace(SearchMask) || data.GetUnsafe<IHasSingleReward>().Entity.FullName.Contains(SearchMask, StringComparison.OrdinalIgnoreCase);
+        return string.IsNullOrWhiteSpace(SearchMask) || data.GetDescUnsafe<IHasSingleReward>().Entity.FullName.Contains(SearchMask, StringComparison.OrdinalIgnoreCase);
     }
 }

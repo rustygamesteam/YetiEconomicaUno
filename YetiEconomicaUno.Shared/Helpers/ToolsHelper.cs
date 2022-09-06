@@ -1,5 +1,5 @@
-﻿using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
+﻿using RustyDTO.DescPropertyModels;
+using RustyDTO.Interfaces;
 using YetiEconomicaUno.ViewModels.CalculateBalance;
 
 namespace YetiEconomicaUno.Helpers;

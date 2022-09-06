@@ -6,7 +6,7 @@ using ReactiveUI;
 using ReactiveUIGenerator;
 using System.Reactive.Linq;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,7 +24,7 @@ public sealed partial class TearBlobView : BaseBlobView
 
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.HasOwner);
+            Initialize(ViewModel.Index, DescPropertyType.HasOwner);
 
             ViewModel.WhenAnyValue(static x => x.Tear)
                 .Select(static tear => $"Tear: {tear + 1}")

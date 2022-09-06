@@ -25,7 +25,7 @@ public class YetiGroupSelectorViewModel : ReactiveObject, IObservable<Func<IRust
         { RustyEntityType.UniqueBuild, YetiGroupTypeMask.Builds },
         { RustyEntityType.UniqueTool, YetiGroupTypeMask.Tools },
         { RustyEntityType.ResourceGroup, YetiGroupTypeMask.Resources },
-        { RustyEntityType.Craft, YetiGroupTypeMask.Crafts },
+        { RustyEntityType.CraftTask, YetiGroupTypeMask.Crafts },
     };
 
     private IDisposable _lastFilterConnect;

@@ -4,7 +4,7 @@ using ReactiveUI;
 using ReactiveUIGenerator;
 using System.Reactive.Linq;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,7 +19,7 @@ public sealed partial class InBuildBlobView : BaseBlobView
         this.InitializeComponent();
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.InBuildProcess);
+            Initialize(ViewModel.Index, DescPropertyType.InBuildProcess);
 
             ViewModel.WhenAnyValue(dependents => dependents.Build)
                 .Select(build => $"Build: {build?.FullName ?? "None"}")

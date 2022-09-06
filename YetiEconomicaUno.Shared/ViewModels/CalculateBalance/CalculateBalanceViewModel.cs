@@ -15,12 +15,13 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Helpers;
 using YetiEconomicaUno.Services;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance;
 
@@ -66,11 +67,11 @@ public class CalculateBalanceViewModel : BaseViewModel
             if (type is ToolsEnum.Unknow)
                 continue;
 
-            var tool = yetiObjects.GetItemsFor(toolGroup.Index).MinBy(data => data.GetUnsafe<IHasOwner>().Tear);
+            var tool = yetiObjects.GetItemsFor(toolGroup.GetIndex()).MinBy(data => data.GetDescUnsafe<IHasOwner>().Tear);
             if (tool == null)
                 continue;
 
-            ToolCache[type] = new ToolProgressInfo(tool.Index, default);
+            ToolCache[type] = new ToolProgressInfo(tool.GetIndex(), default);
         }
 
         _emptyDump = new UserDataDump(Wallet.ToDictionary(static pair => pair.Key, static pair => pair.Value),
@@ -289,14 +290,14 @@ public class CalculateBalanceViewModel : BaseViewModel
     private static bool IsRequestEntity(IRustyEntity source, IRustyEntity target)
     {
         if (source.TryGetProperty(out IInBuildProcess buildProcess) && buildProcess.Build is not null &&
-            buildProcess.Build.Index == target.Index)
+            buildProcess.Build.GetIndex() == target.GetIndex())
             return false;
 
         if (source.TryGetProperty(out IHasDependents dependents))
         {
-            if (dependents.Required is not null && dependents.Required.Index == target.Index)
+            if (dependents.Required is not null && dependents.Required.GetIndex() == target.GetIndex())
                 return false;
-            if (dependents.VisibleAfter is not null && dependents.VisibleAfter.Index == target.Index)
+            if (dependents.VisibleAfter is not null && dependents.VisibleAfter.GetIndex() == target.GetIndex())
                 return false;
         }
 

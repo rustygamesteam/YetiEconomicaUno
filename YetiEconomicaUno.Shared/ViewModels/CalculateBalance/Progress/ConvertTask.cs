@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using DynamicData.Binding;
 using ReactiveUI;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Services;
 using RustyDTO.Interfaces;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 
@@ -35,9 +36,9 @@ public class ConvertTask : ProgressTask
 
     public ConvertTask(IRustyEntity exchagEntity) : base(ProgressType.Convert)
     {
-        Index = exchagEntity.Index;
+        Index = exchagEntity.GetIndex();
         ExchagEntity = exchagEntity;
-        Exchange = exchagEntity.GetUnsafe<IHasExchange>();
+        Exchange = exchagEntity.GetDescUnsafe<IHasExchange>();
 
         this.WhenPropertyChanged(static x => x.Count)
             .Subscribe(static x => x.Sender.RaisePropertyChanged(nameof(Price)));
@@ -66,7 +67,7 @@ public class ConvertTask : ProgressTask
 
     internal override bool OnYetiObjectRemove(IRustyEntity rustyEntity)
     {
-        return rustyEntity.Index == Exchange.ToEntity.Index || rustyEntity.Index == Exchange.FromEntity.Index || rustyEntity == ExchagEntity;
+        return rustyEntity.GetIndex() == Exchange.ToEntity.GetIndex() || rustyEntity.GetIndex() == Exchange.FromEntity.GetIndex() || rustyEntity == ExchagEntity;
     }
 
     [BsonIgnore]

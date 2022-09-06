@@ -16,10 +16,10 @@ public abstract class BaseBlobView : Button
     private CompositeDisposable _flyoutDisposable;
 
     private IRustyEntity _entity;
-    private EntityPropertyType _propertyType;
+    private DescPropertyType _propertyType;
 
     protected IRustyEntity Entity => _entity;
-    protected EntityPropertyType PropertyType => _propertyType;
+    protected DescPropertyType PropertyType => _propertyType;
 
     public BaseBlobView()
     {
@@ -34,12 +34,12 @@ public abstract class BaseBlobView : Button
         base.OnApplyTemplate();
     }
 
-    protected void Initialize(int entityIndex, EntityPropertyType type)
+    protected void Initialize(int entityIndex, DescPropertyType type)
     {
         Initialize(entityIndex, type, out _);
     }
 
-    protected void Initialize(int entityIndex, EntityPropertyType type, out IRustyEntity entity)
+    protected void Initialize(int entityIndex, DescPropertyType type, out IRustyEntity entity)
     {
         _entity = entity = GetEntity(entityIndex);
         _propertyType = type;

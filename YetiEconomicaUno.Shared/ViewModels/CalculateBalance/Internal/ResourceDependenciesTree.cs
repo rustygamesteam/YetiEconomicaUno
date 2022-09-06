@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Services;
 using YetiEconomicaCore.Database;
 using YetiEconomicaUno.Helpers;
@@ -90,7 +90,7 @@ internal struct ResourceDependenciesTree
         else if (PlantsService.Instance.IsPlant(resourceExchange.Resource))
             return new Node(depth, ResourceNodeType.Farm, resourceExchange, Enumerable.Empty<Node>());
         else if (CraftService.Instance.TryGetCraft(resourceExchange.Resource, out var craft))
-            return new Node(depth, ResourceNodeType.Craftable, resourceExchange, ConvetToNodes(depth, craft.GetUnsafe<IPayable>().Price));
+            return new Node(depth, ResourceNodeType.Craftable, resourceExchange, ConvetToNodes(depth, craft.GetDescUnsafe<IPayable>().Price));
         else if (ConvertablesService.Instance.TryGetFirstExchnage(resourceExchange.Resource, out var convert))
             return new Node(depth, ResourceNodeType.Convert, resourceExchange, ToEnuberable(ConvetToNode(depth, new ResourceStack(convert.Resource, resourceExchange.Value * Math.Max(convert.Value, 0.001)))));
         else

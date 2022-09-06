@@ -17,7 +17,7 @@
 	    </StackPanel.ContextFlyout>
         <TextBlock Text="{x:Bind ViewModel.DisplayName, Mode=OneWay}" 
                    Style="{StaticResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="{x:Bind ViewModel.Index, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='Index: {0}'}" 
+        <TextBlock Text="{x:Bind ViewModel.ID.Index, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='Index: {0}'}" 
                    Style="{StaticResource CaptionTextBlockStyle}"/>
         <TextBlock Text="{x:Bind ViewModel.Type, Mode=OneWay, Converter={StaticResource StringFormatConverter}, ConverterParameter='Type: {0}'}" 
                    Style="{StaticResource CaptionTextBlockStyle}"/>

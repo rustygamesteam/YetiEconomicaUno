@@ -5,8 +5,8 @@ using Microsoft.UI.Xaml.Controls;
 using ReactiveUI;
 using ReactiveUIGenerator;
 using System.Threading;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -38,7 +38,7 @@ public sealed partial class ExchangeView : UserControl, IDisposable
         disposable?.Dispose();
         disposable = _disposables;
 
-        var hasExchange = entity.GetUnsafe<IHasExchange>();
+        var hasExchange = entity.GetDescUnsafe<IHasExchange>();
 
         hasExchange.FromEntity.WhenAnyValue(static entity => entity.FullName)
             .BindTo(this, static view => view.NameBox.Text)

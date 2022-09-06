@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;NoReactive</Configurations>
-    <AppDesignerFolder>test</AppDesignerFolder>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -26,6 +26,10 @@
 
 	<ItemGroup Condition="'$(Configuration)' != 'NoReactive'">
 		<PackageReference Include="ReactiveUI" Version="18.3.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\RustyDTOGenerator\RustyDTOGenerator.csproj" PrivateAssets="contentfiles;build" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" />
 	</ItemGroup>
 
 </Project>

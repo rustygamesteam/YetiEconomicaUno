@@ -6,7 +6,7 @@ using ReactiveUIGenerator;
 using RustyDTO;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 using System.Reactive.Linq;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -31,7 +31,7 @@ public sealed partial class YetiObjectTaskView : UserControl
                 .Subscribe(entity => 
                 {
                     if (entity.Type is RustyEntityType.FarmObstacleClearing)
-                        LabelBox.Text = $"Cells: {entity.GetUnsafe<IFarmExpansion>().Count}";
+                        LabelBox.Text = $"Cells: {entity.GetDescUnsafe<IFarmExpansion>().Count}";
                     else
                         LabelBox.Text = entity.FullName;
                 })

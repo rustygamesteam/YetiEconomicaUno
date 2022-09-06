@@ -6,10 +6,11 @@ using System.Linq;
 using DynamicData.Binding;
 using ReactiveUI;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Services;
 using RustyDTO.Interfaces;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 
@@ -18,9 +19,9 @@ public class CraftTask : ProgressTask
     [BsonCtor]
     public CraftTask(IRustyEntity entity) : base(ProgressType.Craft)
     {
-        Index = entity.Index;
+        Index = entity.GetIndex();
         CraftEntity = entity;
-        SingleReward = entity.GetUnsafe<IHasSingleReward>();
+        SingleReward = entity.GetDescUnsafe<IHasSingleReward>();
 
         this.WhenPropertyChanged(static x => x.Count)
             .Subscribe(static x => x.Sender.RaisePropertyChanged(nameof(Price)));
@@ -56,16 +57,16 @@ public class CraftTask : ProgressTask
             Statistics.Clear();
         }
 
-        var reward = CraftEntity.GetUnsafe<IHasSingleReward>();
+        var reward = CraftEntity.GetDescUnsafe<IHasSingleReward>();
         userData.Wallet.IncrimentWallet(reward.Entity, reward.Count * Count);
         foreach (var exchange in Price)
             userData.Wallet.PayWallet(new ResourceStack(exchange.Resource, exchange.Value * Count));
 
-        var buildInfo = CraftEntity.GetUnsafe<IInBuildProcess>();
-        double craftTime = CraftEntity.GetUnsafe<ILongExecution>().Duration;
+        var buildInfo = CraftEntity.GetDescUnsafe<IInBuildProcess>();
+        double craftTime = CraftEntity.GetDescUnsafe<ILongExecution>().Duration;
         if (buildInfo.Build is not null)
         {
-            craftTime /= buildInfo.Build.GetUnsafe<IBoostSpeed>().CraftSpeed;
+            craftTime /= buildInfo.Build.GetDescUnsafe<IBoostSpeed>().CraftSpeed;
             craftTime = Math.Ceiling(craftTime);
         }
 
@@ -94,5 +95,5 @@ public class CraftTask : ProgressTask
     }
 
     [BsonIgnore]
-    internal override IEnumerable<ResourceStackRecord> Price => CraftEntity.GetUnsafe<IPayable>().Price.Select(price => new ResourceStackRecord(price.Resource, price.Value * Count));
+    internal override IEnumerable<ResourceStackRecord> Price => CraftEntity.GetDescUnsafe<IPayable>().Price.Select(price => new ResourceStackRecord(price.Resource, price.Value * Count));
 }

@@ -1,5 +1,8 @@
-﻿using DynamicData;
+﻿#if REACTIVE
+using DynamicData;
+using RustyDTO.Supports;
 using System.Reactive.Subjects;
+#endif
 
 namespace RustyDTO.Interfaces;
 
@@ -8,11 +11,10 @@ public interface IRustyEntity : IEquatable<IRustyEntity>
 , ReactiveUI.IReactiveObject
 #endif
 {
-    int Index { get; }
+    EntityID ID { get; }
 
     RustyEntityType Type { get; }
     int TypeAsIndex { get; }
-
 
     string? DisplayName
     {
@@ -24,21 +26,23 @@ public interface IRustyEntity : IEquatable<IRustyEntity>
     string? DisplayNameWithTear { get; }
     string? FullName { get; }
 
-    IEnumerable<EntityPropertyType> Properties { get; }
+    IReadOnlySet<MutablePropertyType> MutablePropertyTypes { get; }
+    IEnumerable<DescPropertyType> DescProperties { get; }
 
     bool HasSpecialMask(EntitySpecialMask condition);
-    bool IsPropertyRequired(EntityPropertyType propertyType);
+    bool IsPropertyRequired(DescPropertyType propertyType);
 
-    bool HasProperty(EntityPropertyType type);
+    bool HasMutable(MutablePropertyType type);
+    bool HasProperty(DescPropertyType type);
 
-    bool TryGetProperty<TProperty>(EntityPropertyType type, out TProperty property) where TProperty : IRustyEntityProperty;
-    bool TryGetProperty<TProperty>(out TProperty property) where TProperty : IRustyEntityProperty;
+    bool TryGetProperty<TProperty>(DescPropertyType type, out TProperty property) where TProperty : IDescProperty;
+    bool TryGetProperty<TProperty>(out TProperty property) where TProperty : IDescProperty;
 
-    TProperty GetUnsafe<TProperty>() where TProperty : IRustyEntityProperty;
+    TProperty GetDescUnsafe<TProperty>() where TProperty : IDescProperty;
 
-    IRustyEntityProperty GetUnsafe(EntityPropertyType type);
+    IDescProperty GetDescUnsafe(DescPropertyType type);
 
 #if REACTIVE
-    ISubject<ItemChange<(EntityPropertyType Type, IRustyEntityProperty Property)>> PropertiesChangedObserver { get; }
+    ISubject<ItemChange<(DescPropertyType Type, IDescProperty Property)>> PropertiesChangedObserver { get; }
 #endif
 }

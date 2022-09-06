@@ -11,8 +11,9 @@ using DynamicData.PLinq;
 using Nito.Comparers.Linq;
 using ReactiveUI.Fody.Helpers;
 using System.Threading;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels;
 
@@ -49,7 +50,7 @@ public class SelectResourceFlyoutViewModel : ReactiveObject, IObservable<Func<IR
 
     private void OnChangeFilter(IChangeSet<IRustyEntity> obj)
     {
-        var result = _sourceFirst.GroupBy(static resource => resource.GetUnsafe<IHasOwner>().Owner.Index)
+        var result = _sourceFirst.GroupBy(static resource => resource.GetDescUnsafe<IHasOwner>().Owner.GetIndex())
             .Select(static entities => new ResourcesByGroup(RustyEntityService.Instance.GetEntity(entities.Key), entities));
 
         using var supress = _source.SuspendNotifications();

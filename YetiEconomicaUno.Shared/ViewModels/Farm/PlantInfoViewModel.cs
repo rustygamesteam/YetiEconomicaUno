@@ -1,7 +1,6 @@
 ﻿using ReactiveUI;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
-using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.Farm;
 
@@ -28,8 +27,8 @@ public class PlantInfoViewModel : ReactiveObject
     public PlantInfoViewModel(IRustyEntity entity)
     {
         Entity = entity;
-        _singleReward = entity.GetUnsafe<IHasSingleReward>();
-        _longExecution = entity.GetUnsafe<ILongExecution>();
+        _singleReward = entity.GetDescUnsafe<IHasSingleReward>();
+        _longExecution = entity.GetDescUnsafe<ILongExecution>();
     }
 
 }

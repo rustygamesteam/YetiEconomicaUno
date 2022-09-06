@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Disposables;
 using DynamicData;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,13 +18,13 @@ namespace YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 [ViewFor<IRustyEntity>]
 public sealed partial class AttachPropertyBlobView : Button
 {
-    private readonly ReactiveCommand<EntityPropertyType, Unit> _command;
+    private readonly ReactiveCommand<DescPropertyType, Unit> _command;
 
     public AttachPropertyBlobView()
     {
         this.DefaultStyleKey = typeof(BaseBlobView);
 
-        _command = ReactiveCommand.Create<EntityPropertyType>(OnAttachRequest);
+        _command = ReactiveCommand.Create<DescPropertyType>(OnAttachRequest);
 
         this.InitializeComponent();
 
@@ -58,7 +57,7 @@ public sealed partial class AttachPropertyBlobView : Button
         Visibility = ItemsList.Items.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void OnAttachRequest(EntityPropertyType type)
+    private void OnAttachRequest(DescPropertyType type)
     {
         RustyEntityService.Instance.TryAttachProperty(ViewModel, type);
     }

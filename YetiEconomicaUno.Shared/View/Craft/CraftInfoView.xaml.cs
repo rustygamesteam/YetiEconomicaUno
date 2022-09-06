@@ -7,8 +7,8 @@ using System.Reactive.Disposables;
 using ReactiveUI;
 using System.Reactive.Linq;
 using System.Threading;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Converters;
 
@@ -45,7 +45,7 @@ public sealed partial class CraftInfoView : UserControl, IDisposable
         disposable?.Dispose();
         disposable = _disposables;
 
-        var hasReward = viewModel.GetUnsafe<IHasSingleReward>();
+        var hasReward = viewModel.GetDescUnsafe<IHasSingleReward>();
         hasReward.Entity.WhenAnyValue(static entity => entity.FullName)
             .BindTo(this, static view => view.FullName.Text)
             .DisposeWith(disposable);
@@ -54,13 +54,13 @@ public sealed partial class CraftInfoView : UserControl, IDisposable
             .BindTo(this, static view => view.CraftCount.Text)
             .DisposeWith(disposable);
 
-        var longExecution = viewModel.GetUnsafe<ILongExecution>();
+        var longExecution = viewModel.GetDescUnsafe<ILongExecution>();
         longExecution.WhenAnyValue(static longExecution => longExecution.Duration)
             .Select(static duration => $"Duration: {DurationLabelConverter.GetDuration(duration)}")
             .BindTo(this, static view => view.Duration.Text)
             .DisposeWith(disposable);
 
-        var price = viewModel.GetUnsafe<IPayable>().Price;
+        var price = viewModel.GetDescUnsafe<IPayable>().Price;
         price.WhenAnyValue(static price => price.Count)
             .Select(static count => $"From resources: {count}")
             .BindTo(this, static view => view.ResourcesForCrafting.Text)

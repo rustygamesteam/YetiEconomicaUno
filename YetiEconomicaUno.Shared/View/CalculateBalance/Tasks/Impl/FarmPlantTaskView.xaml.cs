@@ -4,9 +4,9 @@ using Microsoft.UI.Xaml.Controls;
 using ReactiveUIGenerator;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 using ReactiveUI;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Services;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -52,7 +52,7 @@ public sealed partial class FarmPlantTaskView : UserControl, IDisposable
     {
         if (PlantsService.Instance.TryGetPlant(resource, out var plant))
         {
-            var dependents = plant.GetUnsafe<IHasDependents>();
+            var dependents = plant.GetDescUnsafe<IHasDependents>();
             if (dependents.Required is null && dependents.VisibleAfter is null)
                 return true;
 

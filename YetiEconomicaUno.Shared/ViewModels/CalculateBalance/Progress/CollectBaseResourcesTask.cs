@@ -1,5 +1,5 @@
 ﻿using System;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Helpers;
 using YetiEconomicaUno.Services;
@@ -25,7 +25,7 @@ internal class CollectBaseResourcesTask
 
             isUpdate = true;
 
-            var toolInfo = yetiService.GetEntity(toolProgress.Index).GetUnsafe<IToolInfo>();
+            var toolInfo = yetiService.GetEntity(toolProgress.Index).GetDescUnsafe<IToolSettings>();
             tools[tool] = toolProgress with { NextUpdate = time + TimeSpan.FromHours(toolInfo.RechargeEvery) };
 
             var session = toolInfo.Efficiency * toolInfo.Strength;

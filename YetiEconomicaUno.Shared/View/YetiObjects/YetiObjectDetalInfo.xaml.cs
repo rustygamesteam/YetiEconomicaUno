@@ -12,9 +12,10 @@ using System.Threading;
 using System.Reactive;
 using Nito.Comparers;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
+using YetiEconomicaCore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -88,9 +89,9 @@ public sealed partial class YetiObjectDetalInfo : UserControl
                         break;
                 }
             }
-
+            
             if (hasChild && ItemsList.Items.Count > 0)
-                _lastTear = Math.Min(ItemsList.Items.OfType<YetiGradeObjectView>().Max(static x => x.ViewModel.GetUnsafe<IHasOwner>().Tear + 1), TearBlobView.Tears.Length);
+                _lastTear = Math.Min(ItemsList.Items.OfType<YetiGradeObjectView>().Max(static x => x.ViewModel.GetDescUnsafe<IHasOwner>().Tear + 1), TearBlobView.Tears.Length);
         }).DisposeWith(_reInitialize);
         Disposable.Create(ItemsList, static list => list.Items.Clear()).DisposeWith(_reInitialize);
     }
@@ -98,7 +99,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
     private static IObservable<IChangeSet<YetiGradeObjectView, int>> Initialize(IRustyEntity viewModel, RustyEntityService service, CompositeDisposable disposables)
     {
         var sort = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(static data => data.GetUnsafe<IHasOwner>().Tear)
+            .OrderBy(static data => data.GetDescUnsafe<IHasOwner>().Tear)
             .ThenBy(static data => data.DisplayName);
 
         switch (viewModel.Type)
@@ -109,14 +110,14 @@ public sealed partial class YetiObjectDetalInfo : UserControl
                 {
                     new Change<YetiGradeObjectView, int>(
                         ChangeReason.Add, 
-                        viewModel.Index, 
+                        viewModel.GetIndex(), 
                         new YetiGradeObjectView(viewModel)
                             .AutoInitialize(viewModel, disposables))
                 };
                 return Observable.Return(set);
             case RustyEntityType.UniqueBuild:
                 return service.ConnectToEntity(static data => data.Type is RustyEntityType.Build)
-                    .Filter(data => data.GetUnsafe<IHasOwner>().Owner.Index == viewModel.Index)
+                    .Filter(data => data.GetDescUnsafe<IHasOwner>().Owner.ID == viewModel.ID)
                     .Sort(sort)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Transform(data => new YetiGradeObjectView(data)
@@ -126,7 +127,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
                         .InjectPriceWithDurantion(data, disposables));
             case RustyEntityType.UniqueTool:
                 return service.ConnectToEntity(static data => data.Type is RustyEntityType.Tool)
-                    .Filter(data => data.GetUnsafe<IHasOwner>().Owner.Index == viewModel.Index)
+                    .Filter(data => data.GetDescUnsafe<IHasOwner>().Owner.ID == viewModel.ID)
                     .Sort(sort)
                     .Transform(data => new YetiGradeObjectView(data)
                         .Initialize(data, disposables)
@@ -144,10 +145,10 @@ public sealed partial class YetiObjectDetalInfo : UserControl
         switch (ViewModel.Type)
         {
             case RustyEntityType.UniqueBuild:
-                RustyEntityService.Instance.Create(RustyEntityType.Build, "New build", EntityBuildOptions.CreateWithOwner(ViewModel.Index, nextTear));
+                RustyEntityService.Instance.Create(RustyEntityType.Build, "New build", EntityBuildOptions.CreateWithOwner(ViewModel.GetIndex(), nextTear));
                 break;
             case RustyEntityType.UniqueTool:
-                RustyEntityService.Instance.Create(RustyEntityType.Tool, "New tool", EntityBuildOptions.CreateWithOwner(ViewModel.Index, nextTear));
+                RustyEntityService.Instance.Create(RustyEntityType.Tool, "New tool", EntityBuildOptions.CreateWithOwner(ViewModel.GetIndex(), nextTear));
                 break;
         }
     }

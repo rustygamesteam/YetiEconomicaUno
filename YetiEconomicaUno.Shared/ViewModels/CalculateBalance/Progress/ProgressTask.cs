@@ -10,7 +10,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Subjects;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
+using YetiEconomicaCore;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Experemental;
 using YetiEconomicaCore.Services;
@@ -67,7 +68,7 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
 
     public bool HasInBag(IRustyEntity entity)
     {
-        return _bag?.Contains(entity.Index) ?? false;
+        return _bag?.Contains(entity.GetIndex()) ?? false;
     }
 
     protected void CopyBag(ref UserData userData)
@@ -191,8 +192,8 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
                         continue;
                     }
                     var farmData = PlantsService.Instance.GetPlantEntity(node.Resource);
-                    var reward = farmData.GetUnsafe<IHasSingleReward>();
-                    var duration = farmData.GetUnsafe<ILongExecution>().Duration;
+                    var reward = farmData.GetDescUnsafe<IHasSingleReward>();
+                    var duration = farmData.GetDescUnsafe<ILongExecution>().Duration;
 
                     var ciclesTotlaCount = (int)Math.Ceiling(targetCount / reward.Count);
                     var cicles = Math.Min(ciclesTotlaCount, userData.FarmCells - farmCellUse);
@@ -228,18 +229,18 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
                     }
 
                     CraftService.Instance.TryGetCraft(node.Resource, out var craft);
-                    var buildInfo = craft.GetUnsafe<IInBuildProcess>();
-                    if (buildInfo.Build is not null && CalculateStepHelper.CraftsQueue.Contains(buildInfo.Build.Index))
+                    var buildInfo = craft.GetDescUnsafe<IInBuildProcess>();
+                    if (buildInfo.Build is not null && CalculateStepHelper.CraftsQueue.Contains(buildInfo.Build.GetIndex()))
                     {
                         result |= CalculateStepResult.WaitCraft;
                         continue;
                     }
 
-                    var rewardInfo = craft.GetUnsafe<IHasSingleReward>();
+                    var rewardInfo = craft.GetDescUnsafe<IHasSingleReward>();
 
-                    double craftTime = craft.GetUnsafe<ILongExecution>().Duration;
+                    double craftTime = craft.GetDescUnsafe<ILongExecution>().Duration;
                     if (buildInfo.Build != null)
-                        craftTime /= buildInfo.Build.GetUnsafe<IBoostSpeed>().CraftSpeed;
+                        craftTime /= buildInfo.Build.GetDescUnsafe<IBoostSpeed>().CraftSpeed;
 
                     craftTimeMax = Math.Max(craftTimeMax, Math.Max((int)craftTime, 1));
                     userData.Wallet.IncrimentWallet(node.Resource, rewardInfo.Count);

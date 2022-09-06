@@ -1,25 +1,72 @@
 ﻿namespace RustyDTOGenerator.Generators;
 
-public class SourceGenerationHelper
+internal class SourceGenerationHelper
 {
     public const string Attribute = @"#nullable enable
 
-namespace RustyDTO;
+namespace RustyDTO.Generator;
 
-internal record struct EntityInfo(global::RustyDTO.RustyEntityType EntityType, global::RustyDTO.EntitySpecialMask Mask = global::RustyDTO.EntitySpecialMask.None)
+[global::System.AttributeUsage(global::System.AttributeTargets.Enum, AllowMultiple = false)]
+internal sealed class PropertyImplAttribute<TBase> : global::System.Attribute
 {
-    global::RustyDTO.EntityPropertyType[]? Requireds { get; init; } = null;
-    global::RustyDTO.EntityPropertyType[]? Optionals { get; init; } = null;
+    public PropertyImplAttribute(string nameSpace, string prefix = null)
+    {
+    }
 }
 
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = true)]
-internal sealed class InjectEntityInfoAttribute : global::System.Attribute
+[global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = false)]
+internal sealed class OverridePropertyNameAttribute<TType> : global::System.Attribute
 {
-    public EntityInfo Info { get; }
-
-    public InjectEntityInfoAttribute(EntityInfo info)
+    public OverridePropertyNameAttribute(string name)
     {
-        Info = info;
     }
-}";
+}
+
+[global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = true)]
+internal sealed class PropertyHaveAttribute<TType> : global::System.Attribute
+{
+    public PropertyHaveAttribute(string name, bool isReadOnly = false, bool isNullable = false)
+    {
+    }
+}
+";
+
+    public static string GenerateProperty(PropertyEnumInfo enumInfo)
+    {
+        return @$"#nullable enable
+
+namespace {enumInfo.Namespace};
+
+public interface I{enumInfo.Prefix}{enumInfo.Name} : global::{enumInfo.BaseType}
+{{
+{string.Join("\n\n", enumInfo.Members.Select(member => $"    {member.TypeName}{NulableGenerator(member.IsNulable)} {member.Name} {{ get; {SetGenerator(member.IsReadOnly)}}}"))}
+}}
+";
+    }
+
+    public static string GenerateEntityDependencies(DependencyLink[] links)
+    {
+        return $@"#nullable enable
+
+namespace RustyDTO;
+
+public static partial class EntityDependencies
+{{
+    private static IReadOnlyDictionary<Type, int> _propertyTypes = new Dictionary<Type, int>
+    {{
+{string.Join(",\n", links.Select(link => $@"      {{ typeof(global::{link.TypeName}), {link.Value-1} }}"))}
+    }};
+}}
+";
+    }
+
+    private static string NulableGenerator(bool isNullable)
+    {
+        return isNullable ? "?" : string.Empty;
+    }
+
+    private static string SetGenerator(bool isReadOnly)
+    {
+        return isReadOnly ? string.Empty : "set; ";
+    }
 }

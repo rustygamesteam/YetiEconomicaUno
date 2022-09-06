@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using ReactiveUIGenerator;
 using ReactiveUI;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaUno.Converters;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -21,7 +21,7 @@ public sealed partial class LongExecutionBlobView : BaseBlobView
 
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.LongExecution);
+            Initialize(ViewModel.Index, DescPropertyType.LongExecution);
             
             ViewModel.WhenAnyValue(dependents => dependents.Duration)
                 .Subscribe(duration =>

@@ -16,6 +16,7 @@ using System.Threading;
 using System.Collections.Specialized;
 using RustyDTO;
 using RustyDTO.Interfaces;
+using YetiEconomicaCore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -65,7 +66,7 @@ public sealed partial class ResourcePriceListView : UserControl, IDisposable
             InsertFlyout.Filter = _onItemsUpdated
                         .Select(list => (Func<IRustyEntity, bool>)(resource =>
                         {
-                            var result = (Filter is null || Filter.Invoke(resource)) && list.Contains(resource.Index) is false;
+                            var result = (Filter is null || Filter.Invoke(resource)) && list.Contains(resource.GetIndex()) is false;
                             return result;
                         }));
 
@@ -81,9 +82,9 @@ public sealed partial class ResourcePriceListView : UserControl, IDisposable
     partial void OnExcludeEntityChanged(IRustyEntity oldValue, IRustyEntity newValue)
     {
         if (oldValue != null)
-            _filterIndexes.Remove(oldValue.Index);
+            _filterIndexes.Remove(oldValue.GetIndex());
         if (newValue != null)
-            _filterIndexes.Add(newValue.Index);
+            _filterIndexes.Add(newValue.GetIndex());
         
         _onItemsUpdated.OnNext(_filterIndexes);
     }
@@ -119,7 +120,7 @@ public sealed partial class ResourcePriceListView : UserControl, IDisposable
         {
             _filterIndexes.Clear();
             foreach (var item in ItemsSource)
-                _filterIndexes.Add(item.Resource.Index);
+                _filterIndexes.Add(item.Resource.GetIndex());
         }
 
         _onItemsUpdated?.OnNext(_filterIndexes);

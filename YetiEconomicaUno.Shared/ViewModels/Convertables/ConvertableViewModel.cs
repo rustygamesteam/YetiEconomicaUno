@@ -3,17 +3,18 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Services;
 using RustyDTO.Interfaces;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.Convertables;
 
 public record ConvertableViewModel(IRustyEntity ConvertableToResource) : ReactiveRecord
 {
-    public IHasOwner ResourceOwner => ConvertableToResource.GetUnsafe<IHasOwner>();
+    public IHasOwner ResourceOwner => ConvertableToResource.GetDescUnsafe<IHasOwner>();
 
-    public IObservable<IChangeSet<IRustyEntity>> ObservableExchanges { get; } = ConvertablesService.Instance.ObservableExchangesToResource(ConvertableToResource.Index);
+    public IObservable<IChangeSet<IRustyEntity>> ObservableExchanges { get; } = ConvertablesService.Instance.ObservableExchangesToResource(ConvertableToResource.GetIndex());
     public IReadOnlyCollection<IRustyEntity> Exchanges { get; private set; }
 
     public IRustyEntity SelectedExchange { get; set; }

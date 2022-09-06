@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using ReactiveUIGenerator;
 using ReactiveUI;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,7 +19,7 @@ public sealed partial class SpeedBootBlobView : BaseBlobView
         this.InitializeComponent();
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.BoostSpeed);
+            Initialize(ViewModel.Index, DescPropertyType.BoostSpeed);
 
             ViewModel.WhenAnyValue(static x => x.CraftSpeed)
                 .CombineLatest(ViewModel.WhenAnyValue(static x => x.TechSpeed))

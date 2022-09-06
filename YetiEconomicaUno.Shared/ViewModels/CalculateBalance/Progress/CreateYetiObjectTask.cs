@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Helpers;
+using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 
@@ -15,7 +16,7 @@ public class CreateYetiObjectTask : ProgressTask
 {
     public CreateYetiObjectTask(IRustyEntity entity) : base(ProgressType.YetiObject)
     {
-        Index = entity.Index;
+        Index = entity.GetIndex();
         Target = entity;
     }
 
@@ -35,9 +36,9 @@ public class CreateYetiObjectTask : ProgressTask
 
         if (Target.HasSpecialMask(EntitySpecialMask.IsInstance))
         {
-            userData.UserBag.Add(Target.Index);
+            userData.UserBag.Add(Target.GetIndex());
             if (Target.TryGetProperty(out IHasOwner ownerInfo) && ownerInfo.Owner.HasSpecialMask(EntitySpecialMask.IsInstance))
-                userData.UserBag.Add(ownerInfo.Owner.Index);
+                userData.UserBag.Add(ownerInfo.Owner.GetIndex());
         }
 
         foreach (var exchange in Price)
@@ -55,7 +56,7 @@ public class CreateYetiObjectTask : ProgressTask
             duration = longExecution.Duration;
             if (Target.Type is RustyEntityType.Tech && Target.TryGetProperty<IInBuildProcess>(out var buildProcess) && buildProcess.Build is not null)
             {
-                var boost = buildProcess.Build.GetUnsafe<IBoostSpeed>();
+                var boost = buildProcess.Build.GetDescUnsafe<IBoostSpeed>();
                 duration /= boost.TechSpeed;
                 duration = Math.Ceiling(duration);
             }
@@ -77,7 +78,7 @@ public class CreateYetiObjectTask : ProgressTask
             throw ex;
         }
 
-        if (Target.TryGetProperty<IMineSizeProperty>(out var mineSize))
+        if (Target.TryGetProperty<IMineSize>(out var mineSize))
             userData.MineSize = (mineSize.X, mineSize.Y);
 
         if (Target.TryGetProperty<IFarmExpansion>(out var farmExpansion))
@@ -96,7 +97,7 @@ public class CreateYetiObjectTask : ProgressTask
 
     internal override bool OnYetiObjectRemove(IRustyEntity rustyEntity)
     {
-        return Target.Index == rustyEntity.Index;
+        return Target.ID == rustyEntity.ID;
     }
 
     [BsonIgnore]

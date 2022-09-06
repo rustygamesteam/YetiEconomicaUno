@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace RustyDTO.Interfaces;
 
-public interface IRustyEntityProperty
+public interface IDescProperty
 #if REACTIVE
     : IReactiveObject
 #endif

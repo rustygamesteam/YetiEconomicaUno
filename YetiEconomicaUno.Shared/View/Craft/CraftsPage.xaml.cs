@@ -10,8 +10,8 @@ using ReactiveUI;
 using YetiEconomicaUno.ViewModels.Crafts;
 using ReactiveUIGenerator;
 using Microsoft.UI.Xaml.Data;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaUno.View.YetiObjects;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -75,7 +75,7 @@ namespace YetiEconomicaUno.View
 
         private bool OnFilter(IRustyEntity resource)
         {
-            return ViewModel.ItemSource.Select(static craft => craft.GetUnsafe<IHasSingleReward>().Entity).Contains(resource) is false;
+            return ViewModel.ItemSource.Select(static craft => craft.GetDescUnsafe<IHasSingleReward>().Entity).Contains(resource) is false;
         }
 
         private void Page_OnUnload(object sender, RoutedEventArgs e)

@@ -8,6 +8,7 @@
     <Nullable>enable</Nullable>
 	<IsRoslynComponent>true</IsRoslynComponent>
 	<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64;win-x86;win-x64</RuntimeIdentifiers>
+	<IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
@@ -30,6 +31,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="H.Generators.Extensions" Version="1.7.7" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" PrivateAssets="all" />
 	</ItemGroup>
 

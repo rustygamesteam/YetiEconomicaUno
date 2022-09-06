@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Text.Json;
 
 #if REACTIVE
 using DynamicData;
@@ -9,6 +10,8 @@ namespace RustyDTO.Interfaces;
 public interface IEntityService
 {
     bool IsInitialize { get; }
+
+    void Initialize(JsonDocument? database);
 
     IRustyEntity GetEntity(int index);
     bool TryGetEntity(int index, out IRustyEntity? entity);
@@ -30,7 +33,7 @@ public interface IEntityService
     void Create(RustyEntityType type, string? displayName, EntityBuildOptions? options = null, int index = 0);
     void Remove(IRustyEntity entity);
 
-    bool TryAttachProperty(IRustyEntity entity, EntityPropertyType propertyType);
-    bool TryRemoveProperty(IRustyEntity entity, EntityPropertyType propertyType);
+    bool TryAttachProperty(IRustyEntity entity, DescPropertyType propertyType);
+    bool TryRemoveProperty(IRustyEntity entity, DescPropertyType propertyType);
 #endif
 }

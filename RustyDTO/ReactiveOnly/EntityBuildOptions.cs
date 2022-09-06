@@ -17,7 +17,6 @@ public record EntityBuildOptions
     private static readonly Dictionary<string, object> _tmp = new();
     private readonly IReadOnlyDictionary<string, object> _values;
 
-
     public static EntityBuildOptions Create()
     {
         return new EntityBuildOptions();

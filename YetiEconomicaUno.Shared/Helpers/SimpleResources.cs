@@ -2,7 +2,8 @@
 using RustyDTO.Interfaces;
 using System;
 using System.Collections.Generic;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
+using YetiEconomicaCore;
 using YetiEconomicaCore.Services;
 
 namespace YetiEconomicaUno.Helpers;
@@ -14,7 +15,7 @@ internal class SimpleResources
 
     private SimpleResources(ResourceService service)
     {
-        service.ObservableResources.Connect(static resource => resource.Index < 0 && resource.TryGetProperty<IHasOwner>(out var ownerInfo) && ownerInfo.Tear == 0 && ownerInfo.Owner.DisplayName == "Main")
+        service.ObservableResources.Connect(static resource => resource.GetIndex() < 0 && resource.TryGetProperty<IHasOwner>(out var ownerInfo) && ownerInfo.Tear == 0 && ownerInfo.Owner.DisplayName == "Main")
             .Subscribe(OnUpdateResources);
     }
 
@@ -49,10 +50,10 @@ internal class SimpleResources
         if (resource is null)
             return false;
 
-        var index = resource.Index;
+        var index = resource.ID;
         foreach (var simple in AllSimplesSafe())
         {
-            if (simple.Index == index)
+            if (simple.ID == index)
                 return true;
         }
         return false;

@@ -24,8 +24,8 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Reactive.Subjects;
 using ReactiveUIGenerator;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -82,7 +82,7 @@ public sealed partial class ConvertableDetalsView : UserControl, IDisposable
 
     private bool OnFilter(IRustyEntity resource)
     {
-        return resource != _exclude && !ViewModel.Exchanges.Select(static x => x.GetUnsafe<IHasExchange>().FromEntity).Contains(resource);
+        return resource != _exclude && !ViewModel.Exchanges.Select(static x => x.GetDescUnsafe<IHasExchange>().FromEntity).Contains(resource);
     }
 
     private void RemoveExchagne_OnClicked()

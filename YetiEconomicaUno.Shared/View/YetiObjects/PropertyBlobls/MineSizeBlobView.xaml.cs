@@ -4,14 +4,14 @@ using System.Reactive.Linq;
 using ReactiveUIGenerator;
 using ReactiveUI;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 
-[ViewFor<IMineSizeProperty>]
+[ViewFor<IMineSize>]
 public sealed partial class MineSizeBlobView : BaseBlobView
 {
     public MineSizeBlobView()
@@ -20,7 +20,7 @@ public sealed partial class MineSizeBlobView : BaseBlobView
 
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.MineSize);
+            Initialize(ViewModel.Index, DescPropertyType.MineSize);
 
             ViewModel.WhenAnyValue(static x => x.X)
                 .CombineLatest(ViewModel.WhenAnyValue(static x => x.Y))

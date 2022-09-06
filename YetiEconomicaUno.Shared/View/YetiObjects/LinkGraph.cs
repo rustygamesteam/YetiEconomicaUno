@@ -15,9 +15,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Nito.Comparers.Linq;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 using YetiEconomicaCore.Services;
 using RustyDTO.Interfaces;
+using YetiEconomicaCore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,7 +37,7 @@ namespace YetiEconomicaUno.View.YetiObjects
         private static readonly Dictionary<RustyEntityType, string> Types = new Dictionary<RustyEntityType, string>
         {
             { RustyEntityType.Build, "build" },
-            { RustyEntityType.Craft, "craft" },
+            { RustyEntityType.CraftTask, "craft" },
             { RustyEntityType.Tech, "tech" },
             { RustyEntityType.Tool, "tool" },
             { RustyEntityType.PVE, "pve" },
@@ -76,13 +77,13 @@ namespace YetiEconomicaUno.View.YetiObjects
                 TryResolveDependents(entity, edges);
             }
 
-            mask = stackalloc[] { RustyEntityType.Craft, RustyEntityType.Tech }.ToBitmask();
+            mask = stackalloc[] { RustyEntityType.CraftTask, RustyEntityType.Tech }.ToBitmask();
             foreach (var entity in entityService.EntitesWhereTypes(mask))
             {
                 if (!entity.TryGetProperty(out IInBuildProcess inBuild) || inBuild.Build is null)
                     continue;
 
-                if (!BuildInfos.TryGetValue(inBuild.Build.Index, out var list))
+                if (!BuildInfos.TryGetValue(inBuild.Build.GetIndex(), out var list))
                     continue;
                 
                 Func<JsonObject, JsonArray> resolveArray;
@@ -90,7 +91,7 @@ namespace YetiEconomicaUno.View.YetiObjects
 
                 switch (entity.Type)
                 {
-                    case RustyEntityType.Craft:
+                    case RustyEntityType.CraftTask:
                         type = "craft";
                         resolveArray = data =>
                         {
@@ -117,7 +118,7 @@ namespace YetiEconomicaUno.View.YetiObjects
                     var array = resolveArray.Invoke(node["data"].AsObject());
                     array.Add(new JsonObject
                     {
-                        { "id", entity.Index.ToString(NumberFormatInfo.InvariantInfo) },
+                        { "id", entity.GetIndex().ToString(NumberFormatInfo.InvariantInfo) },
                         { "name", entity.FullName },
                         { "icon", type }
                     });
@@ -150,7 +151,7 @@ namespace YetiEconomicaUno.View.YetiObjects
 
             AttachBuilds(links, nodes, edges);
 
-            var mask = stackalloc[] {RustyEntityType.Craft, RustyEntityType.Tech, RustyEntityType.Tool, RustyEntityType.PVE}
+            var mask = stackalloc[] {RustyEntityType.CraftTask, RustyEntityType.Tech, RustyEntityType.Tool, RustyEntityType.PVE}
                 .ToBitmask();
             foreach (var entity in entityService.EntitesWhereTypes(mask))
             {
@@ -175,10 +176,10 @@ namespace YetiEconomicaUno.View.YetiObjects
                 return;
 
             if (dependents.Required is not null)
-                edges.Add(CreateEdge(dependents.Required.Index, entity.Index, GroupType.required));
+                edges.Add(CreateEdge(dependents.Required.GetIndex(), entity.GetIndex(), GroupType.required));
 
             if (dependents.VisibleAfter is not null)
-                edges.Add(CreateEdge(dependents.VisibleAfter.Index, entity.Index, GroupType.visible));
+                edges.Add(CreateEdge(dependents.VisibleAfter.GetIndex(), entity.GetIndex(), GroupType.visible));
         }
 
         private static bool TryAttachNode(IRustyEntity entity, JsonArray nodes)
@@ -188,12 +189,12 @@ namespace YetiEconomicaUno.View.YetiObjects
 
             if (TryCreateNode(entity, type, out var result))
             {
-                Nodes[entity.Index] = result;
+                Nodes[entity.GetIndex()] = result;
                 if (entity.Type is RustyEntityType.Build)
                 {
-                    var owner = entity.GetUnsafe<IHasOwner>().Owner;
-                    if (!BuildInfos.TryGetValue(owner.Index, out var list))
-                        BuildInfos[owner.Index] = list = new List<JsonObject>();
+                    var owner = entity.GetDescUnsafe<IHasOwner>().Owner;
+                    if (!BuildInfos.TryGetValue(owner.GetIndex(), out var list))
+                        BuildInfos[owner.GetIndex()] = list = new List<JsonObject>();
                     list.Add(result);
                 }
 
@@ -204,12 +205,12 @@ namespace YetiEconomicaUno.View.YetiObjects
 
         private static bool TryCreateNode(IRustyEntity entity, string type, out JsonObject node)
         {
-            if (NodeIds.Contains(entity.Index))
+            if (NodeIds.Contains(entity.GetIndex()))
             {
                 node = null;
                 return false;
             }
-            NodeIds.Add(entity.Index);
+            NodeIds.Add(entity.GetIndex());
 
             var data = new JsonObject
             {
@@ -220,7 +221,7 @@ namespace YetiEconomicaUno.View.YetiObjects
 
             node = new JsonObject
             {
-                {"id", entity.Index.ToString(NumberFormatInfo.InvariantInfo)},
+                {"id", entity.GetIndex().ToString(NumberFormatInfo.InvariantInfo)},
                 {"data", data},
                 {"type", "entityNode"},
                 {"position", ZeroPosition}
@@ -237,7 +238,7 @@ namespace YetiEconomicaUno.View.YetiObjects
                     continue;
 
                 foreach (var child in group.Child)
-                    edges.Add(CreateEdge(group.Owner.Index, child.entity.Index, child.type));
+                    edges.Add(CreateEdge(group.Owner.GetIndex(), child.entity.GetIndex(), child.type));
             }
         }
 
@@ -282,7 +283,7 @@ namespace YetiEconomicaUno.View.YetiObjects
 
         private static bool IsOwner(EntityGroup group, IRustyEntity entity)
         {
-            var dependents = entity.GetUnsafe<IHasDependents>();
+            var dependents = entity.GetDescUnsafe<IHasDependents>();
             return dependents.Required == group.Owner || dependents.VisibleAfter == group.Owner;
         }
 
@@ -321,7 +322,7 @@ namespace YetiEconomicaUno.View.YetiObjects
 
                 if (owner != null)
                 {
-                    var dependents = entity.GetUnsafe<IHasDependents>();
+                    var dependents = entity.GetDescUnsafe<IHasDependents>();
                     var type = dependents.Required == owner.Owner ? GroupType.required : GroupType.visible;
                     owner.Child.Add(new Link(entity, type));
                 }

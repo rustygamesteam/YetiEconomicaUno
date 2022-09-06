@@ -10,10 +10,12 @@ public enum RustyEntityType : int
     Build = 5,
     UniqueTool = 6,
     Tool = 7,
-    Craft = 8,
-    Plant = 9,
-    // 10 is free
-    Exchage = 11,
+    CraftTask = 8,
+    PlantTask = 9,
+    CityRoad = 10,
+    ExchageTask = 11,
     FarmObstacleClearing = 12,
     PVE = 13,
+    SuperstructureGroup = 14,
+    Superstructure = 15,
 }

@@ -11,7 +11,6 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using RustyDTO;
-using RustyDTO.PropertyModels;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 using YetiEconomicaCore.Services;
 
@@ -123,12 +122,12 @@ public sealed partial class CalculateBalancePage : Page, IDisposable
                     resultTask.Order = toIndex;
                     list.Insert(toIndex, resultTask);
 
-                    if (resultTask is CreateYetiObjectTask createYetiObjectTask && createYetiObjectTask.Target.HasSpecialMask(EntitySpecialMask.IsInstance) && !createYetiObjectTask.Target.HasSpecialMask(EntitySpecialMask.Countable))
+                    if (resultTask is CreateYetiObjectTask createYetiObjectTask && createYetiObjectTask.Target.HasSpecialMask(EntitySpecialMask.IsInstance) && !createYetiObjectTask.Target.HasMutable(MutablePropertyType.Count))
                     {
-                        var index = createYetiObjectTask.Target.Index;
+                        var index = createYetiObjectTask.Target.ID;
                         for (int i = list.Count - 1; i > toIndex; i--)
                         {
-                            if (list[i] is CreateYetiObjectTask task && task.Target.Index == index)
+                            if (list[i] is CreateYetiObjectTask task && task.Target.ID == index)
                                 list.RemoveAt(i);
                         }
                     }

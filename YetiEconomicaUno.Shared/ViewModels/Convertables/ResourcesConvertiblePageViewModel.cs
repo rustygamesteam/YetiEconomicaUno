@@ -6,8 +6,8 @@ using DynamicData.Binding;
 using Nito.Comparers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Services;
 
 namespace YetiEconomicaUno.ViewModels.Convertables;
@@ -31,8 +31,8 @@ public class ResourcesConvertiblePageViewModel : BaseViewModel
     public void Initialize(CompositeDisposable disposable)
     {
         var sort = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(static resource => resource.GetUnsafe<IHasOwner>().Owner.DisplayName, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(static resource => resource.GetUnsafe<IHasOwner>().Tear)
+            .OrderBy(static resource => resource.GetDescUnsafe<IHasOwner>().Owner.DisplayName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(static resource => resource.GetDescUnsafe<IHasOwner>().Tear)
             .ThenBy(static resource => resource.DisplayName, StringComparer.OrdinalIgnoreCase);
 
         var filter = this

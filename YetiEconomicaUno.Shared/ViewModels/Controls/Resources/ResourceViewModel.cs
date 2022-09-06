@@ -2,8 +2,8 @@
 using System.Linq;
 using ReactiveUI;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Converters;
 using YetiEconomicaUno.Models.Resources;
@@ -14,18 +14,18 @@ namespace YetiEconomicaUno.ViewModels
     {
         public IRustyEntity Model { get; }
 
-        public string IndexLabel => $"Index: {Model.Index}";
+        public string IndexLabel => $"Index: {Model.ID}";
 
         public IRustyEntity Group
         {
-            get => Model.GetUnsafe<IHasOwner>().Owner;
+            get => Model.GetDescUnsafe<IHasOwner>().Owner;
             set => RustyEntityService.Instance.ReplaceOwner(Model, value);
         }
 
         public int Tear
         {
-            get => Model.GetUnsafe<IHasOwner>().Tear;
-            set => Model.GetUnsafe<IHasOwner>().Tear = value;
+            get => Model.GetDescUnsafe<IHasOwner>().Tear;
+            set => Model.GetDescUnsafe<IHasOwner>().Tear = value;
         }
 
         public int UseInBuildsCount { get; }
@@ -53,8 +53,8 @@ namespace YetiEconomicaUno.ViewModels
 
             foreach (var priceOwner in priceOwners)
             {
-                if (priceOwner.Type is RustyEntityType.Craft)
-                    useInCrafts.Add($"• {priceOwner.GetUnsafe<IHasSingleReward>().Entity.FullName}");
+                if (priceOwner.Type is RustyEntityType.CraftTask)
+                    useInCrafts.Add($"• {priceOwner.GetDescUnsafe<IHasSingleReward>().Entity.FullName}");
                 else
                     useInSingleCreated.Add($"• {priceOwner.FullName}");
             }
@@ -67,9 +67,9 @@ namespace YetiEconomicaUno.ViewModels
             IEnumerable<string> craftPrice;
             if (CraftService.Instance.TryGetCraft(value, out var craft))
             {
-                craftCount = craft.GetUnsafe<IHasSingleReward>().Count;
-                craftDuration = craft.GetUnsafe<ILongExecution>().Duration;
-                craftPrice = craft.GetUnsafe<IPayable>().Price.Select(static stack => $"• {stack.Resource.FullName}: {stack.Value:0.##}");
+                craftCount = craft.GetDescUnsafe<IHasSingleReward>().Count;
+                craftDuration = craft.GetDescUnsafe<ILongExecution>().Duration;
+                craftPrice = craft.GetDescUnsafe<IPayable>().Price.Select(static stack => $"• {stack.Resource.FullName}: {stack.Value:0.##}");
             }
             else
                 craftPrice = Enumerable.Empty<string>();

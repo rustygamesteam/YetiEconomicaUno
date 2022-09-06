@@ -47,7 +47,7 @@
                 <DataTemplate x:DataType="dataCore:IRustyEntity">
                     <StackPanel Orientation="Vertical" Padding="2, 7, 5, 12">
                         <TextBlock  Margin="10, 0, 0, 0"
-                                    Text="{x:Bind Index, Converter={StaticResource StringFormatConverter}, ConverterParameter='Index: {0}'}"
+                                    Text="{x:Bind ID, Converter={StaticResource StringFormatConverter}, ConverterParameter='Index: {0}'}"
                                     FontSize="10"
                                     Foreground="{ThemeResource TextBoxDisabledForegroundThemeBrush}"/>
                         <TextBox Text="{x:Bind DisplayName, Mode=TwoWay}"/>

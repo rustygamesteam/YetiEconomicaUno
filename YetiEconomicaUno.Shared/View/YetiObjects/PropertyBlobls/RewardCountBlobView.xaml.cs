@@ -1,24 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using ReactiveUIGenerator;
-using YetiEconomicaCore.Descriptions;
 using ReactiveUI;
-using YetiEconomicaCore;
 using System.Reactive.Disposables;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -36,10 +21,10 @@ public sealed partial class RewardCountBlobView : BaseBlobView
         this.InitializeComponent();
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.HasSingleReward);
+            Initialize(ViewModel.Index, DescPropertyType.HasSingleReward);
             var owner = Entity;
 
-            _countLabel = owner.Type is RustyEntityType.Plant ? "Harvest count" : "Count";
+            _countLabel = owner.Type is RustyEntityType.PlantTask ? "Harvest count" : "Count";
             CountBox.Header = _countLabel;
 
             ViewModel.WhenAnyValue(dependents => dependents.Count)

@@ -4,14 +4,14 @@ using System.Reactive.Linq;
 using ReactiveUIGenerator;
 using ReactiveUI;
 using RustyDTO;
-using RustyDTO.PropertyModels;
+using RustyDTO.DescPropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 
-[ViewFor<IToolInfo>]
+[ViewFor<IToolSettings>]
 public sealed partial class ToolInfoBlobView : BaseBlobView
 {
     public ToolInfoBlobView()
@@ -19,7 +19,7 @@ public sealed partial class ToolInfoBlobView : BaseBlobView
         this.InitializeComponent();
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, EntityPropertyType.ToolSettings);
+            Initialize(ViewModel.Index, DescPropertyType.ToolSettings);
 
             ViewModel.WhenAnyValue(static x => x.Efficiency)
                 .CombineLatest(ViewModel.WhenAnyValue(static x => x.Strength), ViewModel.WhenAnyValue(static x => x.RechargeEvery))

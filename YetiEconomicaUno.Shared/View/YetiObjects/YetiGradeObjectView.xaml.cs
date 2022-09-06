@@ -14,8 +14,8 @@ using YetiEconomicaUno.Services;
 using YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 using DynamicData;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -64,10 +64,10 @@ public sealed partial class YetiGradeObjectView : UserControl
     public YetiGradeObjectView AutoInitialize(IRustyEntity entity, CompositeDisposable disposable)
     {
         Initialize(entity, disposable);
-        if (entity.HasProperty(EntityPropertyType.Payable))
+        if (entity.HasProperty(DescPropertyType.Payable))
             InjectPriceWithDurantion(entity, disposable);
 
-        if (entity.HasProperty(EntityPropertyType.HasRewards))
+        if (entity.HasProperty(DescPropertyType.HasRewards))
             InjectRewards(entity, disposable);
 
         return this;
@@ -86,19 +86,19 @@ public sealed partial class YetiGradeObjectView : UserControl
 
         var properties = new ObservableCollectionExtended<IViewFor>();
 
-        foreach (var type in data.Properties.OrderBy(static type => (int)type))
+        foreach (var type in data.DescProperties.OrderBy(static type => (int)type))
         {
             switch (type)
             {
-                case EntityPropertyType.Payable:
+                case DescPropertyType.Payable:
                     continue;
-                case EntityPropertyType.LongExecution:
-                    if(data.HasProperty(EntityPropertyType.Payable))
+                case DescPropertyType.LongExecution:
+                    if(data.HasProperty(DescPropertyType.Payable))
                         continue;
                     break;
             }
 
-            if (TryResolveView(type, data.GetUnsafe(type), out var view))
+            if (TryResolveView(type, data.GetDescUnsafe(type), out var view))
                 properties.Add(view);
         }
 
@@ -122,7 +122,7 @@ public sealed partial class YetiGradeObjectView : UserControl
                             properties.Insert(properties.Count - 1, view);
                         break;
                     case ListChangeReason.Remove:
-                        var propertyView = properties.FirstOrDefault(view => ((IRustyEntityProperty)view.ViewModel) == change.Current.Property);
+                        var propertyView = properties.FirstOrDefault(view => ((IDescProperty)view.ViewModel) == change.Current.Property);
                         if (propertyView != null)
                             properties.Remove(propertyView);
                         break;
@@ -137,7 +137,7 @@ public sealed partial class YetiGradeObjectView : UserControl
         return this;
     }
 
-    private static bool TryResolveView(EntityPropertyType type, IRustyEntityProperty viewModel, out IViewFor view)
+    private static bool TryResolveView(DescPropertyType type, IDescProperty viewModel, out IViewFor view)
     {
         var viewRaw = Locator.Current.GetService(AppBootstrapper.PropertyViewerType, type.ToString());
         if (viewRaw is IViewFor viewFor)
@@ -168,7 +168,7 @@ public sealed partial class YetiGradeObjectView : UserControl
 
     internal YetiGradeObjectView InjectPriceWithDurantion(IRustyEntity entity, CompositeDisposable disposable)
     {
-        var prices = entity.GetUnsafe<IPayable>();
+        var prices = entity.GetDescUnsafe<IPayable>();
 
         if (entity.TryGetProperty(out ILongExecution duration))
         {
@@ -187,7 +187,7 @@ public sealed partial class YetiGradeObjectView : UserControl
 
         if (entity.TryGetProperty<IHasSingleReward>(out var reward))
             PriceList.ExcludeEntity = reward.Entity;
-        else if (entity.TryGetProperty<ILinkTo>(out var link))
+        else if (entity.TryGetProperty<ILink>(out var link))
             PriceList.ExcludeEntity = link.Entity;
         else if (entity.TryGetProperty<IHasExchange>(out var exchange))
             PriceList.ExcludeEntity = exchange.FromEntity;
@@ -211,7 +211,7 @@ public sealed partial class YetiGradeObjectView : UserControl
 
     internal YetiGradeObjectView InjectRewards(IRustyEntity entity, CompositeDisposable disposable)
     {
-        var rewardsInfo = entity.GetUnsafe<IHasRewards>();
+        var rewardsInfo = entity.GetDescUnsafe<IHasRewards>();
 
         RewardsList.ItemsSource = rewardsInfo.Rewards;
         RewardsList.Visibility = Visibility.Visible;
@@ -238,7 +238,7 @@ public sealed partial class YetiGradeObjectView : UserControl
 
     internal YetiGradeObjectView InjectAsTool(IRustyEntity owner, IRustyEntity data, CompositeDisposable disposables)
     {
-        Func<IToolInfo, string> onUpdate;
+        Func<IToolSettings, string> onUpdate;
         switch(owner.DisplayName)
         {
             case "Axe":
@@ -266,7 +266,7 @@ public sealed partial class YetiGradeObjectView : UserControl
                 break;
         }
 
-        var toolInfo = data.GetUnsafe<IToolInfo>();
+        var toolInfo = data.GetDescUnsafe<IToolSettings>();
         toolInfo.WhenAnyPropertyChanged()
             .Subscribe(toolInfo => onUpdate.Invoke(toolInfo))
             .DisposeWith(disposables);

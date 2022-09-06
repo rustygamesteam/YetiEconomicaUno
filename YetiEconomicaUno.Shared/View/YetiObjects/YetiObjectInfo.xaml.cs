@@ -9,8 +9,9 @@ using YetiEconomicaUno.Converters;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using RustyDTO;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
+using YetiEconomicaCore;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -44,11 +45,11 @@ public sealed partial class YetiObjectInfo : UserControl
         if (value == null)
             return;
 
-        var index = value.Index;
+        var index = value.GetIndex();
         switch (ViewModel.Type)
         {
             case RustyEntityType.Tech:
-                var secondsViewModel = ViewModel.GetUnsafe<ILongExecution>();
+                var secondsViewModel = ViewModel.GetDescUnsafe<ILongExecution>();
 
                 secondsViewModel.WhenAnyValue(static x => x.Duration)
                     .Select(static value => $"Tech duration: {DurationLabelConverter.GetDuration(value)}")

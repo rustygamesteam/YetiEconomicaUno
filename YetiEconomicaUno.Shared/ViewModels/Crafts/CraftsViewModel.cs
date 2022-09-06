@@ -6,8 +6,8 @@ using DynamicData.Binding;
 using Nito.Comparers;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyModels;
 using YetiEconomicaCore.Services;
 
 namespace YetiEconomicaUno.ViewModels.Crafts;
@@ -32,9 +32,9 @@ public class CraftsViewModel : BaseViewModel
     public void Intialize(CompositeDisposable disposable)
     {
         var sort = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(static entity => entity.GetUnsafe<IHasSingleReward>().Entity.GetUnsafe<IHasOwner>().Owner.DisplayName, StringComparer.Ordinal)
-            .ThenBy(static entity => entity.GetUnsafe<IHasSingleReward>().Entity.GetUnsafe<IHasOwner>().Tear)
-            .ThenBy(static entity => entity.GetUnsafe<IHasSingleReward>().Entity.DisplayName, StringComparer.Ordinal);
+            .OrderBy(static entity => entity.GetDescUnsafe<IHasSingleReward>().Entity.GetDescUnsafe<IHasOwner>().Owner.DisplayName, StringComparer.Ordinal)
+            .ThenBy(static entity => entity.GetDescUnsafe<IHasSingleReward>().Entity.GetDescUnsafe<IHasOwner>().Tear)
+            .ThenBy(static entity => entity.GetDescUnsafe<IHasSingleReward>().Entity.DisplayName, StringComparer.Ordinal);
 
         var filter = this
             .WhenValueChanged(static x => x.SearchMask)
@@ -56,6 +56,6 @@ public class CraftsViewModel : BaseViewModel
 
     private bool OnFilter(IRustyEntity caftEntity)
     {
-        return string.IsNullOrWhiteSpace(SearchMask) || caftEntity.GetUnsafe<IHasSingleReward>().Entity.FullName.Contains(SearchMask, StringComparison.OrdinalIgnoreCase);
+        return string.IsNullOrWhiteSpace(SearchMask) || caftEntity.GetDescUnsafe<IHasSingleReward>().Entity.FullName.Contains(SearchMask, StringComparison.OrdinalIgnoreCase);
     }
 }
