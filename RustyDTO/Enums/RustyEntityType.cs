@@ -18,4 +18,8 @@ public enum RustyEntityType : int
     PVE = 13,
     SuperstructureGroup = 14,
     Superstructure = 15,
+    Manager = 16,
+    Baff = 17,
+    Profession = 18,
+    Gen = 19,
 }

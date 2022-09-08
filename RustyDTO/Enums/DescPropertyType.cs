@@ -73,7 +73,20 @@ public enum DescPropertyType
     HexMask = 18,
 
     [PropertyHave<string>("Group", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true)]
-    SubGroup = 19
+    SubGroup = 19,
+
+    [PropertyHave<double>("Change")]
+    ChanceActivate = 20,
+
+    [PropertyHave<double>("Value")]
+    //TODO: Применять на (дамаг, время, рессурс, урон прочности, защита)
+    Factor = 21,
+
+    //TODO: Клик игрока, получения рессурса, выполнение задачи, обновление прочности
+    UsageScope = 22,
+
+    [PropertyHave<ICollection<IRustyEntity>>("Links", true, false)]
+    MultiLinks = 23
 }
 
 public static class DescPropertyTypeEx
