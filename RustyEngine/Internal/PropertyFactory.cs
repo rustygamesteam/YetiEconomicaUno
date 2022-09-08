@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using RustyDTO;
-using RustyDTO.PropertyTypes;
 
 namespace RustyEngine.Internal;
 

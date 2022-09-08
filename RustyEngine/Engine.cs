@@ -1,5 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Lepracaun;
 using RustyDTO.Interfaces;
 using RustyEngine.Interfaces;
 
@@ -13,10 +13,14 @@ public class Engine
     public ITimeService TimeService { get; private set; } = null!;
 
     private readonly Dictionary<string, User> _users = null!;
-    private readonly TaskScheduler _context;
+    private WorkerThreadSynchronizationContext _userContext;
+
+    public static Engine Instance { get; private set; } = null!;
 
     public Engine(ITimeService timeService, JsonDocument entityConfig, int userCapacity)
     {
+        Instance = this;
+
         EntityService = new EntityService();
         EntityService.Initialize(entityConfig);
 
@@ -25,7 +29,8 @@ public class Engine
 
         _users = new Dictionary<string, User>(userCapacity);
 
-        _context = TaskScheduler.FromCurrentSynchronizationContext();
+        _userContext = new WorkerThreadSynchronizationContext();
+        _userContext.Run();
     }
 
     public void InjectUser(string id, JsonDocument document, long timeExpiration)
@@ -38,7 +43,17 @@ public class Engine
     private async void UserExpiration(long awaitMilisecond, string userId)
     {
         await Task.Delay(TimeSpan.FromMilliseconds(awaitMilisecond)).ConfigureAwait(false);
-        await Task.Factory.StartNew(static info => ((ExpirationTask)info!).Complete(), new ExpirationTask(_users, userId), default, TaskCreationOptions.None, _context).ConfigureAwait(false);
+        _userContext.Post(state => ((ExpirationTask)state!).Complete(), new ExpirationTask(_users, userId));
+    }
+
+    public void InvokeInUserContext(Action action)
+    {
+        _userContext.Post(_ => action?.Invoke(), null);
+    }
+
+    public void InvokeInUserContext(SendOrPostCallback callback, object? state)
+    {
+        _userContext.Post(callback, state);
     }
 
     private record ExpirationTask(Dictionary<string, User> users, string userId)

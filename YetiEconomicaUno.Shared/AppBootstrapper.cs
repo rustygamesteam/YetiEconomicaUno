@@ -91,6 +91,8 @@ public static class AppBootstrapper
         RegisterPropertyView<CraftingQueueBlobView, IHasCraftingQueue>(DescPropertyType.HasCraftingQueue);
         RegisterPropertyView<PrestigeBlobView, IHasPrestige>(DescPropertyType.HasPrestige);
         RegisterPropertyView<CitySizeBlobView, ICitySize>(DescPropertyType.CitySize);
+        RegisterPropertyView<HexMaskBlobView, IHexMask>(DescPropertyType.HexMask);
+        RegisterPropertyView<SubGroupBlobView, ISubGroup>(DescPropertyType.SubGroup);
         
 
     }

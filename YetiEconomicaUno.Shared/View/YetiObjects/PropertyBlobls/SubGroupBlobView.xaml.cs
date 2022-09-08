@@ -1,20 +1,11 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using ReactiveUIGenerator;
 using RustyDTO.DescPropertyModels;
+using ReactiveUI;
+using YetiEconomicaUno.Helpers;
+using RustyDTO;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -27,9 +18,37 @@ public sealed partial class SubGroupBlobView : BaseBlobView
     public SubGroupBlobView()
     {
         this.InitializeComponent();
+        this.WhenActivated(disposable =>
+        {
+            Initialize(ViewModel.Index, DescPropertyType.SubGroup);
+            SubGroupBox.ItemsSource = SubGroupHelper.ResolveByType(Entity.Type);
+            InfoBox.Text = $"SubGroup: {ViewModel.Group}";
+        });
     }
 
+    private string _lastText;
     protected override void FlyoutOpened(CompositeDisposable disposable)
     {
+        _lastText = SubGroupBox.Text;
+        SubGroupBox.TextChanged += SubGroupBox_OnTextChanged;
+        Disposable.Create(this, view => view.SubGroupBox.TextChanged -= view.SubGroupBox_OnTextChanged)
+            .DisposeWith(disposable);
+    }
+
+    private void SubGroupBox_OnTextChanged(object sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        OnTextChange(SubGroupBox.Text);
+    }
+
+    private void OnTextChange(string value)
+    {
+        value = value.Trim();
+        if (_lastText == value)
+            return;
+
+        SubGroupHelper.Update(Entity.Type, _lastText, value);
+        _lastText = value;
+
+        InfoBox.Text = $"SubGroup: {value}";
     }
 }

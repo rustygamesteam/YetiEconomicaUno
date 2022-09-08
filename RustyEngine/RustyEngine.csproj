@@ -14,4 +14,8 @@
     <Folder Include="Enums\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Lepracaun" Version="0.3.0" />
+  </ItemGroup>
+
 </Project>

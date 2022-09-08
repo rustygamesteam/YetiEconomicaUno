@@ -1,6 +1,8 @@
 ﻿using RustyDTO;
 using RustyDTO.Interfaces;
 using System.Text.Json;
+using RustyDTO.DescPropertyModels;
+using RustyDTO.MutableProperties;
 using RustyDTO.Supports;
 using RustyEngine.Enums;
 
@@ -39,6 +41,24 @@ public class User
         }
         else
             _mutableBag = new Dictionary<EntityID, MutableData>(8);
+
+        if (json.TryGetProperty("tasks", out var tasks))
+        {
+            _exucutingTask = new Dictionary<EntityID, TaskInfo>(tasks.GetArrayLength() + 8);
+            foreach (var taskData in tasks.EnumerateObject())
+            {
+                //TODO парсим задачу
+            }
+        }
+        else
+            _exucutingTask = new Dictionary<EntityID, TaskInfo>(8);
+    }
+
+    public bool OptionalHasEntity(IRustyEntity? entity)
+    {
+        if (entity is null)
+            return true;
+        return HasEntity(entity);
     }
 
     public bool HasEntity(IRustyEntity entity)
@@ -49,26 +69,179 @@ public class User
             return _instanceBag.Contains(entity.ID);
     }
 
-    public bool CanExecute(IRustyEntity rustyEntity)
+    private bool CanPayInternal(IPayable payable)
     {
-        throw new NotImplementedException();
+        var bag = _mutableBag;
+        foreach (var resourceStack in payable.Price)
+        {
+            if (!bag.TryGetValue(resourceStack.Resource.ID, out var data) || data.Get<IMutableCount>().Count < (int)resourceStack.Value)
+                return false;
+        }
+
+        return true;
     }
 
-    public void Execute(IRustyEntity entity)
+    private void UncheckedPayInternal(IPayable payable)
     {
-        throw new NotImplementedException();
+        var bag = _mutableBag;
+        foreach (var resourceStack in payable.Price)
+            bag[resourceStack.Resource.ID].Get<IMutableCount>().Count -= (int)resourceStack.Value;
+
+        //TODO: Сообщить серверу о изменениях
     }
 
-    public void ExecuteBatch(IEnumerable<IRustyEntity> batches)
+    private void UnchekedSignlePay(IRustyEntity entity, int count)
+    {
+        _mutableBag[entity.ID].Get<IMutableCount>().Count -= count;
+        //TODO: Сообщить серверу о изменениях
+    }
+
+    private void InternalIncrement(IRustyEntity resource, int count)
+    {
+        ResolveMutableData(resource).Get<IMutableCount>().Count += count;
+        //TODO: Сообщить серверу о изменениях
+    }
+
+    private MutableData ResolveMutableData(IRustyEntity entity)
+    {
+        if (!_mutableBag.TryGetValue(entity.ID, out var result))
+            _mutableBag.Add(entity.ID, result = new MutableData(entity.Type));
+
+        return result;
+    }
+
+    public bool CanExecute(IRustyEntity entity, int multiplayFactor = 1)
+    {
+        if (!entity.HasSpecialMask(EntitySpecialMask.Executable))
+            return false;
+
+        if (entity.TryGetProperty(out IHasDependents dependents) && !(OptionalHasEntity(dependents.Required) && OptionalHasEntity(dependents.VisibleAfter)))
+            return false;
+
+        if (entity.TryGetProperty(out IPayable payable) && !CanPayInternal(payable))
+            return false;
+
+        if (entity.TryGetProperty(out IHasExchange exchange))
+        {
+            if (!_mutableBag.TryGetValue(exchange.FromEntity.ID, out var data) ||
+                data.Get<IMutableCount>().Count < exchange.FromRate * multiplayFactor)
+                return false;
+        }
+
+        if (entity.HasSpecialMask(EntitySpecialMask.IsInstance))
+        {
+            var mutalbeTypes = EntityDependencies.GetMutalbeProperties(entity.Type);
+            if (mutalbeTypes.Count == 0 && _instanceBag.Contains(entity.ID))
+                return false;
+
+            if (mutalbeTypes.Count > 0 && _mutableBag.ContainsKey(entity.ID))
+                return false;
+        }
+
+        return true;
+    }
+
+    private int CalculateDuration(IRustyEntity entity, int duration)
+    {
+        if (!entity.TryGetProperty(out IInBuildProcess inBuildProcess) || inBuildProcess.Build is null)
+            return duration;
+
+        if (inBuildProcess.Build.TryGetProperty(out IBoostSpeed boostSpeed))
+        {
+            switch (entity.Type)
+            {
+                case RustyEntityType.CraftTask:
+                    duration = (int)Math.Ceiling(duration / boostSpeed.CraftSpeed);
+                    break;
+                case RustyEntityType.Tech:
+                    duration = (int)Math.Ceiling(duration / boostSpeed.TechSpeed);
+                    break;
+            }
+        }
+
+        //TODO Добавляем модификации от менеджеров баффы
+
+        return duration;
+    }
+
+    public void Execute(IRustyEntity entity, int multiplayFactor = 1)
+    {
+        if(!CanExecute(entity, multiplayFactor))
+            return;
+
+        //TODO начинаем запись
+
+        IPayable payable;
+        if (entity.TryGetProperty(out payable))
+            UncheckedPayInternal(payable);
+
+        if (entity.TryGetProperty(out IHasExchange exchange))
+            UnchekedSignlePay(exchange.FromEntity, (int) (exchange.FromRate * multiplayFactor));
+
+        if (entity.TryGetProperty(out ILongExecution longExecution))
+        {
+            ResourceStack[] onCancell = ReferenceEquals(payable, null)
+                ? Array.Empty<ResourceStack>()
+                : payable.Price.ToArray();
+
+            int duration = CalculateDuration(entity, longExecution.Duration);
+            var endTime = Engine.Instance.TimeService.CurrentTime + duration;
+            _exucutingTask.Add(entity.ID, new TaskInfo(endTime, multiplayFactor, entity, onCancell));
+
+            //TODO: Сообщить серверу о задаче
+            //TODO: запустить задачу
+
+            return;
+        }
+
+        ExecuteAfterPay(entity, multiplayFactor);
+    }
+
+    private void ExecuteAfterPay(IRustyEntity entity, int multiplayFactor)
+    {
+        if (entity.TryGetProperty(out IHasRewards rewards))
+        {
+            foreach (var resourceStack in rewards.Rewards)
+                InternalIncrement(resourceStack.Resource, (int) resourceStack.Value);
+        }
+        else if (entity.TryGetProperty(out IHasSingleReward singleReward))
+            InternalIncrement(singleReward.Entity, singleReward.Count);
+
+        if (entity.TryGetProperty(out IHasExchange exchange))
+            InternalIncrement(exchange.ToEntity, (int)(multiplayFactor / exchange.FromRate));
+
+        //TODO завершаем запись
+    }
+
+    public void ExecuteBatch(IEnumerable<(IRustyEntity entity, int multiplayFactor)> batches)
     {
         foreach (var batch in batches)
-            Execute(batch);
+            Execute(batch.entity, batch.multiplayFactor);
     }
 
     private void OnTaskResult(RustyTaskResult status, EntityID index)
     {
-
+        var info = _exucutingTask[index];
+        switch (status)
+        {
+            case RustyTaskResult.Cancel:
+                //TODO Начинаем запись
+                foreach (var resourceStack in info.ResourcesOnCancel)
+                    InternalIncrement(resourceStack.Resource, (int)resourceStack.Value);
+                //TODO завершаем запись
+                throw new NotImplementedException(); //TODO: Result for client
+                break;
+            case RustyTaskResult.Success:
+                //TODO Начинаем запись
+                ExecuteAfterPay(info.ExecuteOnSuccess, info.MultiplayFactor);
+                throw new NotImplementedException(); //TODO: Result for client
+                break;
+            case RustyTaskResult.Failure:
+                throw new NotImplementedException(); //TODO: Error for client
+            case RustyTaskResult.None:
+                throw new NotImplementedException(); //TODO: Error for server
+        }
     }
 }
 
-public record struct TaskInfo (long TimeComplete, ResourceStack[] ResourcesOnSuccess, ResourceStack[] ResourcesOnCancel);
+public record struct TaskInfo (long TimeComplete, int MultiplayFactor, IRustyEntity ExecuteOnSuccess, ResourceStack[] ResourcesOnCancel);

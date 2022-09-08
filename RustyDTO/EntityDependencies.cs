@@ -274,7 +274,7 @@ internal ref struct EntityDependenciesBuilder
 
         public EntityDependenceBuilder Mutable(params MutablePropertyType[] types)
         {
-            _builder._mutableProperties[_index] = types;
+            _builder._mutableProperties[_index] = new HashSet<MutablePropertyType>(types);
             return this;
         }
 
