@@ -59,4 +59,5 @@ public sealed class ViewForAttribute : global::System.Attribute
         ViewModelType = type;
     }
 }";
+
 }

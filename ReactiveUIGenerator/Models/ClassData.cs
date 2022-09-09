@@ -7,5 +7,4 @@ string Namespace,
 string Name,
 string FullName,
 string Modifiers,
-Platform Platform,
 ViewForData ViewFor);

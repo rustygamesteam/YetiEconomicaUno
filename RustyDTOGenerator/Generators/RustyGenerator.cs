@@ -124,6 +124,7 @@ public class RustyGenerator : IIncrementalGenerator
                 string name = enumFieldSymbol.Name;
                 members.Clear();
 
+                
                 foreach (var attributeData in attributes)
                 {
                     var attributeClass = attributeData.AttributeClass!;
@@ -142,8 +143,16 @@ public class RustyGenerator : IIncrementalGenerator
 
                         var isReadOnly = (bool)attributeData.ConstructorArguments[1].Value;
                         var isNullable = (bool)attributeData.ConstructorArguments[2].Value;
+                        var defaultValueConstant = attributeData.ConstructorArguments[3];
+                        
+                        string? defaultValue = defaultValueConstant.Kind switch
+                        {
+                            TypedConstantKind.Primitive => defaultValueConstant.Value?.ToString(),
+                            TypedConstantKind.Enum => $"(global::{defaultValueConstant.Type!.ToDisplayString()}){defaultValueConstant.Value!.ToString()}",
+                            _ => null
+                        };
 
-                        members.Add(new PropertyMember(type, memberName, isReadOnly, isNullable));
+                        members.Add(new PropertyMember(type, memberName, isReadOnly, isNullable, defaultValue));
                     }
                     else if (fullname.StartsWith(OverridePropertyNameAttribute, StringComparison.Ordinal))
                     {

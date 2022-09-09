@@ -17,7 +17,7 @@ public static partial class EntityDependencies
 
 
     [ThreadStatic]
-    private static BitArray _entityTypeBitmask = new BitArray(EntityTypesCount);
+    private static BitArray _entityTypeBitmask = null!;
 
     static EntityDependencies()
     {
@@ -55,8 +55,9 @@ public static partial class EntityDependencies
         builder.For(RustyEntityType.Build)
             .Mask(itemWithGroupMask | EntitySpecialMask.RequiredInDependencies)
             .Required(DescPropertyType.Payable, DescPropertyType.LongExecution, DescPropertyType.HasDependents,
-                DescPropertyType.HasOwner, DescPropertyType.BoostSpeed)
-            .Optional(DescPropertyType.HasPrestige, DescPropertyType.CitySize, DescPropertyType.HasCraftingQueue);
+                DescPropertyType.HasOwner)
+            .Optional(DescPropertyType.HasPrestige, DescPropertyType.CitySize, DescPropertyType.HasCraftingQueue, 
+                DescPropertyType.CraftSpeed, DescPropertyType.TechSpeed);
 
         //Tool
         builder.For(RustyEntityType.Tool)
@@ -99,7 +100,6 @@ public static partial class EntityDependencies
             .Mask(taskMask)
             .Required(DescPropertyType.LongExecution, DescPropertyType.HasSingleReward, DescPropertyType.HasDependents, DescPropertyType.TakeSpace);
 
-
         //ExchageTask
         builder.For(RustyEntityType.ExchageTask)
             .Mask(taskMask)
@@ -131,6 +131,16 @@ public static partial class EntityDependencies
             .Mask(itemWithGroupMask)
             .Required(DescPropertyType.Payable, DescPropertyType.HasDependents, DescPropertyType.HasOwner)
             .Optional(DescPropertyType.HasPrestige);
+
+        //Baff
+        builder.For(RustyEntityType.Baff)
+            .Required(DescPropertyType.HasNameKey, DescPropertyType.UsageScope)
+            .Optional(DescPropertyType.Factor);
+
+        //Gens
+        builder.For(RustyEntityType.Gen)
+            .Required(DescPropertyType.PurposeOfGen, DescPropertyType.HasNameKey, DescPropertyType.Rarity, DescPropertyType.ChanceActivate, DescPropertyType.IconKey)
+            .Optional(DescPropertyType.HasDescKey, DescPropertyType.MultiLinks);
 
     }
 

@@ -6,7 +6,6 @@ using System.Diagnostics;
 using H.Generators.Extensions;
 using ReactiveUIGenerator.Models;
 
-using Platform = H.Generators.Platform;
 using Microsoft.CodeAnalysis.Text;
 using System.Text;
 
@@ -94,8 +93,7 @@ internal class ViewForGenerator : IIncrementalGenerator
 
         try
         {
-            var platform = options.RecognizePlatform(prefix: Name); 
-            var classes = GetTypesToGenerate(compilation, platform, classSyntaxes, context.CancellationToken);
+            var classes = GetTypesToGenerate(compilation, classSyntaxes, context.CancellationToken);
 
             foreach (var @class in classes)
             {
@@ -117,7 +115,6 @@ internal class ViewForGenerator : IIncrementalGenerator
 
     private static IReadOnlyCollection<ClassData> GetTypesToGenerate(
         Compilation compilation,
-        Platform platform,
         IEnumerable<ClassDeclarationSyntax> classes,
         CancellationToken cancellationToken)
     {
@@ -166,7 +163,7 @@ internal class ViewForGenerator : IIncrementalGenerator
                     else
                         continue;
                 }
-                values.Add(new ClassData(@namespace, className, fullClassName, classModifiers, platform, new ViewForData(typeName!)));
+                values.Add(new ClassData(@namespace, className, fullClassName, classModifiers, new ViewForData(typeName!)));
             }
         }
         return values;

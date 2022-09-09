@@ -77,11 +77,11 @@ public static class AppBootstrapper
         Locator.CurrentMutable.Register(static () => new FarmPlantTaskView(), typeof(IViewFor<FarmPlantTask>));
         Locator.CurrentMutable.Register(static () => new RecycleResourcesTaskView(), typeof(IViewFor<RecycleResourcesTask>));
         Locator.CurrentMutable.Register(static () => new ResourceGiftView(), typeof(IViewFor<ResourceGiftTask>));
-
+        
         RegisterPropertyView<DependentsBlobView, IHasDependents>(DescPropertyType.HasDependents);
         RegisterPropertyView<InBuildBlobView, IInBuildProcess>(DescPropertyType.InBuildProcess);
         RegisterPropertyView<MineSizeBlobView, IMineSize>(DescPropertyType.MineSize);
-        RegisterPropertyView<SpeedBootBlobView, IBoostSpeed>(DescPropertyType.BoostSpeed);
+        //RegisterPropertyView<SpeedBootBlobView, IBoostSpeed>(DescPropertyType.BoostSpeed);
         RegisterPropertyView<ToolInfoBlobView, IToolSettings>(DescPropertyType.ToolSettings);
         RegisterPropertyView<TearBlobView, IHasOwner >(DescPropertyType.HasOwner);
         RegisterPropertyView<LongExecutionBlobView, ILongExecution>(DescPropertyType.LongExecution);
@@ -114,6 +114,8 @@ public static class AppBootstrapper
         mapper.RegisterType(
             static value => new BsonDocument(new Dictionary<string, BsonValue> { { "Index", value.Resource.GetIndex() }, { "Value", value.Value } }),
             static doc => new ResourceStack(RustyEntityService.Instance.GetEntity(doc["Index"].AsInt32), doc["Value"].AsDouble));
+
+        mapper.RegisterType(static entity => entity?.ID.Index ?? -1, static value => RustyEntityService.Instance.GetOptionEntity(value.AsInt32));
 
         mapper.RegisterType(
             serialize: static s => ((int)s),

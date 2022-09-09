@@ -1,4 +1,6 @@
-﻿namespace RustyDTOGenerator.Generators;
+﻿using System.Text;
+
+namespace RustyDTOGenerator.Generators;
 
 internal class SourceGenerationHelper
 {
@@ -25,21 +27,55 @@ internal sealed class OverridePropertyNameAttribute<TType> : global::System.Attr
 [global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = true)]
 internal sealed class PropertyHaveAttribute<TType> : global::System.Attribute
 {
-    public PropertyHaveAttribute(string name, bool isReadOnly = false, bool isNullable = false)
+    public PropertyHaveAttribute(string name, bool isReadOnly = false, bool isNullable = false, object? defaultValue = null)
     {
     }
 }
 ";
 
+    private static readonly StringBuilder _sb = new StringBuilder(1024);
+    private static string InternalGenerateProperty(PropertyMember[] members)
+    {
+        _sb.Length = 0;
+        var sb = _sb;
+        foreach (var member in members)
+        {
+            if (member.DefaultValue != null)
+            {
+                sb.Append("\t[global::System.ComponentModel.DefaultValue(");
+                sb.Append(member.DefaultValue);
+                sb.Append(")]\n");
+            }
+
+            sb.Append('\t');
+            sb.Append(member.TypeName);
+            if (member.IsNulable)
+                sb.Append('?');
+            sb.Append(' ');
+            sb.Append(member.Name);
+            sb.Append(" { get; ");
+            if (!member.IsReadOnly)
+                sb.Append("set; ");
+            sb.Append("}\n\n");
+        }
+
+        if (members.Length > 0)
+            sb.Length -= 2;
+
+        return sb.ToString();
+    }
+
     public static string GenerateProperty(PropertyEnumInfo enumInfo)
     {
+        var members = InternalGenerateProperty(enumInfo.Members);
+
         return @$"#nullable enable
 
 namespace {enumInfo.Namespace};
 
 public interface I{enumInfo.Prefix}{enumInfo.Name} : global::{enumInfo.BaseType}
 {{
-{string.Join("\n\n", enumInfo.Members.Select(member => $"    {member.TypeName}{NulableGenerator(member.IsNulable)} {member.Name} {{ get; {SetGenerator(member.IsReadOnly)}}}"))}
+{members}
 }}
 ";
     }

@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	  <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <LangVersion>preview</LangVersion>
+	  <Nullable>enable</Nullable>
+	  <IsRoslynComponent>true</IsRoslynComponent>
+	  <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64;win-x86;win-x64</RuntimeIdentifiers>
+	  <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Platform)'=='AnyCPU'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Platform)'=='x64'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+
+	<ItemGroup>
+    <Folder Include="Generators\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
+		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="H.Generators.Extensions" Version="1.7.7" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" PrivateAssets="all" />
+	</ItemGroup>
+
+	<PropertyGroup Label="Analyzers">
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<AnalysisMode>All</AnalysisMode>
+	</PropertyGroup>
+</Project>

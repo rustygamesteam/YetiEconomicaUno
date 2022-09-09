@@ -1,6 +1,7 @@
 ﻿namespace RustyDTO.Supports;
 
-public enum HexMask
+[Flags]
+public enum HexMaskFlags
 {
     None = 0,
     Center = 1 << 0,

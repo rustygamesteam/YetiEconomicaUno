@@ -20,6 +20,5 @@ public enum RustyEntityType : int
     Superstructure = 15,
     Manager = 16,
     Baff = 17,
-    Profession = 18,
-    Gen = 19,
+    Gen = 18,
 }
