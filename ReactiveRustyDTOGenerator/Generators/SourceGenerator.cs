@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System.Diagnostics;
 using H.Generators.Extensions;
 using System.Linq;
+using System;
 
 namespace ReactiveRustyDTOGenerator.Generators;
 
@@ -83,18 +84,28 @@ public class SourceGenerator : IIncrementalGenerator
                 sb.Append("\t\tIndex = index;\n");
 
                 sb.Append("\t\tvar mapper = global::LiteDB.BsonMapper.Global;\n");
-                
 
-                foreach (var tuple in info.Body)
+                if (info.BodyLength == 1)
                 {
+                    var tuple = info.Body.First();
                     sb.Append("\t\t");
                     sb.Append(tuple.Name);
-                    sb.Append(" = ");
-                    sb.Append("mapper.Deserialize<");
+                    sb.Append(" = mapper.Deserialize<");
                     sb.Append(tuple.BaseType);
-                    sb.Append(">(data[nameof(");
-                    sb.Append(tuple.Name);
-                    sb.Append(")]);\n");
+                    sb.Append(">(data);\n");
+                }
+                else
+                {
+                    foreach (var tuple in info.Body)
+                    {
+                        sb.Append("\t\t");
+                        sb.Append(tuple.Name);
+                        sb.Append(" = mapper.Deserialize<");
+                        sb.Append(tuple.BaseType);
+                        sb.Append(">(data[nameof(");
+                        sb.Append(tuple.Name);
+                        sb.Append(")]);\n");
+                    }
                 }
                 sb.Append("\t}\n\n");
 

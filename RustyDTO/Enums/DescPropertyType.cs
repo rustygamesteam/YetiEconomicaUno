@@ -13,8 +13,8 @@ public enum DescPropertyType
     [PropertyHave<IRustyEntity>("Owner", isReadOnly: true)]
     HasOwner = 1,
 
-    [PropertyHave<IRustyEntity>("Required", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true)]
-    [PropertyHave<IRustyEntity>("VisibleAfter", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true)]
+    [PropertyHave<IRustyEntity>("Required", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: -1)]
+    [PropertyHave<IRustyEntity>("VisibleAfter", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: -1)]
     HasDependents = 2,
 
     [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
