@@ -54,7 +54,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\YetiEconomicaCore\YetiEconomicaCore.csproj" />
+		<ProjectReference Include="..\YetiEconomicaCore\YetiEconomicaCore.csproj" />
 		<ProjectReference Include="..\ReactiveUIGenerator\ReactiveUIGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0">
 			<ExcludeAssets>runtime</ExcludeAssets>
 			<IncludeAssets></IncludeAssets>

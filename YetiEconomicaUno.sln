@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YetiEconomicaUno.Windows", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YetiEconomicaUno.Skia.Wpf", "YetiEconomicaUno.Skia.Wpf\YetiEconomicaUno.Skia.Wpf.csproj", "{870B1917-6FAE-4CAF-8ED1-409DB810ACCD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YetiEconomicaCore", "..\YetiEconomicaCore\YetiEconomicaCore.csproj", "{7582DAD1-8F38-4630-A083-79294A1AAAC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YetiEconomicaCore", "YetiEconomicaCore\YetiEconomicaCore.csproj", "{7582DAD1-8F38-4630-A083-79294A1AAAC4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReactiveUIGenerator", "ReactiveUIGenerator\ReactiveUIGenerator.csproj", "{4291EB54-7F6A-4167-9D27-C786C39118DB}"
 EndProject
