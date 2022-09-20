@@ -51,7 +51,20 @@
             <StackPanel Grid.Column="1"
                         Spacing="5"
                         Orientation="Horizontal">
-	            <AppBarButton Icon="Refresh" LabelPosition="Collapsed" Click="{x:Bind RefrashView}" Width="50" Margin="0, 0, -5, 0" />
+                <AppBarButton Icon="Refresh" LabelPosition="Collapsed" Click="{x:Bind RefrashView}" Width="50" Margin="0, 0, -5, 0" />
+                <AppBarSeparator />
+                <SymbolIcon Symbol="Filter" Margin="5, 0" />
+                <SplitButton>
+                    <TextBlock x:Name="FilterLabel" Text="All" />
+                    <SplitButton.Flyout>
+                        <Flyout Placement="Bottom">
+                            <ListView x:Name="FilterListView" 
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Type"
+                                      SelectionMode="Multiple"/>
+                        </Flyout>
+                    </SplitButton.Flyout>
+                </SplitButton>
                 <AppBarSeparator />
                 <SymbolIcon Symbol="Find" Margin="5, 0" />
                 <TextBox x:Name="SearchBox"

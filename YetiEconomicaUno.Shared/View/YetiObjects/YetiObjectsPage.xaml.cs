@@ -7,7 +7,8 @@ using System.Reactive.Disposables;
 using DynamicData;
 using ReactiveUI;
 using System;
-using RustyDTO;
+using System.Reactive.Linq;
+using System.Linq;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,7 +22,6 @@ namespace YetiEconomicaUno.View.YetiObjects;
 public sealed partial class YetiObjectsPage : Page, IDisposable
 {
     private CompositeDisposable _disposables;
-    public record struct EnumWithHeader(string Name, RustyEntityType Type);
 
     public YetiObjectsPage()
     {
@@ -34,7 +34,36 @@ public sealed partial class YetiObjectsPage : Page, IDisposable
             this.OneWayBind(ViewModel, static vm => vm.ItemSource, static view => view.DetailsView.ItemsSource).DisposeWith(disposable);
             this.Bind(ViewModel, static vm => vm.SearchMask, static view => view.SearchBox.Text).DisposeWith(disposable);
 
+            FilterListView.ItemsSource = YetiObjectsPageViewModel.Filters;
+
+            Observable.FromEventPattern<SelectionChangedEventHandler, SelectionChangedEventArgs>(
+                    handler => FilterListView.SelectionChanged += handler,
+                    handler => FilterListView.SelectionChanged -= handler)
+                .Subscribe(_ =>
+                {
+                    var items = FilterListView.SelectedItems;
+
+                    if (items.Count == YetiObjectsPageViewModel.Filters.Length)
+                        FilterLabel.Text = "All";
+                    else
+                    {
+                        FilterLabel.Text = items.Count switch
+                        {
+                            0 => "All",
+                            > 4 => "Mixed",
+                            _ => string.Join(", ", items.Cast<EnumWithHeader>().Select(item => item.Name))
+                        };
+                    }
+
+                    var source = items.Count == 0 ? YetiObjectsPageViewModel.Filters : items.Cast<EnumWithHeader>();
+                    ViewModel.UpdateBitmask(source);
+                })
+                .DisposeWith(disposable);
+
+            //FilterLabel.
+
             this.DisposeWith(disposable);
+
         });
     }
 
@@ -71,13 +100,7 @@ public sealed partial class YetiObjectsPage : Page, IDisposable
         var comboBox = (ComboBox)sender;
         comboBox.Loaded -= NewType_OnLoaded;
 
-        var values = new EnumWithHeader[]
-        {
-            new ("Build", RustyEntityType.UniqueBuild),
-            new ("Tool", RustyEntityType.UniqueTool),
-            new ("Tech", RustyEntityType.Tech),
-            new ("PVE", RustyEntityType.PVE),
-        };
+        var values = YetiObjectsPageViewModel.Filters;
 
         comboBox.DisplayMemberPath = "Name";
         comboBox.SelectedValuePath = "Type";

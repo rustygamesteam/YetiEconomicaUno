@@ -13,10 +13,10 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <ComboBox HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
-              Header="{Binding Header, Mode=OneWay}">
+    <controls:HeaderedContentControl HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                                     Header="{Binding Header, Mode=OneWay}">
         <TreeView x:Name="EnumComboBox"
                   SelectionMode="Multiple"
                   ItemTemplate="{StaticResource EnumTemplate}" />
-    </ComboBox>
+    </controls:HeaderedContentControl>
 </UserControl>
