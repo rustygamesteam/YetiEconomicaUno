@@ -64,9 +64,9 @@ public class CraftTask : ProgressTask
 
         var buildInfo = CraftEntity.GetDescUnsafe<IInBuildProcess>();
         double craftTime = CraftEntity.GetDescUnsafe<ILongExecution>().Duration;
-        if (buildInfo.Build is not null)
+        if (buildInfo.Build is not null && buildInfo.Build.TryGetProperty(out ICraftSpeed craftSpeed))
         {
-            craftTime /= buildInfo.Build.GetDescUnsafe<IBoostSpeed>().CraftSpeed;
+            craftTime /= craftSpeed.Factor;
             craftTime = Math.Ceiling(craftTime);
         }
 

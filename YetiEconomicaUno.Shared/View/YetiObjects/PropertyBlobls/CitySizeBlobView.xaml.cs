@@ -31,7 +31,8 @@ public sealed partial class CitySizeBlobView : BaseBlobView
 
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, DescPropertyType.MineSize);
+            Initialize(ViewModel.Index, DescPropertyType.CitySize);
+            MakeSmallInfo();
 
             ViewModel.WhenAnyValue(static x => x.BuildsMax)
                 .CombineLatest(ViewModel.WhenAnyValue(static x => x.RoadsMax))

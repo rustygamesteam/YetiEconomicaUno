@@ -54,10 +54,11 @@ public class CreateYetiObjectTask : ProgressTask
         if (Target.TryGetProperty(out ILongExecution longExecution))
         {
             duration = longExecution.Duration;
-            if (Target.Type is RustyEntityType.Tech && Target.TryGetProperty<IInBuildProcess>(out var buildProcess) && buildProcess.Build is not null)
+            if (Target.Type is RustyEntityType.Tech && 
+                Target.TryGetProperty<IInBuildProcess>(out var buildProcess) && 
+                buildProcess.Build is not null && buildProcess.Build.TryGetProperty(out ITechSpeed techSpeed))
             {
-                var boost = buildProcess.Build.GetDescUnsafe<IBoostSpeed>();
-                duration /= boost.TechSpeed;
+                duration /= techSpeed.Factor;
                 duration = Math.Ceiling(duration);
             }
         }

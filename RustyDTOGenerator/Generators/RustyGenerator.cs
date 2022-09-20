@@ -147,7 +147,7 @@ public class RustyGenerator : IIncrementalGenerator
                         
                         string? defaultValue = defaultValueConstant.Kind switch
                         {
-                            TypedConstantKind.Primitive => defaultValueConstant.Value?.ToString(),
+                            TypedConstantKind.Primitive => defaultValueConstant.Value?.ToString()?.ToLower(),
                             TypedConstantKind.Enum => $"(global::{defaultValueConstant.Type!.ToDisplayString()}){defaultValueConstant.Value!.ToString()}",
                             _ => null
                         };

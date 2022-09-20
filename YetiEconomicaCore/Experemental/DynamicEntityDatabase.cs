@@ -109,7 +109,8 @@ internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
         var type = (RustyEntityType)document["Type"].AsInt32;
         var displayName = document["Name"].AsString;
         var properties = document["Properties"].AsArray.Select(value => (DescPropertyType)value.AsInt32);
-        var mutable = document["Mutalbe"].AsArray.Select(value => (MutablePropertyType)value.AsInt32);
+
+        var mutable = EntityDependencies.GetMutalbeProperties(type);
 
         return new RustyEntity(index, type, displayName, properties, mutable);
     }

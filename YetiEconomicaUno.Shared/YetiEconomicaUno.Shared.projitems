@@ -192,8 +192,10 @@
       <DependentUpon>HexMaskBlobView.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\CraftingQueueBlobView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\CraftSpeedBlobView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\PrestigeBlobView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\TakeSpaceBlob.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\Impls\TechSpeedBlobView.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml.cs">
       <DependentUpon>InBuildBlobView.xaml</DependentUpon>
     </Compile>
@@ -205,9 +207,6 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml.cs">
       <DependentUpon>RewardCountBlobView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml.cs">
-      <DependentUpon>SpeedBootBlobView.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SubGroupBlobView.xaml.cs">
       <DependentUpon>SubGroupBlobView.xaml</DependentUpon>
@@ -421,10 +420,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

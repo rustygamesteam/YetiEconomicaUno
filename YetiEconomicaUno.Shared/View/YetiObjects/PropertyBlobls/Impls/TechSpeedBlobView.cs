@@ -9,20 +9,20 @@ using YetiEconomicaUno.View.YetiObjects.PropertyBlobls.Abstract;
 
 namespace YetiEconomicaUno.View.YetiObjects.PropertyBlobls.Impls;
 
-[ViewFor<IHasPrestige>]
-public sealed partial class PrestigeBlobView : SingleNumberBlob
+[ViewFor<ITechSpeed>]
+public sealed partial class TechSpeedBlobView : SingleNumberBlob
 {
-    public override (double minimum, double maximum) Range => (1, 1000000);
+    public override (double minimum, double maximum) Range => (0.01, 1000);
 
     protected override void OnActivated(CompositeDisposable disposable)
     {
         base.OnActivated(disposable);
 
-        Initialize(ViewModel, DescPropertyType.HasPrestige);
+        Initialize(ViewModel, DescPropertyType.TechSpeed);
 
-        SetValueBinding("Prestige", ViewModel.WhenAnyValue(static viewModel => viewModel.Prestige), new Binding
+        SetValueBinding("Craft speed", ViewModel.WhenAnyValue(static viewModel => viewModel.Factor), new Binding
         {
-            Path = new PropertyPath(nameof(ViewModel.Prestige)),
+            Path = new PropertyPath(nameof(ViewModel.Factor)),
             Mode = BindingMode.TwoWay,
             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
         }, disposable);

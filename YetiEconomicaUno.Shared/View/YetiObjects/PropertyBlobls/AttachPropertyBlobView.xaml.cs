@@ -39,6 +39,10 @@ public sealed partial class AttachPropertyBlobView : Button
         Resources["ButtonBackgroundPointerOver"] = Background;
         Resources["ButtonBackgroundPressed"] = Background;
 
+        CornerRadius = new CornerRadius(10);
+        Padding = new Thickness(10, 3, 10, 3);
+        Margin = new Thickness(0, 7, 0, 0);
+
         base.OnApplyTemplate();
     }
 

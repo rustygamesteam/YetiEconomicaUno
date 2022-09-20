@@ -115,7 +115,7 @@ public static class AppBootstrapper
             static value => new BsonDocument(new Dictionary<string, BsonValue> { { "Index", value.Resource.GetIndex() }, { "Value", value.Value } }),
             static doc => new ResourceStack(RustyEntityService.Instance.GetEntity(doc["Index"].AsInt32), doc["Value"].AsDouble));
 
-        mapper.RegisterType(static entity => entity?.ID.Index ?? -1, static value => RustyEntityService.Instance.GetOptionEntity(value.AsInt32));
+        mapper.RegisterType(static entity => entity?.ID.Index ?? int.MinValue, static value => RustyEntityService.Instance.GetOptionEntity(value.AsInt32));
 
         mapper.RegisterType(
             serialize: static s => ((int)s),
@@ -135,8 +135,15 @@ public static class AppBootstrapper
 
         var getEntityMapperFunc = typeof(BsonMapper).GetMethod("GetEntityMapper", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         var progressTask = typeof(ProgressTask);
+
+        var reactiveModel = typeof(IDescProperty);
+
+
         var types = Assembly.GetAssembly(progressTask).DefinedTypes
-            .Where(type => type.IsSubclassOf(progressTask) && !type.IsAbstract);
+            .Where(type => !type.IsAbstract && type.IsSubclassOf(progressTask));
+
+        types = types.Concat(Assembly.GetAssembly(typeof(RustyEntityService)).DefinedTypes
+            .Where(type => !type.IsAbstract && type.ImplementedInterfaces.Contains(reactiveModel)));
 
         foreach (var type in types)
         {

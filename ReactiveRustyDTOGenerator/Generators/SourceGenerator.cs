@@ -251,11 +251,20 @@ public class SourceGenerator : IIncrementalGenerator
                         return displayName.StartsWith(DefaultValueAttribute, StringComparison.Ordinal);
 
                     }).FirstOrDefault();
+
+
                     if (defualValueAttribute is null)
                         defualValue = $"({type})default";
                     else
                     {
-                        defualValue = defualValueAttribute.ConstructorArguments[0].Value?.ToString() ?? $"({type})default";
+                        var defaultArgument = defualValueAttribute.ConstructorArguments[0];
+                        var defaultValueAsString = defaultArgument.Value?.ToString();
+                        if (defaultValueAsString is null)
+                            defaultValueAsString = $"({type})default";
+                        else if (defaultArgument.Kind is TypedConstantKind.Primitive)
+                            defaultValueAsString = defaultValueAsString.ToLower();
+
+                        defualValue = defaultValueAsString;
                     }
 
                     return (type, name, defualValue, symbol.IsReadOnly);

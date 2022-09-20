@@ -31,13 +31,13 @@ public static class MathHelper
         if (value.Length == 0)
             return 0;
 
-        int index = 0;
+        int result = 0;
         bool isNeg = value[startIndex] == '-';
         if (isNeg)
             startIndex++;
 
         for (int i = startIndex; i < value.Length; i++)
-            index = index * 10 + (value[i] - '0');
-        return isNeg ? -index : index;
+            result = result * 10 + (value[i] - '0');
+        return isNeg ? -result : result;
     }
 }

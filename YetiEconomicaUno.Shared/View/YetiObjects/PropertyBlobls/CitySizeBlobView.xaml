@@ -4,31 +4,24 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:flyouts="using:YetiEconomicaUno.View.Flyouts"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <Button.ContextFlyout>
-        <flyouts:FlyoutWithBtn Label="Remove"
-	                           Icon="Remove"
-	                           Opened="Flyout_OnOpened" 
-	                           Closing="Flyout_OnClosing">
-            <StackPanel Orientation="Horizontal" Spacing="5">
-                <NumberBox x:Name="MineCellsXBox"
+    <local:BaseBlobView.Detals>
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <NumberBox x:Name="MineCellsXBox"
 			               Minimum="1" 
 			               Maximum="10000"
 			               Value="{Binding BuildsMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 			               ValidationMode="InvalidInputOverwritten"
 			               Header="Builds max"
 			               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"/>
-                <NumberBox x:Name="MineCellsYBox"
+            <NumberBox x:Name="MineCellsYBox"
 			               Minimum="1" 
 			               Maximum="10000"
 			               Value="{Binding RoadsMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 			               ValidationMode="InvalidInputOverwritten"
 			               Header="Roads max"
 			               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"/>
-            </StackPanel>
-        </flyouts:FlyoutWithBtn>
-    </Button.ContextFlyout>
-    <TextBlock x:Name="InfoBox" />
+        </StackPanel>
+    </local:BaseBlobView.Detals>
 </local:BaseBlobView>

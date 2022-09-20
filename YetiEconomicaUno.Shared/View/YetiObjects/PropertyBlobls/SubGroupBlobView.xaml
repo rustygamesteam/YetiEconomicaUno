@@ -21,5 +21,4 @@
             </controls:HeaderedContentControl>
         </flyouts:FlyoutWithBtn>
     </Button.ContextFlyout>
-    <TextBlock x:Name="InfoBox" />
 </local:BaseBlobView>

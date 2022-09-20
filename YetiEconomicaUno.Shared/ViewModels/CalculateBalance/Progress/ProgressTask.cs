@@ -239,8 +239,8 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
                     var rewardInfo = craft.GetDescUnsafe<IHasSingleReward>();
 
                     double craftTime = craft.GetDescUnsafe<ILongExecution>().Duration;
-                    if (buildInfo.Build != null)
-                        craftTime /= buildInfo.Build.GetDescUnsafe<IBoostSpeed>().CraftSpeed;
+                    if (buildInfo.Build is not null && buildInfo.Build.TryGetProperty(out ICraftSpeed craftSpeed))
+                        craftTime /= craftSpeed.Factor;
 
                     craftTimeMax = Math.Max(craftTimeMax, Math.Max((int)craftTime, 1));
                     userData.Wallet.IncrimentWallet(node.Resource, rewardInfo.Count);

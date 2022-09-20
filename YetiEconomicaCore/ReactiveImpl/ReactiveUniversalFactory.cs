@@ -92,9 +92,12 @@ internal static partial class ReactiveUniversalFactory
 
                     foreach (var key in keys)
                     {
+                        if(!_serialize.TryGetValue(key, out var fixedKey))
+                            continue;
+
                         var value = document[key];
                         document.Remove(key);
-                        document.Add(_serialize[key], value);
+                        document[fixedKey] = value;
                     }
                 }
             }
@@ -110,9 +113,12 @@ internal static partial class ReactiveUniversalFactory
                 var keys = document.Keys.ToArray();
                 foreach (var key in keys)
                 {
+                    if(!_deserialize.TryGetValue(key, out var fixedKey))
+                        continue;
+
                     var value = document[key];
                     document.Remove(key);
-                    document.Add(_deserialize[key], value);
+                    document[fixedKey] = value;
                 }
             }
 

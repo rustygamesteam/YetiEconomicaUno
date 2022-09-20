@@ -30,8 +30,5 @@
     
 
     <Style TargetType="local2:BaseBlobView" BasedOn="{StaticResource DefaultButtonStyle}">
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="Padding" Value="10, 3" />
-        <Setter Property="Margin" Value="0, 7, 0, 0" />
     </Style>
 </ResourceDictionary>

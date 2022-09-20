@@ -12,7 +12,7 @@ namespace YetiEconomicaUno.View.YetiObjects.PropertyBlobls.Abstract;
 
 public abstract partial class SingleNumberBlob : BaseBlobView, IActivatableView
 {
-    public abstract (int minimum, int maximum) Range { get; }
+    public abstract (double minimum, double maximum) Range { get; }
 
     public SingleNumberBlob()
     {
@@ -40,6 +40,17 @@ public abstract partial class SingleNumberBlob : BaseBlobView, IActivatableView
         NumberBox.SetBinding(NumberBox.ValueProperty, binding);
 
         valueObservable.Select(value => $"{header}: {value}")
+            .BindTo(this, view => view.InfoBox.Text)
+            .DisposeWith(disposable);
+    }
+
+
+    protected void SetValueBinding(string header, IObservable<double> valueObservable, Binding binding, CompositeDisposable disposable)
+    {
+        NumberBox.Header = header;
+        NumberBox.SetBinding(NumberBox.ValueProperty, binding);
+
+        valueObservable.Select(value => $"{header}: {value:N3}")
             .BindTo(this, view => view.InfoBox.Text)
             .DisposeWith(disposable);
     }

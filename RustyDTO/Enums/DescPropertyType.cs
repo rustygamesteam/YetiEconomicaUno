@@ -13,13 +13,14 @@ public enum DescPropertyType
     [PropertyHave<IRustyEntity>("Owner", isReadOnly: true)]
     HasOwner = 1,
 
-    [PropertyHave<IRustyEntity>("Required", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: -1)]
-    [PropertyHave<IRustyEntity>("VisibleAfter", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: -1)]
+    [PropertyHave<IRustyEntity>("Required", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: int.MinValue)]
+    [PropertyHave<IRustyEntity>("VisibleAfter", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: int.MinValue)]
     HasDependents = 2,
 
     [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
     Payable = 3,
 
+    [PropertyHave<bool>("IsCancelable", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: true)]
     [PropertyHave<int>("Duration", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 60)]
     LongExecution = 4,
 
@@ -34,7 +35,7 @@ public enum DescPropertyType
     [PropertyHave<int>("RechargeEvery", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 14)]
     ToolSettings = 6,
 
-    [PropertyHave<IRustyEntity>("Build", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true)]
+    [PropertyHave<IRustyEntity>("Build", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: int.MinValue)]
     InBuildProcess = 7,
 
     [PropertyHave<IRustyEntity>("Entity", isReadOnly: true)]
@@ -68,8 +69,8 @@ public enum DescPropertyType
     [PropertyHave<int>("Prestige", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
     HasPrestige = 16,
 
-    [PropertyHave<int>("BuildsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
-    [PropertyHave<int>("RoadsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
+    [PropertyHave<int>("BuildsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 10)]
+    [PropertyHave<int>("RoadsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 10)]
     CitySize = 17,
 
     [PropertyHave<HexMaskFlags>("Mask", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: HexMaskFlags.All)]

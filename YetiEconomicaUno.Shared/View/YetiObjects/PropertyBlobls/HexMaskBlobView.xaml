@@ -4,18 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:flyouts="using:YetiEconomicaUno.View.Flyouts"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <Button.ContextFlyout>
-        <flyouts:FlyoutWithBtn Label="Remove"
-	                           Icon="Remove"
-	                           Opened="Flyout_OnOpened" 
-	                           Closing="Flyout_OnClosing">
-            <local:MaskBoxView x:Name="MaskBox"
+    <local:BaseBlobView.Detals>
+        <local:MaskBoxView x:Name="MaskBox"
                        AllowFocusWhenDisabled="True"
                        Value="{Binding ViewModel.Mask, Mode=TwoWay}"/>
-        </flyouts:FlyoutWithBtn>
-    </Button.ContextFlyout>
-    <TextBlock x:Name="InfoBox" />
+    </local:BaseBlobView.Detals>
 </local:BaseBlobView>

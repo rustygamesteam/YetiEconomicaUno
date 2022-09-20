@@ -202,7 +202,7 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
     {
         //yield return new (DescPropertyType.HasOwner, ReactiveHasOwnerFactory.Instance); // 1
         yield return new (DescPropertyType.HasDependents, ReactiveUniversalFactory.ReactiveHasDependentsFactory()); //2
-        yield return new (DescPropertyType.LongExecution, ReactiveLongExecutionFactory.Instance); //4
+        yield return new (DescPropertyType.LongExecution, ReactiveUniversalFactory.ReactiveLongExecutionFactory()); //4
         //yield return new (DescPropertyType.BoostSpeed, ReactiveBoostInfoFactory.Instance); //5
         yield return new (DescPropertyType.ToolSettings, ReactiveUniversalFactory.ReactiveToolSettingsFactory()); //6
         yield return new (DescPropertyType.InBuildProcess, ReactiveUniversalFactory.ReactiveInBuildProcessFactory()); //7

@@ -25,6 +25,8 @@ public sealed partial class DependentsBlobView : BaseBlobView
         this.WhenActivated(disposables =>
         {
             Initialize(ViewModel.Index, DescPropertyType.HasDependents);
+            MakeSmallInfo();
+
             _filter = new DeepFilter(ViewModel);
 
             ViewModel.WhenAnyValue(dependents => dependents.Required)

@@ -1,18 +1,20 @@
-﻿using System.Text;
-
-namespace RustyDTO.Supports;
+﻿namespace RustyDTO.Supports;
 
 public struct EntityID : IEquatable<EntityID>
-{
-    private static readonly char[] _keys = new char[] { 'd', 'm', 'u' };
-
+{ 
     public int Index { get; }
     public EntityIndexType Type { get; }
 
-    public EntityID(EntityIndexType type, int index)
+    private readonly int _hash;
+    private string? _str;
+
+    public EntityID(EntityIndexType type, int index, string? str = null)
     {
         Index = index;
         Type = type;
+
+        _str = str;
+        _hash = HashCode.Combine(type, index);
     }
 
     public static bool operator ==(EntityID first, EntityID second)
@@ -27,38 +29,48 @@ public struct EntityID : IEquatable<EntityID>
 
     public override string ToString()
     {
-        return EntityIndexHelper.ToString(_keys[(int) Type], Index);
+        if (_str is null)
+        {
+            Span<char> chars = stackalloc char[16];
+            chars[0] = (char)Type;
+
+            if (Index.TryFormat(chars.Slice(1), out var length))
+            {
+                _str = new string(chars.Slice(0, length + 1));
+                return _str;
+            }
+
+            _str = string.Concat(chars[0], Index);
+        }
+
+        return _str;
     }
 
     public string ToJsonRaw()
     {
-        return EntityIndexHelper.ToJsonRaw(_keys[(int)Type], Index);
+        Span<char> chars = stackalloc char[19];
+        chars[0] = '[';
+        chars[1] = (char)Type;
+        chars[2] = ',';
+
+        if (Index.TryFormat(chars.Slice(3), out var length))
+        {
+            chars[length + 3] = ']';
+            return new string(chars.Slice(0, length + 4));
+        }
+
+        return $"[{chars[1]},{Index}]";
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(Type, Index);
+        return _hash;
     }
 
     public static EntityID Parse(string raw)
     {
-        EntityIndexType indexType;
-        switch (raw[0])
-        {
-            case 'd':
-                indexType = EntityIndexType.d;
-                break;
-            case 'm':
-                indexType = EntityIndexType.m;
-                break;
-            case 'u':
-                indexType = EntityIndexType.u;
-                break;
-            default:
-                throw new NotImplementedException($"EntityIndexType invalid try parse: {raw}");
-        }
-
-        return new EntityID(indexType, MathHelper.ToIndexString(raw, 1));
+        EntityIndexType indexType = (EntityIndexType)raw[0];
+        return new EntityID(indexType, MathHelper.ToIndexString(raw, 1), raw);
     }
 
     public bool Equals(EntityID other)
@@ -72,48 +84,18 @@ public struct EntityID : IEquatable<EntityID>
     }
 }
 
-internal static class EntityIndexHelper
-{
-    private static readonly ThreadLocal<StringBuilder> _toStringBuilder = new (() => new StringBuilder(8));
-
-    public static string ToString(char type, int index)
-    {
-        var sb = _toStringBuilder.Value!;
-
-        sb.Length = 0;
-        sb.Append(type);
-        sb.Append(index);
-
-        return sb.ToString();
-    }
-
-    public static string ToJsonRaw(char type, int index)
-    {
-        var sb = _toStringBuilder.Value!;
-
-        sb.Length = 0;
-        sb.Append('[');
-        sb.Append(type);
-        sb.Append(',');
-        sb.Append(index);
-        sb.Append(']');
-
-        return sb.ToString();
-    }
-}
-
 public enum EntityIndexType : byte
 {
     /// <summary>
     /// Default
     /// </summary>
-    d = 0,
+    d = (byte)'d',
     /// <summary>
     /// Multi instance
     /// </summary>
-    m = 1,
+    m = (byte)'m',
     /// <summary>
     /// User or game generated
     /// </summary>
-    u = 2
+    u = (byte)'u'
 }

@@ -20,7 +20,8 @@
                       CanDrag="False">
             <StackPanel Orientation="Horizontal" Spacing="10">
                 <SymbolIcon Width="20" Symbol="Document" />
-                <TextBlock Text="{Binding DisplayNameWithTear, Mode=OneWay}" />
+                <TextBlock Text="{Binding DisplayNameWithTear, Mode=OneWay}"
+                           Margin="0, 0, 10, 0"/>
             </StackPanel>
         </TreeViewItem>
     </DataTemplate>

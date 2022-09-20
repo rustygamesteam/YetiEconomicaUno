@@ -165,6 +165,7 @@
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\Impls\CraftingQueueBlobView.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\Impls\PrestigeBlobView.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\Impls\TakeSpaceBlob.cs" />
+    <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\Impls\TechSpeedBlobView.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\LongExecutionBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\MineSizeViewBlob.xaml.cs" />
