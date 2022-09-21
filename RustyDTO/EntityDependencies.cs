@@ -105,7 +105,6 @@ public static partial class EntityDependencies
             .Mask(taskMask)
             .Required(DescPropertyType.HasExchange);
 
-
         //FarmObstacleClearing
         builder.For(RustyEntityType.FarmObstacleClearing)
             .Mask(EntitySpecialMask.Executable | EntitySpecialMask.IsInstance)
@@ -124,7 +123,7 @@ public static partial class EntityDependencies
 
         //Superstructure
         builder.For(RustyEntityType.Superstructure)
-            .Mask(itemWithGroupMask)
+            .Mask(itemMask | EntitySpecialMask.HasUniqueID)
             .Required(DescPropertyType.HasDependents, DescPropertyType.Payable, DescPropertyType.HexMask)
             .Optional(DescPropertyType.HasPrestige, DescPropertyType.SubGroup);
 

@@ -50,7 +50,7 @@ public sealed partial class YetiObjectsPage : Page, IDisposable
                         FilterLabel.Text = items.Count switch
                         {
                             0 => "All",
-                            > 4 => "Mixed",
+                            > 3 => "Mixed...",
                             _ => string.Join(", ", items.Cast<EnumWithHeader>().Select(item => item.Name))
                         };
                     }
