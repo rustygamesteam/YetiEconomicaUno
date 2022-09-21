@@ -36,6 +36,7 @@ public class YetiObjectsPageViewModel : BaseViewModel
         new("Tool", RustyEntityType.UniqueTool),
         new("Tech", RustyEntityType.Tech),
         new("PVE", RustyEntityType.PVE),
+        new("SubBuild", RustyEntityType.Superstructure)
     };
 
     private class YetiObjectsPageFilter : IObservable<Func<IRustyEntity, bool>>
@@ -96,7 +97,7 @@ public class YetiObjectsPageViewModel : BaseViewModel
             .OrderBy(static data => data.Type)
             .ThenBy(static data => data.DisplayName);
 
-        var mask = EntityDependencies.ToConstantBitmask(stackalloc[] {RustyEntityType.UniqueBuild, RustyEntityType.UniqueTool, RustyEntityType.Tech, RustyEntityType.PVE});
+        var mask = EntityDependencies.ToConstantBitmask(Filters.Select(header => header.Type).ToArray());
         _filter = new YetiObjectsPageFilter(mask);
 
         Service.ConnectToEntity(model => mask.Get(model.TypeAsIndex))

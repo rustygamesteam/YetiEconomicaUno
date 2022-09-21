@@ -1,0 +1,60 @@
+﻿<Page
+    x:Class="YetiEconomicaUno.View.MineConfigPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:cutomControls="using:CommunityToolkit.WinUI.UI.Controls" 
+    xmlns:yetiObjects="using:YetiEconomicaUno.View.YetiObjects"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel Margin="10" Spacing="5">
+
+        <cutomControls:HeaderedContentControl Header="Simple resources">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <yetiObjects:YetiObjectSelector Header="Wood" Mask="Resources" SelectedValue="{x:Bind SimpleResourcesConfig.Wood, Mode=TwoWay}" />
+                <yetiObjects:YetiObjectSelector Header="Stone" Mask="Resources" SelectedValue="{x:Bind SimpleResourcesConfig.Stone, Mode=TwoWay}" />
+                <yetiObjects:YetiObjectSelector Header="Ore" Mask="Resources" SelectedValue="{x:Bind SimpleResourcesConfig.Ore, Mode=TwoWay}" />
+            </StackPanel>
+        </cutomControls:HeaderedContentControl>
+
+        <Expander Header="Mine configs"
+                  IsExpanded="true"
+                  ExpandDirection="Down">
+            <StackPanel Spacing="5">
+                <cutomControls:HeaderedContentControl Header="Cells">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <NumberBox x:Name="SizeX_Box" 
+                           Minimum="1" Maximum="10" 
+                           ValidationMode="InvalidInputOverwritten" />
+                        <NumberBox x:Name="SizeY_Box" 
+                           Minimum="1" Maximum="10" 
+                           ValidationMode="InvalidInputOverwritten" />
+                    </StackPanel>
+                </cutomControls:HeaderedContentControl>
+
+
+                <cutomControls:HeaderedContentControl Header="Proportions">
+                    <StackPanel Spacing="5" Orientation="Horizontal">
+                        <NumberBox x:Name="GroundBox" 
+                           Header="Ground"
+                           HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                           Minimum="1" Maximum="50" 
+                           ValidationMode="InvalidInputOverwritten" />
+                        <NumberBox x:Name="StoneBox" 
+                           Header="Stone"
+                           HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                           Minimum="1" Maximum="50" 
+                           ValidationMode="InvalidInputOverwritten" />
+                        <NumberBox x:Name="OreBox" 
+                           Header="Ore"
+                           HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                           Minimum="1" Maximum="50" 
+                           ValidationMode="InvalidInputOverwritten" />
+                    </StackPanel>
+                </cutomControls:HeaderedContentControl>
+            </StackPanel>
+        </Expander>
+    </StackPanel>
+</Page>

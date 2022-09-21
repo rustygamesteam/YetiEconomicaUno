@@ -46,6 +46,7 @@ public sealed partial class YetiObjectInfo : UserControl
             return;
 
         var index = value.GetIndex();
+        Visibility hasSpecial = Visibility.Visible;
         switch (ViewModel.Type)
         {
             case RustyEntityType.Tech:
@@ -65,7 +66,11 @@ public sealed partial class YetiObjectInfo : UserControl
                     .BindTo(this, static view => view.SpecialLine.Text)
                     .DisposeWith(_disposables);
                 break;
+            case RustyEntityType.Superstructure:
+            case RustyEntityType.PVE:
+                hasSpecial = Visibility.Collapsed;
+                break;
         }
-        SpecialLine.Visibility = Visibility.Visible;
+        SpecialLine.Visibility = hasSpecial;
     }
 }

@@ -14,13 +14,15 @@
             <Grid ColumnSpacing="5" Margin="0, 8, 0, 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0" 
+                         FontSize="13"
                          Loaded="NewName_OnLoaded" 
                          HorizontalAlignment="Stretch"/>
                 <ComboBox Grid.Column="1" 
-                         Width="80"
+                          HorizontalAlignment="Stretch"
+                          FontSize="12"
                          Loaded="NewType_OnLoaded" />
             </Grid>
         </DataTemplate>
@@ -102,7 +104,7 @@
                     IsDynamicOverflowEnabled="False"
                     HorizontalContentAlignment="Stretch"
                     ContentTemplate="{StaticResource DataTemplateResourceSelector}">
-                    <AppBarButton x:Name="AddReceiptBtn" Icon="Add" Label="Add" Click="{x:Bind Add_OnClicked}"/>
+                    <AppBarButton x:Name="AddReceiptBtn" Width="50" Icon="Add" Label="Add" Click="{x:Bind Add_OnClicked}"/>
                 </CommandBar>
             </controls:ListDetailsView.ListCommandBar>
 

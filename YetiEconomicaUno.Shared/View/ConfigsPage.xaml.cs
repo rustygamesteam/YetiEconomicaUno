@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System;
 using System.Linq.Expressions;
+using YetiEconomicaCore.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,9 +20,13 @@ namespace YetiEconomicaUno.View
     [ViewFor<MineConfigViewModel>]
     public sealed partial class MineConfigPage : Page
     {
+        public SimpleResourcesConfig SimpleResourcesConfig { get; }
+
         public MineConfigPage()
         {
             this.InitializeComponent();
+
+            SimpleResourcesConfig = GlobalConfigService.Instance.SimpleResources;
 
             this.WhenActivated(disposables =>
             {
@@ -35,6 +40,11 @@ namespace YetiEconomicaUno.View
                     (GroundBox, static value => value.Ground),
                     (StoneBox, static value => value.Stone), 
                     (OreBox, static value => value.Ore));
+
+                Disposable.Create(this, page =>
+                {
+                    page.Bindings.StopTracking();
+                }).DisposeWith(disposables);
             });
         }
 

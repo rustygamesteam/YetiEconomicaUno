@@ -16,6 +16,7 @@ using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
 using YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 using YetiEconomicaCore;
+using System.Windows.Markup;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -77,15 +78,30 @@ public sealed partial class YetiObjectDetalInfo : UserControl
             {
                 switch(change.Reason)
                 {
-                    case ChangeReason.Add:
-                        ItemsList.Items.Add(change.Current);
+                    case ListChangeReason.AddRange:
+                        foreach (var view in change.Range)
+                            ItemsList.Items.Add(view);
                         break;
-                    case ChangeReason.Remove:
-                        ItemsList.Items.Remove(change.Current);
+                    case ListChangeReason.RemoveRange:
+                        foreach (var view in change.Range)
+                            ItemsList.Items.Remove(view);
                         break;
-                    case ChangeReason.Moved:
-                        ItemsList.Items.Replace(change.Previous, change.Current);
-                        ItemsList.Items.Replace(change.Current, change.Previous);
+                    case ListChangeReason.Add:
+                        ItemsList.Items.Add(change.Item.Current);
+                        break;
+                    case ListChangeReason.Remove:
+                        ItemsList.Items.Remove(change.Item.Current);
+                        break;
+                    case ListChangeReason.Clear:
+                        ItemsList.Items.Clear();
+                        break;
+                    case ListChangeReason.Moved:
+                        if (change.Range.Count == 0)
+                        {
+                            var item = change.Item;
+                            ItemsList.Items.Replace(item.Previous.Value, item.Current);
+                            ItemsList.Items.Replace(item.Current, item.Previous.Value);
+                        }
                         break;
                 }
             }
@@ -96,46 +112,30 @@ public sealed partial class YetiObjectDetalInfo : UserControl
         Disposable.Create(ItemsList, static list => list.Items.Clear()).DisposeWith(_reInitialize);
     }
 
-    private static IObservable<IChangeSet<YetiGradeObjectView, int>> Initialize(IRustyEntity viewModel, RustyEntityService service, CompositeDisposable disposables)
+    private static IObservable<IChangeSet<YetiGradeObjectView>> Initialize(IRustyEntity viewModel, RustyEntityService service, CompositeDisposable disposables)
     {
         var sort = ComparerBuilder.For<IRustyEntity>()
             .OrderBy(static data => data.GetDescUnsafe<IHasOwner>().Tear)
             .ThenBy(static data => data.DisplayName);
 
-        switch (viewModel.Type)
+        if (EntityDependencies.HasSpectialMask(viewModel.TypeAsIndex, EntitySpecialMask.HasChild))
         {
-            case RustyEntityType.PVE:
-            case RustyEntityType.Tech:
-                var set = new ChangeSet<YetiGradeObjectView, int>(1)
-                {
-                    new Change<YetiGradeObjectView, int>(
-                        ChangeReason.Add, 
-                        viewModel.GetIndex(), 
-                        new YetiGradeObjectView(viewModel)
-                            .AutoInitialize(viewModel, disposables))
-                };
-                return Observable.Return(set);
-            case RustyEntityType.UniqueBuild:
-                return service.ConnectToEntity(static data => data.Type is RustyEntityType.Build)
-                    .Filter(data => data.GetDescUnsafe<IHasOwner>().Owner.ID == viewModel.ID)
-                    .Sort(sort)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Transform(data => new YetiGradeObjectView(data)
-                        .Initialize(data, disposables)
-                        .InjectName(data, disposables)
-                        .InjectAsBuild(viewModel, data, disposables)
-                        .InjectPriceWithDurantion(data, disposables));
-            case RustyEntityType.UniqueTool:
-                return service.ConnectToEntity(static data => data.Type is RustyEntityType.Tool)
-                    .Filter(data => data.GetDescUnsafe<IHasOwner>().Owner.ID == viewModel.ID)
-                    .Sort(sort)
-                    .Transform(data => new YetiGradeObjectView(data)
-                        .Initialize(data, disposables)
-                        .InjectName(data, disposables)
-                        .InjectAsTool(viewModel, data, disposables)
-                        .InjectPriceWithDurantion(data, disposables));
-            default:
-                throw new NotImplementedException();
+            return service.GetObservableEntitiesForOwner(viewModel.GetIndex())
+                .Sort(sort)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Transform(entity => new YetiGradeObjectView(entity)
+                    .InjectName(entity, disposables)
+                    .AutoInitialize(entity, disposables));
+        }
+        else
+        {
+            return Observable.Return(new ChangeSet<YetiGradeObjectView>()
+            {
+                new Change<YetiGradeObjectView>(
+                    ListChangeReason.Add,
+                    new YetiGradeObjectView(viewModel)
+                        .AutoInitialize(viewModel, disposables))
+            });
         }
     }
 

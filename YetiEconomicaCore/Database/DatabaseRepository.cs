@@ -27,7 +27,11 @@ public sealed partial class DatabaseRepository : IDisposable
         var disposable = config.WhenAnyPropertyChanged()
             .Throttle(TimeSpan.FromSeconds(1))
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(config => _configs.Upsert(BsonMapper.Global.ToDocument(config)));
+            .Subscribe(config =>
+            {
+                var configBson = BsonMapper.Global.ToDocument(config);
+                _configs.Upsert(configBson);
+            });
 
         if (compositeDisposable is not null)
             disposable.DisposeWith(compositeDisposable);

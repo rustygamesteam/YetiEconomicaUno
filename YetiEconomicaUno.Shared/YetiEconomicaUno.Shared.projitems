@@ -182,8 +182,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)View\ResourcesPage.xaml.cs">
       <DependentUpon>ResourcesPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)View\MineConfigPage.xaml.cs">
-      <DependentUpon>MineConfigPage.xaml</DependentUpon>
+    <Compile Include="$(MSBuildThisFileDirectory)View\ConfigsPage.xaml.cs">
+      <DependentUpon>ConfigsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml.cs">
       <DependentUpon>FarmExpansionBlobView.xaml</DependentUpon>
@@ -375,7 +375,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="$(MSBuildThisFileDirectory)View\MineConfigPage.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)View\ConfigsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

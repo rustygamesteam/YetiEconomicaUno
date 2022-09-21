@@ -122,15 +122,11 @@ public static partial class EntityDependencies
             .Optional(DescPropertyType.HasPrestige)
             .Mask(itemMask | EntitySpecialMask.HasUniqueID);
 
-        //SuperstructureGroup
-        builder.For(RustyEntityType.SuperstructureGroup)
-            .Mask(EntitySpecialMask.HasChild);
-
         //Superstructure
         builder.For(RustyEntityType.Superstructure)
             .Mask(itemWithGroupMask)
-            .Required(DescPropertyType.Payable, DescPropertyType.HasDependents, DescPropertyType.HasOwner)
-            .Optional(DescPropertyType.HasPrestige);
+            .Required(DescPropertyType.HasDependents, DescPropertyType.Payable, DescPropertyType.HexMask)
+            .Optional(DescPropertyType.HasPrestige, DescPropertyType.SubGroup);
 
         //Baff
         builder.For(RustyEntityType.Baff)

@@ -24,7 +24,7 @@
             <NavigationViewItem Content="Convertable" Tag="Convertable" />
             <NavigationViewItem Content="Plants" Tag="Plants" />
             <NavigationViewItem Content="Plant obstacles" Tag="PlantObstacles" /> 
-            <NavigationViewItem Content="Mine configs" Tag="MineConfigs" />
+            <NavigationViewItem Content="Configs" Tag="MineConfigs" />
             <NavigationViewItem Content="Yeti objects" Tag="YetiObjects" />
             <NavigationViewItem Content="Calculate balance" Tag="CalculateBalance" />
         </NavigationView.MenuItems>

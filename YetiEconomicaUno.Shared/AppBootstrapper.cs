@@ -81,7 +81,6 @@ public static class AppBootstrapper
         RegisterPropertyView<DependentsBlobView, IHasDependents>(DescPropertyType.HasDependents);
         RegisterPropertyView<InBuildBlobView, IInBuildProcess>(DescPropertyType.InBuildProcess);
         RegisterPropertyView<MineSizeBlobView, IMineSize>(DescPropertyType.MineSize);
-        //RegisterPropertyView<SpeedBootBlobView, IBoostSpeed>(DescPropertyType.BoostSpeed);
         RegisterPropertyView<ToolInfoBlobView, IToolSettings>(DescPropertyType.ToolSettings);
         RegisterPropertyView<TearBlobView, IHasOwner >(DescPropertyType.HasOwner);
         RegisterPropertyView<LongExecutionBlobView, ILongExecution>(DescPropertyType.LongExecution);
@@ -93,8 +92,9 @@ public static class AppBootstrapper
         RegisterPropertyView<CitySizeBlobView, ICitySize>(DescPropertyType.CitySize);
         RegisterPropertyView<HexMaskBlobView, IHexMask>(DescPropertyType.HexMask);
         RegisterPropertyView<SubGroupBlobView, ISubGroup>(DescPropertyType.SubGroup);
-        
 
+        RegisterPropertyView<CraftSpeedBlobView, ICraftSpeed>(DescPropertyType.CraftSpeed);
+        RegisterPropertyView<TechSpeedBlobView, ITechSpeed>(DescPropertyType.TechSpeed);
     }
 
     public static Type PropertyViewerType { get; } = typeof(PropertyViewer);

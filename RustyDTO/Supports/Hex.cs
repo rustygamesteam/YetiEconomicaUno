@@ -12,6 +12,7 @@ public enum HexMaskFlags
     LeftDown = 1 << 5,
     Down = 1 << 6,
     RightDown = 1 << 7,
+    Around = ~Center,
     All = int.MaxValue
 }
 

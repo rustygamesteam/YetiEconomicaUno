@@ -16,9 +16,8 @@ public enum RustyEntityType : int
     ExchageTask = 11,
     FarmObstacleClearing = 12,
     PVE = 13,
-    SuperstructureGroup = 14,
-    Superstructure = 15,
-    Manager = 16,
-    Baff = 17,
-    Gen = 18,
+    Superstructure = 14,
+    Manager = 15,
+    Baff = 16,
+    Gen = 17,
 }
