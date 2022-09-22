@@ -58,7 +58,7 @@ public class PlantsService
 
 
         var sortByIndex = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(entity => entity.ID);
+            .OrderBy(static entity => entity.GetIndex());
 
         RustyEntityService.Instance.ConnectToEntity(static entity => entity.Type is RustyEntityType.FarmObstacleClearing)
             .RemoveKey()
@@ -145,7 +145,7 @@ public class PlantsService
     public IList GetObstaclesAsObservable(CompositeDisposable disposable)
     {
         var sortByIndex = ComparerBuilder.For<IRustyEntity>()
-            .OrderBy(entity => entity.ID);
+            .OrderBy(static entity => entity.GetIndex());
         RustyEntityService.Instance.ConnectToEntity(entity => entity.Type is RustyEntityType.FarmObstacleClearing)
             .Sort(sortByIndex)
             .Bind(out var list)

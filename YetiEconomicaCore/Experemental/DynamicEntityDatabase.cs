@@ -21,7 +21,7 @@ internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
         _disposable = new CompositeDisposable();
 
         _entities = database.GetCollection(table, BsonAutoId.Int32);
-        _cache = new SourceCache<IRustyEntity, int>(entity => entity.ID.Index);
+        _cache = new SourceCache<IRustyEntity, int>(static entity => entity.GetIndex());
         _cache.Edit(updater =>
         {
             foreach (var document in _entities.FindAll())
