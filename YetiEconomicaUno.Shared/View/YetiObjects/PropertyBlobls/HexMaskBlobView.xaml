@@ -7,8 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <local:BaseBlobView.Detals>
-        <local:MaskBoxView x:Name="MaskBox"
-                       AllowFocusWhenDisabled="True"
-                       Value="{Binding ViewModel.Mask, Mode=TwoWay}"/>
+        <local:MaskBoxView  x:Name="MaskBox"
+                            AllowFocusWhenDisabled="True"
+                            Header="Mask"
+                            Value="{Binding Mask, Mode=TwoWay}"/>
     </local:BaseBlobView.Detals>
 </local:BaseBlobView>

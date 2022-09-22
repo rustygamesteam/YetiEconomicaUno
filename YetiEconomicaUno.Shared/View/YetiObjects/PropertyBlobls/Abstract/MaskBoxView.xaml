@@ -9,14 +9,18 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <DataTemplate x:Key="EnumTemplate">
-            <TextBlock Text="{Binding Label}" />
+            <TextBlock Text="{Binding Label}"
+                       Padding="0, 0, 10, 0"/>
         </DataTemplate>
+        <Style TargetType="TreeViewItem">
+            <Setter Property="Padding" Value="0, 0, 10, 0" />
+        </Style>
     </UserControl.Resources>
 
-    <controls:HeaderedContentControl HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
-                                     Header="{Binding Header, Mode=OneWay}">
+    <controls:HeaderedContentControl HeaderTemplate="{StaticResource SmallHeaderForComboBoxDataTemplate}"
+                                     Header="{x:Bind Header, Mode=OneWay}">
         <TreeView x:Name="EnumComboBox"
-                  SelectionMode="Multiple"
-                  ItemTemplate="{StaticResource EnumTemplate}" />
+                  MaxHeight="250"
+                  SelectionMode="Multiple" />
     </controls:HeaderedContentControl>
 </UserControl>

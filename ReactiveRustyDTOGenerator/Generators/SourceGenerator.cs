@@ -264,7 +264,7 @@ public class SourceGenerator : IIncrementalGenerator
                         else if (defaultArgument.Kind is TypedConstantKind.Primitive)
                         {
                             if(symbol.Type.IsValueType)
-                                defaultValueAsString = $"({type}){defaultValueAsString.ToLower()}";
+                                defaultValueAsString = $"({type})({defaultValueAsString.ToLower()})";
                             else
                                 defaultValueAsString = defaultValueAsString.ToLower();
                         }

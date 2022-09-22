@@ -17,6 +17,7 @@ using ReactiveUIGenerator;
 using RustyDTO.DescPropertyModels;
 using ReactiveUI;
 using RustyDTO;
+using RustyDTO.Supports;
 using YetiEconomicaUno.Converters;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -32,17 +33,15 @@ public sealed partial class HexMaskBlobView : BaseBlobView
         this.InitializeComponent();
         this.WhenActivated(disposables =>
         {
-            Initialize(ViewModel.Index, DescPropertyType.HexMask);
+            Initialize(ViewModel, DescPropertyType.HexMask);
 
             ViewModel.WhenAnyValue(prop => prop.Mask)
                 .Subscribe(mask =>
                 {
-                    //var durationString = DurationLabelConverter.GetDuration(duration);
-                    //InfoBox.Text = $"Mask: {durationString}";
-
-                    //TODO!
-
+                    if (!MaskBox.IsInitialize)
+                        MaskBox.InitializeCache(typeof(HexMaskFlags), ViewModel.Mask);
                     InfoBox.Text = $"Mask: {MaskBox.SelectedValuesAsString()}";
+                    InfoBox.FontSize = MaskBox.ResultCount > 1 ? 12 : 14;
                 })
                 .DisposeWith(disposables);
         });

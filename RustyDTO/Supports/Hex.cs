@@ -1,7 +1,7 @@
 ﻿namespace RustyDTO.Supports;
 
 [Flags]
-public enum HexMaskFlags
+public enum HexMaskFlags : int
 {
     None = 0,
     Center = 1 << 0,
@@ -13,7 +13,7 @@ public enum HexMaskFlags
     Down = 1 << 6,
     RightDown = 1 << 7,
     Around = ~Center,
-    All = int.MaxValue
+    All = -1
 }
 
 public enum HexPosition
