@@ -143,12 +143,12 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
         return result;
     }
 
-    private void InternalClearList<TResult>(int index, Dictionary<int, TResult> dictionary, Func<TResult, ICollection<ResourceStack>> action)
+    private void InternalClearList<TResult>(int index, Dictionary<int, TResult> dictionary, Func<TResult, ICollection<ResourceStack>> takeCollection)
         where TResult : ReactiveRecord, IDescProperty
     {
         if (dictionary.TryGetValue(index, out var result))
         {
-            action.Invoke(result).Clear();
+            takeCollection.Invoke(result).Clear();
             dictionary.Remove(index);
         }
     }
