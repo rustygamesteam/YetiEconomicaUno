@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -64,7 +65,7 @@ public sealed partial class YetiGradeObjectView : UserControl
     public YetiGradeObjectView AutoInitialize(IRustyEntity entity, CompositeDisposable disposable)
     {
         Initialize(entity, disposable);
-        if (entity.HasProperty(DescPropertyType.Payable))
+        if (entity.HasProperty(DescPropertyType.Payable) || entity.HasProperty(DescPropertyType.FakePayable))
             InjectPriceWithDurantion(entity, disposable);
 
         if (entity.HasProperty(DescPropertyType.HasRewards))
@@ -168,7 +169,11 @@ public sealed partial class YetiGradeObjectView : UserControl
 
     internal YetiGradeObjectView InjectPriceWithDurantion(IRustyEntity entity, CompositeDisposable disposable)
     {
-        var prices = entity.GetDescUnsafe<IPayable>();
+        ICollection<ResourceStack> price;
+        if (entity.TryGetProperty(out IPayable payable))
+            price = payable.Price;
+        else
+            price = entity.GetDescUnsafe<IFakePayable>().Price;
 
         if (entity.TryGetProperty(out ILongExecution duration))
         {
@@ -182,7 +187,7 @@ public sealed partial class YetiGradeObjectView : UserControl
             PriceList.HasDuration = false;
         }
 
-        PriceList.ItemsSource = prices.Price;
+        PriceList.ItemsSource = price;
         PriceList.Visibility = Visibility.Visible;
 
         if (entity.TryGetProperty<IHasSingleReward>(out var reward))

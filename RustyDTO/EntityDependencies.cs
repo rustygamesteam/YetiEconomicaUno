@@ -57,7 +57,7 @@ public static partial class EntityDependencies
             .Required(DescPropertyType.Payable, DescPropertyType.LongExecution, DescPropertyType.HasDependents,
                 DescPropertyType.HasOwner)
             .Optional(DescPropertyType.HasPrestige, DescPropertyType.CitySize, DescPropertyType.HasCraftingQueue, 
-                DescPropertyType.CraftSpeed, DescPropertyType.TechSpeed);
+                DescPropertyType.CraftSpeed, DescPropertyType.TechSpeed, DescPropertyType.SubGroup);
 
         //Tool
         builder.For(RustyEntityType.Tool)
@@ -70,7 +70,8 @@ public static partial class EntityDependencies
         builder.For(RustyEntityType.Tech)
             .Mask(itemMask | EntitySpecialMask.RequiredInDependencies)
             .Required(DescPropertyType.Payable, DescPropertyType.LongExecution, DescPropertyType.HasDependents,
-                DescPropertyType.InBuildProcess);
+                DescPropertyType.InBuildProcess)
+            .Optional(DescPropertyType.PveArmyImprovement, DescPropertyType.SubGroup);
 
         //UniqueBuild, UniqueTool, ResourceGroup
         builder.For(RustyEntityType.UniqueBuild)
@@ -112,8 +113,12 @@ public static partial class EntityDependencies
 
         //PVE
         builder.For(RustyEntityType.PVE)
-            .Mask(itemMask | EntitySpecialMask.RequiredInDependencies)
-            .Required(DescPropertyType.Payable, DescPropertyType.HasDependents, DescPropertyType.HasRewards);
+            .Mask(itemWithGroupMask | EntitySpecialMask.RequiredInDependencies)
+            .Required(DescPropertyType.HasOwner, DescPropertyType.HasDependents, DescPropertyType.HasRewards, DescPropertyType.PveEnemyPower, DescPropertyType.PveEnemyUnits, DescPropertyType.FakePayable);
+
+        //PVE Chapter
+        builder.For(RustyEntityType.PveChapter)
+            .Mask(EntitySpecialMask.HasChild);
 
         //CityRoad
         builder.For(RustyEntityType.CityRoad)

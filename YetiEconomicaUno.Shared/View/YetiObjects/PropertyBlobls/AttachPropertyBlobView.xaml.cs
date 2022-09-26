@@ -51,7 +51,7 @@ public sealed partial class AttachPropertyBlobView : Button
         var optional = EntityDependencies.GetOptionalProperties(ViewModel.Type);
 
         ItemsList.Items.Clear();
-        ItemsList.Items.AddRange(optional.SkipWhile(ViewModel.HasProperty).Select(type => new MenuFlyoutItem
+        ItemsList.Items.AddRange(optional.Where(type => !ViewModel.HasProperty(type)).Select(type => new MenuFlyoutItem
         {
             Text = type.ToString(),
             CommandParameter = type,

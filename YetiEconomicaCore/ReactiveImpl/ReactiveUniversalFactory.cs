@@ -22,6 +22,9 @@ namespace YetiEconomicaCore.ReactiveImpl;
 [FactoryForProperty<IHasDependents>]
 [FactoryForProperty<ICitySize>]
 [FactoryForProperty<ISubGroup>]
+[FactoryForProperty<IPveEnemyUnits>]
+[FactoryForProperty<IPveEnemyPower>]
+[FactoryForProperty<IPveArmyImprovement>]
 internal static partial class ReactiveUniversalFactory
 {
     internal class ReactiveFactory<TProperty> : IPropertyResolver

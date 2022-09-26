@@ -20,9 +20,9 @@ public sealed partial class SubGroupBlobView : BaseBlobView
         this.InitializeComponent();
         this.WhenActivated(disposable =>
         {
-            Initialize(ViewModel.Index, DescPropertyType.SubGroup);
+            Initialize(ViewModel, DescPropertyType.SubGroup);
             SubGroupBox.ItemsSource = SubGroupHelper.ResolveByType(Entity.Type);
-            InfoBox.Text = $"SubGroup: {ViewModel.Group}";
+            InfoBox.Text = $"SubGroup: {ViewModel.Group ?? "NONE"}";
         });
     }
 
@@ -38,6 +38,11 @@ public sealed partial class SubGroupBlobView : BaseBlobView
     private void SubGroupBox_OnTextChanged(object sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         OnTextChange(SubGroupBox.Text);
+    }
+
+    private void OnGotFocus(object sender, RoutedEventArgs args)
+    {
+        SubGroupBox.IsSuggestionListOpen = true;
     }
 
     private void OnTextChange(string value)

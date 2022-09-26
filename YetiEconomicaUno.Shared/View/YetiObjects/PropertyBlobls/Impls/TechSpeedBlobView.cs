@@ -20,7 +20,7 @@ public sealed partial class TechSpeedBlobView : SingleNumberBlob
 
         Initialize(ViewModel, DescPropertyType.TechSpeed);
 
-        SetValueBinding("Craft speed", ViewModel.WhenAnyValue(static viewModel => viewModel.Factor), new Binding
+        SetValueBinding("Tech speed", ViewModel.WhenAnyValue(static viewModel => viewModel.Factor), new Binding
         {
             Path = new PropertyPath(nameof(ViewModel.Factor)),
             Mode = BindingMode.TwoWay,

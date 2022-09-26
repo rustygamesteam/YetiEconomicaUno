@@ -49,8 +49,8 @@ public abstract partial class SingleNumberBlob : BaseBlobView, IActivatableView
     {
         NumberBox.Header = header;
         NumberBox.SetBinding(NumberBox.ValueProperty, binding);
-
-        valueObservable.Select(value => $"{header}: {value:N3}")
+        
+        valueObservable.Select(value => $"{header}: {value:#####.###}")
             .BindTo(this, view => view.InfoBox.Text)
             .DisposeWith(disposable);
     }

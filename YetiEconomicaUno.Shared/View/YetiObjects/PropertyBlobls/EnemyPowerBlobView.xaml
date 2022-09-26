@@ -1,0 +1,61 @@
+﻿<local:BaseBlobView
+    x:Class="YetiEconomicaUno.View.YetiObjects.PropertyBlobls.EnemyPowerBlobView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <local:BaseBlobView.Detals>
+        <Grid ColumnSpacing="5" RowSpacing="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" 
+                       Text="Property" />
+            <TextBlock Grid.Row="0" Grid.Column="1" 
+                       Text="Damage" />
+            <TextBlock Grid.Row="0" Grid.Column="2" 
+                        Text="Defense" />
+            <TextBlock Grid.Row="0" Grid.Column="3" 
+                       Text="Speed" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" 
+                       Text="Swordsmens" />
+            <TextBlock Grid.Row="2" Grid.Column="0" 
+                       Text="Spearmans" />
+            <TextBlock Grid.Row="3" Grid.Column="0" 
+                       Text="Cavalry" />
+
+            <NumberBox Grid.Row="1" Grid.Column="1" 
+                       x:Name="SwDmg" ValueChanged="OnChanged" />
+            <NumberBox Grid.Row="1" Grid.Column="2" 
+                       x:Name="SwDef" ValueChanged="OnChanged" />
+            <NumberBox Grid.Row="1" Grid.Column="3" 
+                       x:Name="SwSpeed" ValueChanged="OnChanged" />
+
+            <NumberBox Grid.Row="2" Grid.Column="1" 
+                       x:Name="SpDmg" ValueChanged="OnChanged" />
+            <NumberBox Grid.Row="2" Grid.Column="2" 
+                       x:Name="SpDef" ValueChanged="OnChanged" />
+            <NumberBox Grid.Row="2" Grid.Column="3" 
+                       x:Name="SpSpeed" ValueChanged="OnChanged" />
+
+            <NumberBox Grid.Row="3" Grid.Column="1" 
+                       x:Name="CDmg" ValueChanged="OnChanged" />
+            <NumberBox Grid.Row="3" Grid.Column="2" 
+                       x:Name="CDef" ValueChanged="OnChanged" />
+            <NumberBox Grid.Row="3" Grid.Column="3" 
+                       x:Name="CSpeed" ValueChanged="OnChanged" />
+        </Grid>
+    </local:BaseBlobView.Detals>
+</local:BaseBlobView>

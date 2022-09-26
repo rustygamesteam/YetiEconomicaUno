@@ -117,7 +117,21 @@ public enum DescPropertyType
     CraftSpeed = 31,
 
     [PropertyHave<double>("Factor", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1d)]
-    TechSpeed = 32
+    TechSpeed = 32,
+    
+    [PropertyHave<ArmyTypeFlags>("AvailableUnits", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: ArmyTypeFlags.All)]
+    PveEnemyUnits = 33,
+
+    [PropertyHave<ArmyPowerConfig[]>("Value", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
+    PveEnemyPower = 34,
+
+    [PropertyHave<ArmyTypeFlags>("ForUnits", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: ArmyTypeFlags.Cavalry)]
+    [PropertyHave<ArmyPropertyFlags>("ForProperty", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: ArmyPropertyFlags.Damage)]
+    [PropertyHave<double>("Force", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1)]
+    PveArmyImprovement = 35,
+
+    [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
+    FakePayable = 36,
 }
 
 public static class DescPropertyTypeEx
@@ -131,5 +145,13 @@ public static class DescPropertyTypeEx
     public static int AsIndex(this DescPropertyType type)
     {
         return (int)type - 1;
+    }
+
+    public static double ToScore(this ArmyPowerConfig[] configs, ArmyPowerConfig influence)
+    {
+        double result = 0;
+        for (int i = 0; i < configs.Length; i++)
+            result += configs[i].ToScore(influence);
+        return result / configs.Length;
     }
 }

@@ -87,4 +87,10 @@
 	<ItemGroup>
 	  <_Globbed_Compile Remove="ConvertableViewModel.cs" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Update="graph.exe">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

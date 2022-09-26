@@ -158,6 +158,8 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IRustyEnti
         var service = RustyEntityService.Instance;
         var index = ID;
 
+        var propertyIndex = propertyType.AsIndex();
+
         if (!service.Properties.TryResolve(index.Index, propertyType, out var lazy))
         {
             lazy = propertyType switch
@@ -170,7 +172,10 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IRustyEnti
             };
         }
 
-        _properties[(int)propertyType - 1] = lazy;
+        var isValidLast = _properties[propertyIndex].IsValid;
+        _properties[propertyIndex] = lazy;
+        if(!isValidLast)
+            this.RaisePropertyChanged(nameof(DescProperties));
     }
 
     private void InjectProperties(IEnumerable<DescPropertyType> properties)

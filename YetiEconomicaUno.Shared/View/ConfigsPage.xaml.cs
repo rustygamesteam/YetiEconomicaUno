@@ -8,6 +8,7 @@ using System.Reactive.Disposables;
 using System;
 using System.Linq.Expressions;
 using YetiEconomicaCore.Services;
+using RustyDTO.Supports;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,6 +22,12 @@ namespace YetiEconomicaUno.View
     public sealed partial class MineConfigPage : Page
     {
         public SimpleResourcesConfig SimpleResourcesConfig { get; }
+
+        public ArmyPowerConfig ArmyInfluence
+        {
+            get => GlobalConfigService.Instance.ArmyInfluence.Config;
+            set => GlobalConfigService.Instance.ArmyInfluence.Config = value;
+        }
 
         public MineConfigPage()
         {

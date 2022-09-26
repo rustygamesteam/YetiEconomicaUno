@@ -8,17 +8,15 @@
     xmlns:flyouts="using:YetiEconomicaUno.View.Flyouts"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls" 
     mc:Ignorable="d">
-    <Button.ContextFlyout>
-        <flyouts:FlyoutWithBtn Label="Remove"
-	                           Icon="Remove"
-	                           Opened="Flyout_OnOpened" 
-	                           Closing="Flyout_OnClosing">
-            <controls:HeaderedContentControl HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+    <local:BaseBlobView.Detals>
+        <controls:HeaderedContentControl HeaderTemplate="{StaticResource SmallHeaderForComboBoxDataTemplate}"
                                              Header="Sub group">
-                <AutoSuggestBox x:Name="SubGroupBox"
-                       AllowFocusWhenDisabled="True"
-                       Text="{Binding ViewModel.SubGroup, Mode=TwoWay}"/>
-            </controls:HeaderedContentControl>
-        </flyouts:FlyoutWithBtn>
-    </Button.ContextFlyout>
+            <AutoSuggestBox x:Name="SubGroupBox"
+                            AllowFocusWhenDisabled="True"
+                            MinWidth="200"
+                            QueryIcon="Edit"
+                            GotFocus="OnGotFocus"
+                            Text="{Binding Group, Mode=TwoWay}"/>
+        </controls:HeaderedContentControl>
+    </local:BaseBlobView.Detals>
 </local:BaseBlobView>

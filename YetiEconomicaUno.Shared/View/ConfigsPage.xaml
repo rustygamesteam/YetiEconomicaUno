@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:cutomControls="using:CommunityToolkit.WinUI.UI.Controls" 
-    xmlns:yetiObjects="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:yetiObjects="using:YetiEconomicaUno.View.YetiObjects" xmlns:pve="using:YetiEconomicaUno.View.PVE"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -55,6 +55,12 @@
                     </StackPanel>
                 </cutomControls:HeaderedContentControl>
             </StackPanel>
+        </Expander>
+
+        <Expander Header="Army property influence configs"
+                  IsExpanded="true"
+                  ExpandDirection="Down">
+            <pve:ArmyPowerConfigView ViewModel="{x:Bind ArmyInfluence, Mode=TwoWay}" />
         </Expander>
     </StackPanel>
 </Page>

@@ -20,4 +20,5 @@ public enum RustyEntityType : int
     Manager = 15,
     Baff = 16,
     Gen = 17,
+    PveChapter
 }

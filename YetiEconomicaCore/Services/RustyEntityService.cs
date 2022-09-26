@@ -27,14 +27,17 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
     internal DynamicEntityDatabase Entities { get; private set; }
 
     internal DynamicLiteChankListCollection<ResourceStack, ResourceStackForRecord> Prices { get; private set; }
+    internal DynamicLiteChankListCollection<ResourceStack, ResourceStackForRecord> FakePrices { get; private set; }
     internal DynamicLiteChankListCollection<ResourceStack, ResourceStackForRecord> Rewards { get; private set; }
     internal DynamicLiteCacheCollection<IHasOwner, ItemOfGroupInfo> ItemsOfGroup { get; private set; }
     internal DynamicLazyPropertiesDatabase Properties { get; private set; }
 
     internal record PayableInfo(int Index, ICollection<ResourceStack> Price) : ReactiveRecord, IPayable;
+    internal record FakePayableInfo(int Index, ICollection<ResourceStack> Price) : ReactiveRecord, IFakePayable;
     internal record RewardsInfo(int Index, ICollection<ResourceStack> Rewards) : ReactiveRecord, IHasRewards;
 
     private readonly Dictionary<int, PayableInfo> _pricesByOwners = new();
+    private readonly Dictionary<int, FakePayableInfo> _fakePricesByOwners = new();
     private readonly Dictionary<int, RewardsInfo> _rewardsByOwners = new();
 
     public bool IsInitialize { get; private set; }
@@ -114,22 +117,40 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
 
     internal IPayable GetPrices(int index)
     {
-        if (!_pricesByOwners.TryGetValue(index, out var result))
-            _pricesByOwners[index] = result = new PayableInfo(index,
-                new DynamicLiteCollectionByFilter<ResourceStack, ResourceStackForRecord>(Prices,
-                    new ResourceStackChunk(index), true));
+        return InternalGetList(index, _pricesByOwners, Prices, static (index, collection) => new PayableInfo(index, collection));
+    }
 
-        return result;
+    internal IFakePayable GetFakePrices(int index)
+    {
+        return InternalGetList(index, _fakePricesByOwners, FakePrices, static (index, collection) => new FakePayableInfo(index, collection));
     }
 
     internal IHasRewards GetRewards(int index)
     {
-        if (!_rewardsByOwners.TryGetValue(index, out var result))
-            _rewardsByOwners[index] = result = new RewardsInfo(index,
-                new DynamicLiteCollectionByFilter<ResourceStack, ResourceStackForRecord>(Rewards,
+        return InternalGetList(index, _rewardsByOwners, Rewards, static (index, collection) => new RewardsInfo(index, collection));
+    }
+
+    private TResult InternalGetList<TResult>(int index, Dictionary<int, TResult> dictionary, DynamicLiteChankListCollection<ResourceStack, ResourceStackForRecord> database, Func<int, ICollection<ResourceStack>, TResult> factory)
+        where TResult : ReactiveRecord, IDescProperty
+    {
+        if (!dictionary.TryGetValue(index, out var result))
+        {
+            dictionary[index] = result = factory.Invoke(index,
+                new DynamicLiteCollectionByFilter<ResourceStack, ResourceStackForRecord>(database,
                     new ResourceStackChunk(index), true));
+        }
 
         return result;
+    }
+
+    private void InternalClearList<TResult>(int index, Dictionary<int, TResult> dictionary, Action<TResult> action)
+        where TResult : ReactiveRecord, IDescProperty
+    {
+        if (dictionary.TryGetValue(index, out var result))
+        {
+            action.Invoke(result);
+            dictionary.Remove(index);
+        }
     }
 
     public void Initialize(JsonDocument? _)
@@ -219,7 +240,11 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
         yield return new (DescPropertyType.SubGroup, ReactiveUniversalFactory.ReactiveSubGroupFactory()); //19
 
         yield return new (DescPropertyType.CraftSpeed, ReactiveUniversalFactory.ReactiveCraftSpeedFactory()); //31
-        yield return new(DescPropertyType.TechSpeed, ReactiveUniversalFactory.ReactiveTechSpeedFactory()); //32
+        yield return new (DescPropertyType.TechSpeed, ReactiveUniversalFactory.ReactiveTechSpeedFactory()); //32
+
+        yield return new(DescPropertyType.PveEnemyUnits, ReactiveUniversalFactory.ReactivePveEnemyUnitsFactory());
+        yield return new(DescPropertyType.PveEnemyPower, ReactiveUniversalFactory.ReactivePveEnemyPowerFactory());
+        yield return new(DescPropertyType.PveArmyImprovement, ReactiveUniversalFactory.ReactivePveArmyImprovementFactory());
     }
 
     public IEnumerable<IRustyEntity> GetItemsFor(int index)
@@ -319,14 +344,13 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
                     ItemsOfGroup.AsWriter().RemoveAt(index);
                     break;
                 case DescPropertyType.Payable:
-                    var prices = GetPrices(index);
-                    prices.Price.Clear();
-                    _pricesByOwners.Remove(index);
+                    InternalClearList(index, _pricesByOwners, static info => info.Price.Clear());
+                    break;
+                case DescPropertyType.FakePayable:
+                    InternalClearList(index, _fakePricesByOwners, static info => info.Price.Clear());
                     break;
                 case DescPropertyType.HasRewards:
-                    var rewards = GetRewards(index);
-                    rewards.Rewards.Clear();
-                    _rewardsByOwners.Remove(index);
+                    InternalClearList(index, _rewardsByOwners, static info => info.Rewards.Clear());
                     break;
             }
         }
@@ -358,7 +382,8 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
             TryRemoveItemsFor(Prices, index);
             TryRemoveItemsFor(Rewards, index);
         }
-        else if (rustyEntity.Type is RustyEntityType.Build or RustyEntityType.Tech)
+
+        if (rustyEntity.HasSpecialMask(EntitySpecialMask.RequiredInDependencies))
         {
             foreach (var entity in Entities)
             {
@@ -372,7 +397,8 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
                 }
             }
         }
-        else if (rustyEntity.Type is RustyEntityType.UniqueBuild)
+
+        if (rustyEntity.Type is RustyEntityType.UniqueBuild)
         {
             foreach (var entity in Entities)
             {

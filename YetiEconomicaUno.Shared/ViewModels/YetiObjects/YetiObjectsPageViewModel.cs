@@ -35,7 +35,7 @@ public class YetiObjectsPageViewModel : BaseViewModel
         new("Build", RustyEntityType.UniqueBuild),
         new("Tool", RustyEntityType.UniqueTool),
         new("Tech", RustyEntityType.Tech),
-        new("PVE", RustyEntityType.PVE),
+        new("PVE Chapter", RustyEntityType.PveChapter),
         new("Road", RustyEntityType.CityRoad),
         new("SubBuild", RustyEntityType.Superstructure)
     };

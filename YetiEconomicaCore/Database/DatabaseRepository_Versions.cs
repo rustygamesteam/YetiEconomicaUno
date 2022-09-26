@@ -7,7 +7,7 @@ namespace YetiEconomicaCore.Services;
 
 public partial class DatabaseRepository
 {
-    private const int DEFAULT_VERSION = 2;
+    private const int DEFAULT_VERSION = 5;
     private BD_version _version;
 
     private void Validate(BD_version versionConfig)
@@ -38,6 +38,22 @@ public partial class DatabaseRepository
         {
             Version_3(entitise, properties);
             versionConfig.Version++;
+        }
+        if (versionConfig.Version == 4)
+        {
+            Version_4(entitise, properties);
+            versionConfig.Version++;
+        }
+    }
+
+    private void Version_4(ILiteCollection<BsonDocument> entitise, ILiteCollection<BsonDocument> properties)
+    {
+        const int pveType = (int) RustyEntityType.PVE;
+        var removes = entitise.FindAll().Where(static document => document["Type"].AsInt32 == pveType).Select(static document => document["_id"]).ToArray();
+        foreach (var remove in removes)
+        {
+            entitise.Delete(remove);
+            properties.Delete(remove);
         }
     }
 

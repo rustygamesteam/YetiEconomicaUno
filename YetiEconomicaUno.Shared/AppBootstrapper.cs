@@ -11,6 +11,7 @@ using RustyDTO.Interfaces;
 using Splat;
 using YetiEconomicaCore;
 using YetiEconomicaCore.Database;
+using YetiEconomicaCore.Experemental;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.Extensions;
 using YetiEconomicaUno.Services;
@@ -95,6 +96,10 @@ public static class AppBootstrapper
 
         RegisterPropertyView<CraftSpeedBlobView, ICraftSpeed>(DescPropertyType.CraftSpeed);
         RegisterPropertyView<TechSpeedBlobView, ITechSpeed>(DescPropertyType.TechSpeed);
+
+        RegisterPropertyView<EnemyPowerBlobView, IPveEnemyPower>(DescPropertyType.PveEnemyPower);
+        RegisterPropertyView<PveEnemyUnitsBlobView, IPveEnemyUnits>(DescPropertyType.PveEnemyUnits);
+        RegisterPropertyView<PveArmyImprovementBlobView, IPveArmyImprovement>(DescPropertyType.PveArmyImprovement);
     }
 
     public static Type PropertyViewerType { get; } = typeof(PropertyViewer);
@@ -133,11 +138,9 @@ public static class AppBootstrapper
             nameof(ReactiveObject.ThrownExceptions)
         };
 
-        var getEntityMapperFunc = typeof(BsonMapper).GetMethod("GetEntityMapper", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
         var progressTask = typeof(ProgressTask);
 
         var reactiveModel = typeof(IDescProperty);
-
 
         var types = Assembly.GetAssembly(progressTask).DefinedTypes
             .Where(type => !type.IsAbstract && type.IsSubclassOf(progressTask));
@@ -146,16 +149,7 @@ public static class AppBootstrapper
             .Where(type => !type.IsAbstract && type.ImplementedInterfaces.Contains(reactiveModel)));
 
         foreach (var type in types)
-        {
-            var entity = (EntityMapper)getEntityMapperFunc.Invoke(mapper, new object[] { type.AsType() });
-
-            var members = entity.Members;
-            for(int i = members.Count - 1; i >= 0; i--)
-            {
-                if (reactiveMembers.Contains(members[i].MemberName))
-                    members.RemoveAt(i);
-            }
-        }
+            mapper.IgnoreForType(type.AsType());
 
         mapper.Entity<ProgressTask>()
             .Ctor(FactoryProgressTask);

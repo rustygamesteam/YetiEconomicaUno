@@ -1,0 +1,36 @@
+﻿<local:BaseBlobView
+    x:Class="YetiEconomicaUno.View.YetiObjects.PropertyBlobls.PveArmyImprovementBlobView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:YetiEconomicaUno.View.YetiObjects"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <local:BaseBlobView.Detals>
+
+        <StackPanel Orientation="Vertical"
+                    Spacing="5">
+            <StackPanel Orientation="Horizontal"
+                    Spacing="5">
+                <local:MaskBoxView  x:Name="ForUnitsBox"
+                                AllowFocusWhenDisabled="True"
+                                Header="For units"
+                                Value="{Binding ForUnits, Mode=TwoWay}"/>
+                <local:MaskBoxView  x:Name="ForPopertyBox"
+                                AllowFocusWhenDisabled="True"
+                                Header="For property"
+                                Value="{Binding ForProperty, Mode=TwoWay}"/>
+            </StackPanel>
+            <NumberBox x:Name="FactorBox"
+		               Minimum="0.1"
+		               Maximum="10000"
+		               HeaderTemplate="{StaticResource SmallHeaderDataTemplate}"
+                       Header="Value"
+                       AllowFocusWhenDisabled="True"
+                       Value="{Binding Force, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+		               ValidationMode="InvalidInputOverwritten"/>
+        </StackPanel>
+        
+    </local:BaseBlobView.Detals>
+</local:BaseBlobView>

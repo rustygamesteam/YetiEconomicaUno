@@ -108,6 +108,8 @@ public class CreateYetiObjectTask : ProgressTask
         {
             if(Target.TryGetProperty(out IPayable payable))
                 return payable.Price.Select(static x => (ResourceStackRecord)x);
+            if (Target.TryGetProperty(out IFakePayable fakePayable))
+                return fakePayable.Price.Select(static x => (ResourceStackRecord)x);
             return Enumerable.Empty<ResourceStackRecord>();
         }
     }

@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using DynamicData.Binding;
 using LiteDB;
 using ReactiveUI;
+using YetiEconomicaCore.Experemental;
 
 namespace YetiEconomicaCore.Services;
 
@@ -17,6 +18,8 @@ public sealed partial class DatabaseRepository : IDisposable
 
     public TConfig GetConfig<TConfig>(string key, Func<string, TConfig> factory, CompositeDisposable? compositeDisposable) where TConfig : IReactiveObject
     {
+        BsonMapper.Global.IgnoreForType(typeof(TConfig));
+
         var document = _configs.FindById(key);
         TConfig config;
         if (document == null)

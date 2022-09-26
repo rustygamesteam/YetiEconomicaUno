@@ -66,9 +66,14 @@ public static class SubGroupHelper
             if (result.Count == 0)
                 list.Remove(result);
         }
-        result = list.FirstOrDefault(info => info.Group == newValue);
+
+        var isFill = !string.IsNullOrEmpty(newValue);
+        result = isFill ? list.FirstOrDefault(info => info.Group == newValue) : null;
         if (result == null)
-            list.Add(new SubGroupInfo(newValue));
+        {
+            if (isFill)
+                list.Add(new SubGroupInfo(newValue));
+        }
         else
             result.Count++;
     }

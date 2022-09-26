@@ -16,7 +16,6 @@ using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
 using YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 using YetiEconomicaCore;
-using System.Windows.Markup;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -107,7 +106,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
             }
             
             if (hasChild && ItemsList.Items.Count > 0)
-                _lastTear = Math.Min(ItemsList.Items.OfType<YetiGradeObjectView>().Max(static x => x.ViewModel.GetDescUnsafe<IHasOwner>().Tear + 1), TearBlobView.Tears.Length);
+                _lastTear = Math.Min(ItemsList.Items.OfType<YetiGradeObjectView>().Max(static x => x.ViewModel.GetDescUnsafe<IHasOwner>().Tear + 1), TearBlobView.GetTears(ViewModel.Type).Length);
         }).DisposeWith(_reInitialize);
         Disposable.Create(ItemsList, static list => list.Items.Clear()).DisposeWith(_reInitialize);
     }
@@ -141,16 +140,25 @@ public sealed partial class YetiObjectDetalInfo : UserControl
 
     private void GradeAdd_OnClick(object sender, RoutedEventArgs args)
     {
-        var nextTear = Math.Min(_lastTear, TearBlobView.Tears.Length);
+        (RustyEntityType Type, string NewName) info;
+
         switch (ViewModel.Type)
         {
             case RustyEntityType.UniqueBuild:
-                RustyEntityService.Instance.Create(RustyEntityType.Build, "New build", EntityBuildOptions.CreateWithOwner(ViewModel.GetIndex(), nextTear));
+                info = (RustyEntityType.Build, "New build");
                 break;
             case RustyEntityType.UniqueTool:
-                RustyEntityService.Instance.Create(RustyEntityType.Tool, "New tool", EntityBuildOptions.CreateWithOwner(ViewModel.GetIndex(), nextTear));
+                info = (RustyEntityType.Tool, "New tool");
                 break;
+            case RustyEntityType.PveChapter:
+                info = (RustyEntityType.PVE, "New mission");
+                break;
+            default:
+                return;
         }
+
+        var nextTear = Math.Min(_lastTear, TearBlobView.GetTears(ViewModel.Type).Length);
+        RustyEntityService.Instance.Create(info.Type, info.NewName, EntityBuildOptions.CreateWithOwner(ViewModel.GetIndex(), nextTear));
     }
 
     private void UserControl_Unloaded(object sender, RoutedEventArgs e)

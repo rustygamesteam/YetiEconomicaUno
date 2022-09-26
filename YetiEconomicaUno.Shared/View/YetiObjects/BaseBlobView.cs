@@ -107,7 +107,10 @@ public abstract partial class BaseBlobView : Button
         FlyoutOpened(_flyoutDisposable);
     }
 
-    protected abstract void FlyoutOpened(CompositeDisposable disposable);
+    protected virtual void FlyoutOpened(CompositeDisposable disposable)
+    {
+
+    }
 
     protected void Flyout_OnRemoveClicked(object sender, RoutedEventArgs e)
     {

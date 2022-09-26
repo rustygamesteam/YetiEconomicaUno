@@ -42,6 +42,8 @@
     <UpToDateCheckInput Remove="View\Farm\PlantInfoView.xaml" />
     <UpToDateCheckInput Remove="View\FirstPage.xaml" />
     <UpToDateCheckInput Remove="View\Flyouts\FlyoutWithBtn.xaml" />
+    <UpToDateCheckInput Remove="View\PVE\ArmyPowerConfigView.xaml" />
+    <UpToDateCheckInput Remove="View\PVE\PVESequencePage.xaml" />
     <UpToDateCheckInput Remove="View\ResourcesConvertiblePage.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjectsPage.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\Abstract\MaskBoxView.xaml" />
@@ -49,10 +51,13 @@
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\AttachPropertyBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\CitySizeBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\DependentsBlobView.xaml" />
+    <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\EnemyPowerBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\HexMaskBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\LongExecutionBlobView.xaml" />
+    <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\PveArmyImprovementBlobView.xaml" />
+    <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\PveEnemyUnitsBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml" />
     <UpToDateCheckInput Remove="View\YetiObjects\PropertyBlobls\SubGroupBlobView.xaml" />
@@ -145,6 +150,8 @@
     <_Globbed_Compile Remove="View\Farm\PlanyObstaclesPage.xaml.cs" />
     <_Globbed_Compile Remove="View\FirstPage.xaml.cs" />
     <_Globbed_Compile Remove="View\Flyouts\FlyoutWithBtn.xaml.cs" />
+    <_Globbed_Compile Remove="View\PVE\ArmyPowerConfigView.xaml.cs" />
+    <_Globbed_Compile Remove="View\PVE\PVESequencePage.xaml.cs" />
     <_Globbed_Compile Remove="View\Resources.cs" />
     <_Globbed_Compile Remove="View\ResourcesConvertiblePage.xaml.cs" />
     <_Globbed_Compile Remove="View\ResourcesPage.cs" />
@@ -160,6 +167,7 @@
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\BaseBlobView.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\CitySizeBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\DependentsBlobView.xaml.cs" />
+    <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\EnemyPowerBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\HexMaskBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\Impls\CraftingQueueBlobView.cs" />
@@ -169,6 +177,8 @@
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\LongExecutionBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\MineSizeViewBlob.xaml.cs" />
+    <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\PveArmyImprovementBlobView.xaml.cs" />
+    <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\PveEnemyUnitsBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml.cs" />
     <_Globbed_Compile Remove="View\YetiObjects\PropertyBlobls\SubGroupBlobView.xaml.cs" />
@@ -214,6 +224,8 @@
     <_Globbled_Page Remove="View\Farm\PlantInfoView.xaml" />
     <_Globbled_Page Remove="View\FirstPage.xaml" />
     <_Globbled_Page Remove="View\Flyouts\FlyoutWithBtn.xaml" />
+    <_Globbled_Page Remove="View\PVE\ArmyPowerConfigView.xaml" />
+    <_Globbled_Page Remove="View\PVE\PVESequencePage.xaml" />
     <_Globbled_Page Remove="View\ResourcesConvertiblePage.xaml" />
     <_Globbled_Page Remove="View\YetiObjectsPage.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\Abstract\MaskBoxView.xaml" />
@@ -221,10 +233,13 @@
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\AttachPropertyBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\CitySizeBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\DependentsBlobView.xaml" />
+    <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\EnemyPowerBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\FarmExpansionBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\HexMaskBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\InBuildBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\LongExecutionBlobView.xaml" />
+    <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\PveArmyImprovementBlobView.xaml" />
+    <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\PveEnemyUnitsBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\RewardCountBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\SpeedBootBlobView.xaml" />
     <_Globbled_Page Remove="View\YetiObjects\PropertyBlobls\SubGroupBlobView.xaml" />
