@@ -143,12 +143,12 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
         return result;
     }
 
-    private void InternalClearList<TResult>(int index, Dictionary<int, TResult> dictionary, Action<TResult> action)
+    private void InternalClearList<TResult>(int index, Dictionary<int, TResult> dictionary, Func<TResult, ICollection<ResourceStack>> action)
         where TResult : ReactiveRecord, IDescProperty
     {
         if (dictionary.TryGetValue(index, out var result))
         {
-            action.Invoke(result);
+            action.Invoke(result).Clear();
             dictionary.Remove(index);
         }
     }
@@ -344,13 +344,13 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
                     ItemsOfGroup.AsWriter().RemoveAt(index);
                     break;
                 case DescPropertyType.Payable:
-                    InternalClearList(index, _pricesByOwners, static info => info.Price.Clear());
+                    InternalClearList(index, _pricesByOwners, static info => info.Price);
                     break;
                 case DescPropertyType.FakePayable:
-                    InternalClearList(index, _fakePricesByOwners, static info => info.Price.Clear());
+                    InternalClearList(index, _fakePricesByOwners, static info => info.Price);
                     break;
                 case DescPropertyType.HasRewards:
-                    InternalClearList(index, _rewardsByOwners, static info => info.Rewards.Clear());
+                    InternalClearList(index, _rewardsByOwners, static info => info.Rewards);
                     break;
             }
         }
