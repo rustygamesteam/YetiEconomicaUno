@@ -15,6 +15,7 @@ using YetiEconomicaCore;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Experemental;
 using YetiEconomicaCore.Services;
+using YetiEconomicaUno.Services;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Internal;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
@@ -25,7 +26,7 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
 
     [BsonIgnore]
     public Subject<Unit> EvaluteObservable { get; } = new Subject<Unit>();
- 
+
     #region IDatabaseOrderEntity
     private BsonValue _id;
 
@@ -49,9 +50,17 @@ public abstract class ProgressTask : ReactiveObject, IDatabaseOrderEntity
 
     public ProgressType Type { get; }
 
-    protected ProgressTask(ProgressType type)
+    public string Model { get; }
+
+    protected ProgressTask(ProgressType type, string model)
     {
         Type = type;
+        Model = model;
+    }
+
+    protected ProgressTask(ProgressType type) : this(type, CalculateBalanceService.CurrentModel.Value)
+    {
+
     }
 
     internal abstract bool OnYetiObjectRemove(IRustyEntity rustyEntity);

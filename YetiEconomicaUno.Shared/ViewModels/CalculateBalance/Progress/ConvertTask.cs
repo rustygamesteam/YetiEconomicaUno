@@ -9,6 +9,7 @@ using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Services;
 using RustyDTO.Interfaces;
 using YetiEconomicaCore;
+using YetiEconomicaUno.Services;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 

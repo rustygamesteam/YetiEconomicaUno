@@ -1,6 +1,7 @@
 ﻿using RustyDTO;
 using RustyDTO.Interfaces;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using RustyDTO.DescPropertyModels;
 using RustyDTO.MutableProperties;
 using RustyDTO.Supports;
@@ -8,12 +9,21 @@ using RustyEngine.Enums;
 
 namespace RustyEngine;
 
-public class User
+public partial class User
 {
     private HashSet<EntityID> _instanceBag;
     private Dictionary<EntityID, MutableData> _mutableBag;
 
     private Dictionary<EntityID, TaskInfo> _exucutingTask;
+
+    private JsonObject _stats;
+
+    private Random _random;
+    private int _nextMultiIndex;
+
+    private Dictionary<string, int> _intStats;
+    private Dictionary<string, string> _stringStats;
+    private Dictionary<string, double> _doubleStats;
 
     public User(JsonDocument jsonDocument)
     {
@@ -52,6 +62,11 @@ public class User
         }
         else
             _exucutingTask = new Dictionary<EntityID, TaskInfo>(8);
+
+        if (json.TryGetProperty("stats", out var statsJsonElement))
+            _stats = JsonObject.Create(statsJsonElement)!;
+        else
+            _stats = new JsonObject();
     }
 
     public bool OptionalHasEntity(IRustyEntity? entity)
@@ -90,7 +105,7 @@ public class User
         //TODO: Сообщить серверу о изменениях
     }
 
-    private void UnchekedSignlePay(IRustyEntity entity, int count)
+    private void UnchekedSinglePay(IRustyEntity entity, int count)
     {
         _mutableBag[entity.ID].Get<IMutableCount>().Count -= count;
         //TODO: Сообщить серверу о изменениях
@@ -105,7 +120,7 @@ public class User
     private MutableData ResolveMutableData(IRustyEntity entity)
     {
         if (!_mutableBag.TryGetValue(entity.ID, out var result))
-            _mutableBag.Add(entity.ID, result = new MutableData(entity.Type));
+            _mutableBag.Add(entity.ID, result = new MutableData(entity.TypeAsIndex));
 
         return result;
     }
@@ -146,19 +161,24 @@ public class User
         if (!entity.TryGetProperty(out IInBuildProcess inBuildProcess) || inBuildProcess.Build is null)
             return duration;
 
-        if (inBuildProcess.Build.TryGetProperty(out IBoostSpeed boostSpeed))
+        if (_mutableBag.TryGetValue(inBuildProcess.Build.ID, out var mutableBuildData) && 
+            mutableBuildData.TryGet(out IMutableUsedInstance usedInstance) && 
+            usedInstance.Entity is not null)
         {
+            var build = usedInstance.Entity;
             switch (entity.Type)
             {
                 case RustyEntityType.CraftTask:
-                    duration = (int)Math.Ceiling(duration / boostSpeed.CraftSpeed);
+                    if (build.TryGetProperty(out ICraftSpeed craftSpeed))
+                        duration = (int)Math.Ceiling(duration / craftSpeed.Factor);
                     break;
                 case RustyEntityType.Tech:
-                    duration = (int)Math.Ceiling(duration / boostSpeed.TechSpeed);
+                    if (build.TryGetProperty(out ITechSpeed techSpeed))
+                        duration = (int)Math.Ceiling(duration / techSpeed.Factor);
                     break;
             }
         }
-
+        
         //TODO Добавляем модификации от менеджеров баффы
 
         return duration;
@@ -176,7 +196,7 @@ public class User
             UncheckedPayInternal(payable);
 
         if (entity.TryGetProperty(out IHasExchange exchange))
-            UnchekedSignlePay(exchange.FromEntity, (int) (exchange.FromRate * multiplayFactor));
+            UnchekedSinglePay(exchange.FromEntity, (int) (exchange.FromRate * multiplayFactor));
 
         if (entity.TryGetProperty(out ILongExecution longExecution))
         {
@@ -209,6 +229,8 @@ public class User
 
         if (entity.TryGetProperty(out IHasExchange exchange))
             InternalIncrement(exchange.ToEntity, (int)(multiplayFactor / exchange.FromRate));
+
+        TryCreateInstance(entity);
 
         //TODO завершаем запись
     }

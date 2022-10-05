@@ -1,15 +1,8 @@
-﻿#if REACTIVE
-using DynamicData;
-using RustyDTO.Supports;
-using System.Reactive.Subjects;
-#endif
+﻿using RustyDTO.Supports;
 
 namespace RustyDTO.Interfaces;
 
 public interface IRustyEntity : IEquatable<IRustyEntity>
-#if REACTIVE
-, ReactiveUI.IReactiveObject
-#endif
 {
     EntityID ID { get; }
 
@@ -42,7 +35,11 @@ public interface IRustyEntity : IEquatable<IRustyEntity>
 
     IDescProperty GetDescUnsafe(DescPropertyType type);
 
-#if REACTIVE
-    ISubject<ItemChange<(DescPropertyType Type, IDescProperty Property)>> PropertiesChangedObserver { get; }
-#endif
 }
+
+#if REACTIVE
+public interface IReactiveRustyEntity : IRustyEntity, ReactiveUI.IReactiveObject
+{
+    System.Reactive.Subjects.ISubject<DynamicData.ItemChange<(DescPropertyType Type, IDescProperty Property)>> PropertiesChangedObserver { get; }
+}
+#endif

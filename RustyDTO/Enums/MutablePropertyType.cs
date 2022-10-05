@@ -10,7 +10,7 @@ public enum MutablePropertyType : int
     None = 0,
     [PropertyHave<int>("Count")]
     Count = 1,
-    [PropertyHave<IRustyEntity>("Manager")]
+    [PropertyHave<IRustyEntity>("Manager", isNullable: true)]
     Manager = 2,
     [PropertyHave<int>("X")]
     [PropertyHave<int>("Y")]
@@ -19,9 +19,9 @@ public enum MutablePropertyType : int
     PositionInsideHex = 4,
     [PropertyHave<IRustyEntity>("Entity")]
     OwnerArchetype = 5,
-    Genom = 6,
     [PropertyHave<IRustyEntity>("Entity")]
-    UsedInstance = 7,
+    UsedInstance = 6,
+    Genom = 7
 }
 
 public static class MutablePropertyTypeEx

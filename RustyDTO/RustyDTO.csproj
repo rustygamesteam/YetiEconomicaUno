@@ -7,9 +7,15 @@
     <Configurations>Debug;Release;NoReactive</Configurations>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE;REACTIVE</DefineConstants>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>$(DefineConstants)TRACE;REACTIVE</DefineConstants>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
@@ -19,7 +25,17 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>$(DefineConstants)TRACE;REACTIVE</DefineConstants>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoReactive|AnyCPU'">
+    <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NoReactive|x64'">
     <DefineConstants>$(DefineConstants)TRACE</DefineConstants>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
@@ -29,7 +45,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\RustyDTOGenerator\RustyDTOGenerator.csproj" PrivateAssets="contentfiles;build" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" />
+		<ProjectReference Include="..\RustyDTOGenerator\RustyDTOGenerator.csproj" PrivateAssets="contentfiles;build" OutputItemType="Analyzer">
+		  <ExcludeAssets>all</ExcludeAssets>
+		</ProjectReference>
 	</ItemGroup>
 
 </Project>

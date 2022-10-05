@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Text.Json;
 using RustyDTO;
-using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
 using RustyDTO.Supports;
 using RustyEngine.Internal;
+using RustyDTO.DescPropertyModels;
 
 namespace RustyEngine;
 
@@ -22,8 +22,8 @@ public class EntityService : IEntityService
     {
         if(database is null)
             return;
-        
-        var propertyFactory = new PropertyFactory();
+
+        var propertyFactory = Engine.Instance.PropertyFactory;
 
         var root = database.RootElement;
         var entities = root.GetProperty("entities");
@@ -42,7 +42,7 @@ public class EntityService : IEntityService
 
         foreach (var entityNode in entities.EnumerateArray())
         {
-            var id = entityNode.GetProperty("id").GetInt32();
+            var id = new EntityID(EntityIndexType.d, entityNode.GetProperty("id").GetInt32());
             var type = entityNode.GetProperty("type").GetInt32();
             var displayName = entityNode.GetProperty("diplayName").GetString();
 
@@ -65,7 +65,7 @@ public class EntityService : IEntityService
                 mutableTypes[mutableCount++] = (MutablePropertyType)index.GetInt32();
 
             var entity = new Entity(id, type, displayName, propertyTypes.Slice(0, descCount), propertySpan.Slice(0, descCount), mutableTypes.Slice(0, mutableCount), out var onComplete);
-            _entities.Add(id, entity);
+            _entities.Add(id.Index, entity);
             onInitialize.Add(onComplete);
 
             if (entity.HasSpecialMask(EntitySpecialMask.HasParent))
@@ -75,22 +75,20 @@ public class EntityService : IEntityService
         foreach (var disposable in onInitialize)
             disposable.Dispose();
 
-        foreach (var info in entityWithParent.GroupBy(static info => info.GetDescUnsafe<IHasOwner>().Owner.ID))
-            _entitiesByOwner.Add(info.Key.Index, info.ToArray());
+        foreach (var info in entityWithParent.GroupBy(static info => info.GetDescUnsafe<IHasOwner>().Owner.ID.Index))
+            _entitiesByOwner.Add(info.Key, info.ToArray());
 
         IsInitialize = true;
     }
 
-    
-
-    public IRustyEntity GetEntity(int index)
+    public IRustyEntity GetEntity(EntityID id)
     {
-        return _entities[index];
+        return _entities[id.Index];
     }
 
-    public bool TryGetEntity(int index, out IRustyEntity? entity)
+    public bool TryGetEntity(EntityID id, out IRustyEntity? entity)
     {
-        return _entities.TryGetValue(index, out entity);
+        return _entities.TryGetValue(id.Index, out entity);
     }
 
     public IEnumerable<IRustyEntity> AllEntites()
@@ -122,9 +120,9 @@ public class EntityService : IEntityService
         }
     }
 
-    public IEnumerable<IRustyEntity> GetItemsFor(int ownerIndex)
+    public IEnumerable<IRustyEntity> GetItemsFor(EntityID ownerID)
     {
-        if (_entitiesByOwner.TryGetValue(ownerIndex, out var range))
+        if (_entitiesByOwner.TryGetValue(ownerID.Index, out var range))
             return range;
         return Enumerable.Empty<IRustyEntity>();
     }

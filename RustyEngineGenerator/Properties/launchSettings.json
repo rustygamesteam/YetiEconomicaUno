@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Профиль 1": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\RustyEngine\\RustyEngine.csproj"
+    }
+  }
+}

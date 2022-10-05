@@ -1,16 +1,22 @@
 ﻿using RustyDTO;
 using RustyDTO.Interfaces;
-using RustyDTO.PropertyTypes;
+using RustyDTO.Supports;
 
 namespace RustyEngine.Internal;
 
 internal class Entity : IRustyEntity
 {
-    public int Index { get; }
+    public EntityID ID { get; }
     public RustyEntityType Type { get; }
     public int TypeAsIndex { get; }
 
-    public string? DisplayName { get; }
+    public string? DisplayName
+    {
+        get;
+#if REACTIVE
+        set;
+#endif
+    }
     public string? DisplayNameWithTear { get; }
     public string? FullName { get; }
 
@@ -21,9 +27,9 @@ internal class Entity : IRustyEntity
 
     public IEnumerable<DescPropertyType> DescProperties => _properyTypes;
 
-    public Entity(int index, int type, string? displayName, Span<DescPropertyType> propertyTypes, Span<LazyDescProperty> lazyProperties, Span<MutablePropertyType> mutableProperties, out IDisposable onInitalize)
+    public Entity(EntityID id, int type, string? displayName, Span<DescPropertyType> propertyTypes, Span<LazyDescProperty> lazyProperties, Span<MutablePropertyType> mutableProperties, out IDisposable onInitalize)
     {
-        Index = index;
+        ID = id;
         Type = (RustyEntityType)type;
         TypeAsIndex = type;
         DisplayName = displayName;
@@ -63,12 +69,12 @@ internal class Entity : IRustyEntity
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        return Index == other.ID;
+        return ID == other.ID;
     }
 
     public override int GetHashCode()
     {
-        return Index;
+        return ID.GetHashCode();
     }
 
     public bool HasSpecialMask(EntitySpecialMask condition)

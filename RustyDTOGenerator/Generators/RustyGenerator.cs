@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Diagnostics;
 using H.Generators.Extensions;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace RustyDTOGenerator.Generators;
 
@@ -18,20 +19,26 @@ public class RustyGenerator : IIncrementalGenerator
     private const string MainAttribute = "RustyDTO.Generator.PropertyImpl";
     private const string PropertyInfoAttribute = "RustyDTO.Generator.PropertyHave";
     private const string OverridePropertyNameAttribute = "RustyDTO.Generator.OverridePropertyName";
-
-
+    
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
             "DTOGenerator.g.cs",
             SourceText.From(SourceGenerationHelper.Attribute, Encoding.UTF8)));
 
-
         var classes = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (node, _) => node is EnumDeclarationSyntax { AttributeLists.Count: > 0 },
                 transform: static (context, _) => GetSemanticTargetForGeneration(context))
             .Where(static syntax => syntax is not null);
+
+
+        var resolvers = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (node, _) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
+                transform: static (context, _) => GetSemanticResolversForGeneration(context))
+            .Where(static syntax => syntax is not null);
+
 
         var compilationAndClasses = context.CompilationProvider
             .Combine(context.AnalyzerConfigOptionsProvider)
@@ -45,18 +52,19 @@ public class RustyGenerator : IIncrementalGenerator
     private static void Execute(
         Compilation compilation,
         AnalyzerConfigOptionsProvider options,
-        ImmutableArray<EnumDeclarationSyntax> classSyntaxes,
+        ImmutableArray<EnumDeclarationSyntax> enumDeclaration,
         SourceProductionContext context)
     {
         if (!options.IsDesignTime() && options.GetGlobalOption("DebuggerBreak", prefix: Name) != null)
             Debugger.Launch();
 
-        if (classSyntaxes.IsDefaultOrEmpty)
+        if (enumDeclaration.IsDefaultOrEmpty)
             return;
 
+        IReadOnlyCollection<PropertyEnumInfo>? classes;
         try
         {
-            GetTypesToGenerate(compilation, classSyntaxes, out var classes, out var links);
+            GetTypesToGenerate(compilation, enumDeclaration, out classes, out var links);
 
             string result;
             foreach (var info in classes)
@@ -65,12 +73,58 @@ public class RustyGenerator : IIncrementalGenerator
                 context.AddTextSource(
                     hintName: $"{info.Namespace}.{info.Name}.generated.cs",
                     text: result);
+
+                switch (info.HelpType)
+                {
+                    case PropertyType.Mutable:
+                        result = SourceGenerationHelper.GenerateMutableImpl(info);
+                        context.AddTextSource(
+                            hintName: $"{info.Namespace}.{info.Name}.impl.generated.cs",
+                            text: result);
+                        break;
+                    case PropertyType.Desc:
+                        result = SourceGenerationHelper.GenerateDescImpl(info);
+                        context.AddTextSource(
+                            hintName: $"{info.Namespace}.{info.Name}.impl.generated.cs",
+                            text: result);
+                        break;
+                }
             }
 
             result = SourceGenerationHelper.GenerateEntityDependencies(links);
             context.AddTextSource(
                 hintName: $"EntityDependencies.generated.cs",
                 text: result);
+        }
+        catch (Exception exception)
+        {
+            classes = null;
+
+            context.ReportException(
+                id: "001",
+                exception: exception,
+                prefix: Id);
+        }
+
+
+        if (classes is null)
+            return;
+
+        try
+        {
+            StringBuilder sb = new StringBuilder(2048);
+            SourceGenerationHelper.GenerateJsonDefaultResolver(sb, "RustyDTO.CodeGen.Impl", classes);
+
+            if(sb.Length > 10)
+                context.AddTextSource(
+                    hintName: $"RustyPropertyJsonSerializerContext.g.cs",
+                    text: sb.ToString());
+            SourceGenerationHelper.GenerateSimpleDescPropertyResolver(sb, "RustyDTO.CodeGen.Impl", classes);
+            if (sb.Length > 10)
+                context.AddTextSource(
+                    hintName: $"SimpleDescPropertyResolver.g.cs",
+                    text: sb.ToString());
+
         }
         catch (Exception exception)
         {
@@ -85,10 +139,10 @@ public class RustyGenerator : IIncrementalGenerator
         Compilation compilation,
         IEnumerable<EnumDeclarationSyntax> enums, out IReadOnlyCollection<PropertyEnumInfo> classes, out DependencyLink[] dependencies)
     {
-
         var links = new List<DependencyLink>(64);
+        var values = new List<PropertyEnumInfo>(64);
+
         var members = new List<PropertyMember>(8);
-        var values = new List<PropertyEnumInfo>(8);
 
         foreach (var @enum in enums)
         {
@@ -136,35 +190,38 @@ public class RustyGenerator : IIncrementalGenerator
                         if (memberName is null)
                             continue;
 
-                        var type = attributeClass.TypeArguments.ElementAtOrDefault(0)!.ToDisplayString();
+                        var typeArg = attributeClass.TypeArguments.ElementAtOrDefault(0)!;
+                        var type = typeArg.ToDisplayString();
                         if (type.Contains('.'))
                             type = "global::" + type;
 
 
-                        var isReadOnly = (bool)attributeData.ConstructorArguments[1].Value;
-                        var isNullable = (bool)attributeData.ConstructorArguments[2].Value;
+                        var isReadOnly = (bool)attributeData.ConstructorArguments[1].Value!;
+                        var isNullable = (bool)attributeData.ConstructorArguments[2].Value!;
                         var defaultValueConstant = attributeData.ConstructorArguments[3];
-                        
+                        var serializedName = (string?)attributeData.ConstructorArguments[4].Value;
+
                         string? defaultValue = defaultValueConstant.Kind switch
                         {
                             TypedConstantKind.Primitive => defaultValueConstant.Value?.ToString()?.ToLower(),
-                            TypedConstantKind.Enum => $"(global::{defaultValueConstant.Type!.ToDisplayString()})({defaultValueConstant.Value!.ToString()})",
+                            TypedConstantKind.Enum => $"(global::{defaultValueConstant.Type!.ToDisplayString()})({defaultValueConstant.Value!})",
                             _ => null
                         };
 
-                        members.Add(new PropertyMember(type, memberName, isReadOnly, isNullable, defaultValue));
+                        members.Add(new PropertyMember(typeArg.TypeKind, type, memberName, isReadOnly, isNullable, defaultValue, serializedName));
                     }
                     else if (fullname.StartsWith(OverridePropertyNameAttribute, StringComparison.Ordinal))
                     {
-                        name = attributeData.ConstructorArguments[0].Value as string;
+                        name = (string)attributeData.ConstructorArguments[0].Value!;
                     }
                 }
 
                 if(members.Count == 0)
                     continue;
 
-                values.Add(new PropertyEnumInfo(nameSpace, baseType, prefix, name, members.ToArray()));
-                links.Add(new DependencyLink($"{nameSpace}.I{prefix}{name}", (int)enumFieldSymbol.ConstantValue));
+                var helpType = baseType.Contains("Mutable") ? PropertyType.Mutable : PropertyType.Desc;
+                values.Add(new PropertyEnumInfo(nameSpace, baseType, prefix, name, members.ToArray(), (int)enumFieldSymbol.ConstantValue! - 1, helpType, $"I{prefix}{name}"));
+                links.Add(new DependencyLink($"{nameSpace}.I{prefix}{name}", (int)enumFieldSymbol.ConstantValue!));
             }
         }
 
@@ -191,6 +248,19 @@ public class RustyGenerator : IIncrementalGenerator
             : null;
     }
 
+    private static ClassDeclarationSyntax? GetSemanticResolversForGeneration(GeneratorSyntaxContext context)
+    {
+        var syntax = (ClassDeclarationSyntax)context.Node;
+
+        return syntax
+            .AttributeLists
+            .SelectMany(static list => list.Attributes)
+            .Any(attributeSyntax => IsAttribute(attributeSyntax, context.SemanticModel, "RustyDTO.Generator.DefaultResolver"))
+            ? syntax
+            : null;
+    }
+
+
     private static bool IsGeneratorAttribute(AttributeData attributeData)
     {
         var attributeClass = attributeData.AttributeClass?.ToDisplayString() ?? string.Empty;
@@ -200,6 +270,19 @@ public class RustyGenerator : IIncrementalGenerator
 
 
     private static bool IsGeneratorAttribute(AttributeSyntax attributeSyntax, SemanticModel semanticModel)
+    {
+        if (semanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
+        {
+            return false;
+        }
+
+        var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
+        var fullName = attributeContainingTypeSymbol.ToDisplayString();
+
+        return IsGeneratorAttribute(fullName);
+    }
+
+    private static bool IsAttribute(AttributeSyntax attributeSyntax, SemanticModel semanticModel, string attributeName)
     {
         if (semanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
         {

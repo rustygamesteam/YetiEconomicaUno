@@ -13,7 +13,7 @@ using YetiEconomicaCore.Services;
 namespace YetiEconomicaCore;
 
 [DebuggerDisplay("ID: {ID}; Type: {Type}; Name: {FullName}")]
-internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IRustyEntity
+internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveRustyEntity
 {
     public EntityID ID { get; }
 

@@ -11,7 +11,7 @@ namespace YetiEconomicaCore.Experemental;
 internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
 {
     private readonly ILiteCollection<BsonDocument> _entities;
-    private readonly SourceCache<IRustyEntity, int> _cache;
+    private readonly SourceCache<IReactiveRustyEntity, int> _cache;
 
     private CompositeDisposable _disposable;
     private IList<IRustyEntity>? _items;
@@ -21,13 +21,13 @@ internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
         _disposable = new CompositeDisposable();
 
         _entities = database.GetCollection(table, BsonAutoId.Int32);
-        _cache = new SourceCache<IRustyEntity, int>(static entity => entity.GetIndex());
+        _cache = new SourceCache<IReactiveRustyEntity, int>(static entity => entity.GetIndex());
         _cache.Edit(updater =>
         {
             foreach (var document in _entities.FindAll())
             {
                 var entity = ParseFromDocument(document);
-                updater.AddOrUpdate(new KeyValuePair<int, IRustyEntity>(entity.ID.Index, entity));
+                updater.AddOrUpdate(new KeyValuePair<int, IReactiveRustyEntity>(entity.ID.Index, entity));
             }
         });
 
@@ -45,17 +45,17 @@ internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
         get => _cache.Lookup(index).Value;
     }
 
-    public Optional<IRustyEntity> Lookup(int index)
+    public Optional<IReactiveRustyEntity> Lookup(int index)
     {
         return _cache.Lookup(index);
     }
 
-    public IObservable<IChangeSet<IRustyEntity, int>> Connect(Func<IRustyEntity, bool>? filter = null)
+    public IObservable<IChangeSet<IReactiveRustyEntity, int>> Connect(Func<IRustyEntity, bool>? filter = null)
     {
         return _cache.Connect(filter);
     }
 
-    public IObservable<IChangeSet<IRustyEntity, int>> Preview(Func<IRustyEntity, bool>? filter = null)
+    public IObservable<IChangeSet<IReactiveRustyEntity, int>> Preview(Func<IRustyEntity, bool>? filter = null)
     {
         return _cache.Preview(filter);
     }
@@ -84,7 +84,7 @@ internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
         return _items ??= (IList<IRustyEntity>)_cache.Items;
     }
 
-    private void OnEntitiesChange(IChangeSet<IRustyEntity, int> diffs)
+    private void OnEntitiesChange(IChangeSet<IReactiveRustyEntity, int> diffs)
     {
         foreach (var diff in diffs)
         {
@@ -103,7 +103,7 @@ internal class DynamicEntityDatabase : IDisposable, IEnumerable<IRustyEntity>
         }
     }
 
-    private IRustyEntity ParseFromDocument(BsonDocument document)
+    private IReactiveRustyEntity ParseFromDocument(BsonDocument document)
     {
         var index = document["_id"].AsInt32;
         var type = (RustyEntityType)document["Type"].AsInt32;

@@ -7,19 +7,19 @@ using YetiEconomicaUno.Converters;
 
 namespace YetiEconomicaUno.ViewModels.CalculateBalance;
 
-public class TimeTarget : ReactiveObject
+public class BalanceConfig : ReactiveObject
 {
-    public const string PROP_ID = "TimeTarget";
+    public const string PROP_ID = "BalanceConfig";
 
     [BsonId]
     public string ID { get; } = PROP_ID;
 
     [BsonCtor]
-    public TimeTarget() 
+    public BalanceConfig() 
     {
         this.WhenAnyValue(static x => x.Days, static x => x.Hours)
             .Select(static values => DurationLabelConverter.GetDuration((int)(TimeSpan.FromHours(values.Item2) + TimeSpan.FromDays(values.Item1)).TotalSeconds))
-            .ToPropertyEx(this, static x => x.ResultInfo);
+            .ToPropertyEx(this, static x => x.ResultTimeInfo);
     }
 
     [Reactive]
@@ -28,5 +28,8 @@ public class TimeTarget : ReactiveObject
     public int Hours { get; set; }
 
     [ObservableAsProperty, BsonIgnore]
-    public string ResultInfo { get; }
+    public string ResultTimeInfo { get; }
+
+    [Reactive]
+    public string CurrentModel { get; set; }
 }

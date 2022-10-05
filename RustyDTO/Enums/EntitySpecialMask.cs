@@ -13,3 +13,16 @@ public enum EntitySpecialMask : int
     IsUserConent = 1 << 6,
     IsTask = Executable & ~IsInstance, 
 }
+
+public static class EntitySpecialMaskEx
+{
+    public static bool IsHas(this EntitySpecialMask flags, EntitySpecialMask mask)
+    {
+        return (flags & mask) != 0;
+    }
+
+    public static bool IsDontHas(this EntitySpecialMask flags, EntitySpecialMask mask)
+    {
+        return (flags & mask) == 0;
+    }
+}

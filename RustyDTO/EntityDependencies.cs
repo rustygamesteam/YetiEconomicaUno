@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.Json;
 using RustyDTO.Interfaces;
 
 namespace RustyDTO;
@@ -11,10 +14,15 @@ public static partial class EntityDependencies
     private static ICollection<DescPropertyType>[] _optionalProperties;
     private static ICollection<MutablePropertyType>[] _mutableProperties;
 
+    private static Memory<int> _mutableMap;
+
+    private static int _internalMutableCount;
+
     public static int DescPropertiesCount { get; }
-    public static int MutablePropertiesCount { get; }
+    public static int MutablePropertiesCount => _internalMutableCount;
     public static int EntityTypesCount { get; }
 
+    private static string[] _intAsString;
 
     [ThreadStatic]
     private static BitArray _entityTypeBitmask = null!;
@@ -22,9 +30,17 @@ public static partial class EntityDependencies
     static EntityDependencies()
     {
         DescPropertiesCount = Enum.GetValues<DescPropertyType>().Max(static type => (int)type);
-        MutablePropertiesCount = Enum.GetValues<MutablePropertyType>().Max(static type => (int)type);
+        _internalMutableCount = Enum.GetValues<MutablePropertyType>().Max(static type => (int)type);
 
         var count = EntityTypesCount = Enum.GetValues<RustyEntityType>().Max(static type => (int)type) + 1;
+
+        var maxCount = Math.Max(DescPropertiesCount, _internalMutableCount);
+        maxCount = Math.Max(count, maxCount);
+        _intAsString = new string[maxCount + 1];
+        for (int i = 0; i < _intAsString.Length; i++)
+            _intAsString[i] = i.ToString();
+
+        _mutableMap = new int[count * MutablePropertiesCount];
 
         _masks = new EntitySpecialMask[count];
         _requiredProperties = new ICollection<DescPropertyType>[count];
@@ -43,7 +59,7 @@ public static partial class EntityDependencies
 
     private static void Initialize()
     {
-        var builder = EntityDependenciesBuilder.Create(_masks, _requiredProperties, _optionalProperties, _mutableProperties);
+        var builder = EntityDependenciesBuilder.Create();
         var itemMask = EntitySpecialMask.Executable | EntitySpecialMask.IsInstance;
 
         var itemWithGroupMask = EntitySpecialMask.HasParent | itemMask;
@@ -191,6 +207,11 @@ public static partial class EntityDependencies
         return _optionalProperties[entityTypeAsIndex];
     }
 
+    public static ICollection<MutablePropertyType> GetMutalbeProperties(int entityTypeAsIndex)
+    {
+        return _mutableProperties[entityTypeAsIndex];
+    }
+
     public static ICollection<MutablePropertyType> GetMutalbeProperties(RustyEntityType entityType)
     {
         return _mutableProperties[(int)entityType];
@@ -206,6 +227,11 @@ public static partial class EntityDependencies
         return (_masks[entityTypeAsIndex] & condition) != 0;
     }
 
+    public static EntitySpecialMask GetMask(int entityTypeAsIndex)
+    {
+        return _masks[entityTypeAsIndex];
+    }
+
     public static int ResolveTypeAsIndex<TProperty>() where TProperty : IDescProperty
     {
         if (_propertyTypes.TryGetValue(typeof(TProperty), out var index))
@@ -218,79 +244,121 @@ public static partial class EntityDependencies
         return (DescPropertyType)ResolveTypeAsIndex<TProperty>();
     }
 
-    public static int ResolveMutableTypeAsIndex<TProperty>() where TProperty : IMutableProperty
+    public static int ResolveMutableTypeAsIndex<TProperty>(int entityTypeIndex) where TProperty : IMutableProperty
     {
         if (_propertyTypes.TryGetValue(typeof(TProperty), out var index))
-            return index;
+            return _mutableMap.Span[entityTypeIndex * _internalMutableCount + index];
         return -1;
     }
-}
 
-internal ref struct EntityDependenciesBuilder
-{
-    private EntitySpecialMask[] _masks;
-
-    private ICollection<DescPropertyType>[] _requiredProperties;
-    private ICollection<DescPropertyType>[] _optionalProperties;
-    private ICollection<MutablePropertyType>[] _mutableProperties;
-
-    private EntityDependenciesBuilder(EntitySpecialMask[] masks, ICollection<DescPropertyType>[] requiredProperties, ICollection<DescPropertyType>[] optionalProperties, ICollection<MutablePropertyType>[] mutableProperties)
+    public static void MutalbeBuild(int entityType, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties)
     {
-        _masks = masks;
-        _requiredProperties = requiredProperties;
-        _optionalProperties = optionalProperties;
-        _mutableProperties = mutableProperties;
+        var types = _mutableProperties[entityType];
+        mutableProperties = new IMutableProperty[types.Count];
+
+        var map = _mutableMap.Slice(entityType * _internalMutableCount, _internalMutableCount).Span;
+        for (int i = 0; i < map.Length; i++)
+        {
+            var index = map[i];
+            if(index == -1)
+                continue;
+
+            mutableProperties[index] = resolver.Resolve(i);
+        }
     }
 
-    internal static EntityDependenciesBuilder Create(EntitySpecialMask[] masks, ICollection<DescPropertyType>[] requiredProperties, ICollection<DescPropertyType>[] optionalProperties, ICollection<MutablePropertyType>[] mutableProperties)
+    public static void MutalbeBuild(int entityType, JsonElement data, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties)
     {
-        return new EntityDependenciesBuilder(masks, requiredProperties, optionalProperties, mutableProperties);
+        var types = _mutableProperties[entityType];
+        mutableProperties = new IMutableProperty[types.Count];
+
+        var map = _mutableMap.Slice(entityType * _internalMutableCount, _internalMutableCount).Span;
+        for (int i = 0; i < map.Length; i++)
+        {
+            var index = map[i];
+            if (index == -1)
+                continue;
+
+            if (data.TryGetProperty(_intAsString[i], out var propertyData))
+                mutableProperties[index] = resolver.Resolve(i, propertyData);
+            else
+                mutableProperties[index] = resolver.Resolve(i);
+        }
     }
 
-    public EntityDependenceBuilder For(RustyEntityType entity)
+    internal ref struct EntityDependenciesBuilder
     {
-        var index = (int)entity;
-        return new EntityDependenceBuilder(this, index);
-    }
+        private EntitySpecialMask[] _masks;
 
-    internal ref struct EntityDependenceBuilder
-    {
-        private EntityDependenciesBuilder _builder;
-        private int _index;
-
-        public EntityDependenceBuilder(EntityDependenciesBuilder builder, int index)
+        private EntityDependenciesBuilder(EntitySpecialMask[] masks, ICollection<DescPropertyType>[] requiredProperties, ICollection<DescPropertyType>[] optionalProperties, ICollection<MutablePropertyType>[] mutableProperties)
         {
-            _builder = builder;
-            _index = index;
+            _masks = masks;
+            _requiredProperties = requiredProperties;
+            _optionalProperties = optionalProperties;
+            _mutableProperties = mutableProperties;
         }
 
-        public EntityDependenceBuilder Mask(EntitySpecialMask mask)
+        internal static EntityDependenciesBuilder Create(EntitySpecialMask[] masks, ICollection<DescPropertyType>[] requiredProperties, ICollection<DescPropertyType>[] optionalProperties, ICollection<MutablePropertyType>[] mutableProperties)
         {
-            _builder._masks[_index] = mask;
-            return this;
+            return new EntityDependenciesBuilder(masks, requiredProperties, optionalProperties, mutableProperties);
         }
 
-        public EntityDependenceBuilder Required(params DescPropertyType[] types)
+        internal static EntityDependenciesBuilder Create()
         {
-            _builder._requiredProperties[_index] = Pack(types);
-            return this;
+            return new EntityDependenciesBuilder();
         }
 
-        public EntityDependenceBuilder Optional(params DescPropertyType[] types)
+        public EntityDependenceBuilder For(RustyEntityType entity)
         {
-            _builder._optionalProperties[_index] = Pack(types);
-            return this;
+            var index = (int)entity;
+            return new EntityDependenceBuilder(this, index);
         }
 
-        public EntityDependenceBuilder Mutable(params MutablePropertyType[] types)
+        internal ref struct EntityDependenceBuilder
         {
-            _builder._mutableProperties[_index] = new HashSet<MutablePropertyType>(types);
-            return this;
-        }
+            private EntityDependenciesBuilder _builder;
+            private int _index;
 
-        private ICollection<DescPropertyType> Pack(DescPropertyType[] types)
-        {
-            return types.Length < 4 ? types : new HashSet<DescPropertyType>(types);
+            public EntityDependenceBuilder(EntityDependenciesBuilder builder, int index)
+            {
+                _builder = builder;
+                _index = index;
+            }
+
+            public EntityDependenceBuilder Mask(EntitySpecialMask mask)
+            {
+                _builder._masks[_index] = mask;
+                return this;
+            }
+
+            public EntityDependenceBuilder Required(params DescPropertyType[] types)
+            {
+                _requiredProperties[_index] = Pack(types);
+                return this;
+            }
+
+            public EntityDependenceBuilder Optional(params DescPropertyType[] types)
+            {
+                _optionalProperties[_index] = Pack(types);
+                return this;
+            }
+
+            public EntityDependenceBuilder Mutable(params MutablePropertyType[] types)
+            {
+                var hash = new HashSet<MutablePropertyType>(types);
+                _mutableProperties[_index] = hash;
+
+                var slice = _mutableMap.Slice(_index * _internalMutableCount, _internalMutableCount).Span;
+                for (int i = 0; i < slice.Length; i++)
+                    slice[i] = hash.Contains((MutablePropertyType) (i + 1)) ? i : -1;
+
+                return this;
+            }
+
+            private ICollection<DescPropertyType> Pack(DescPropertyType[] types)
+            {
+                return types.Length < 4 ? types : new HashSet<DescPropertyType>(types);
+            }
         }
     }
 }

@@ -104,7 +104,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\RecycleResourcesTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\Progress\ResourceGiftTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\SessionTimeRecord.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\TimeTarget.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\BalanceConfig.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\ToolsEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\CalculateBalance\UserData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Controls\Resources\ResourceSelectorViewModel.cs" />

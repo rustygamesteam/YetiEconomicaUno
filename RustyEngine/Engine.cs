@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using Lepracaun;
 using RustyDTO.Interfaces;
+using RustyDTO.Supports;
 using RustyEngine.Interfaces;
+using RustyEngine.Internal;
 
 namespace RustyEngine;
 
@@ -15,11 +17,16 @@ public class Engine
     private readonly Dictionary<string, User> _users = null!;
     private WorkerThreadSynchronizationContext _userContext;
 
+    internal PropertyFactory PropertyFactory { get; }
+    internal IMutablePropertyResolver MutableResolver { get; }
+
     public static Engine Instance { get; private set; } = null!;
 
     public Engine(ITimeService timeService, JsonDocument entityConfig, int userCapacity)
     {
         Instance = this;
+
+        MutableResolver = new SimpleMutablePropertyResolver();
 
         EntityService = new EntityService();
         EntityService.Initialize(entityConfig);
@@ -62,5 +69,10 @@ public class Engine
         {
             users.Remove(userId);
         }
+    }
+
+    public EntityID GetNextUserEntityID()
+    {
+        throw new NotImplementedException();
     }
 }

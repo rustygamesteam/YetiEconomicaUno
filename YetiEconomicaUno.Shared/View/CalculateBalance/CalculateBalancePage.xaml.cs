@@ -10,6 +10,7 @@ using System.Reactive.Disposables;
 using ReactiveUI;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DynamicData;
 using RustyDTO;
 using YetiEconomicaUno.ViewModels.CalculateBalance.Progress;
 using YetiEconomicaCore.Services;
@@ -31,10 +32,26 @@ public sealed partial class CalculateBalancePage : Page, IDisposable
     {
         this.InitializeComponent();
 
+        ModelSelectBox.ItemsSource = Service.BalanceModels;
+
+        ModelSelectBox.SelectionChanged += (sender, args) =>
+        {
+            var value = ModelSelectBox.SelectedValue as string;
+            if (value != CalculateBalanceService.CurrentModel.Value)
+                CalculateBalanceService.CurrentModel.OnNext(value);
+
+            SessionList.ItemsSource = Service.Sessions;
+        };
+        CalculateBalanceService.CurrentModel.Subscribe(value => ModelSelectBox.SelectedValue = value);
+
+        //RemoveModelBtn
+
         this.WhenActivated(disposables =>
         {
             ViewModel.Initialize(disposables, ListView);
-            SessionList.ItemsSource = Service.Sessions;
+
+            Service.BalanceModels.AsObservableChangeSet()
+                .Subscribe(set => RemoveModelBtn.IsEnabled = Service.BalanceModels.Count > 1).DisposeWith(disposables);
 
             SessionList.WhenAnyValue(static list => list.SelectedIndex)
                 .Select(static count => count != -1)
@@ -73,6 +90,16 @@ public sealed partial class CalculateBalancePage : Page, IDisposable
         SetToolInfo(ToolsEnum.Axe, AxeTool_InfoBox);
         SetToolInfo(ToolsEnum.Pick, PickTool_InfoBox);
         SetToolInfo(ToolsEnum.Shovel, ShovelTool_InfoBox);
+    }
+
+    private void CloneModel_OnClick()
+    {
+        Service.CreateModel(CloneModelNameBox.Text);
+    }
+
+    private void RemoveModel_OnClick()
+    {
+        Service.RemoveModel();
     }
 
     private async void AddSessionTime_OnClick()

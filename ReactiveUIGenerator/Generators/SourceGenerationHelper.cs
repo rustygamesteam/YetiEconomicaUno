@@ -35,7 +35,9 @@ namespace {@class.Namespace}
     }
 
 
-    public const string Attribute = @"namespace ReactiveUIGenerator;
+    public const string Attribute = @"#nullable enable
+
+namespace ReactiveUIGenerator;
 
 [global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = false)]
 public sealed class ViewForAttribute<T> : global::System.Attribute

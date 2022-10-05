@@ -50,8 +50,8 @@ public enum DescPropertyType
     [PropertyHave<ICollection<ResourceStack>>("Rewards", isReadOnly: true)]
     HasRewards = 10,
 
-    [PropertyHave<int>("X", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
-    [PropertyHave<int>("Y", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
+    [PropertyHave<int>("X", isReadOnly: DescPropertyTypeEx.IsNotReactive, serializedName: "x")]
+    [PropertyHave<int>("Y", isReadOnly: DescPropertyTypeEx.IsNotReactive, serializedName: "y")]
     MineSize = 11,
 
     [PropertyHave<int>("Count", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
@@ -69,8 +69,8 @@ public enum DescPropertyType
     [PropertyHave<int>("Prestige", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
     HasPrestige = 16,
 
-    [PropertyHave<int>("BuildsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 10)]
-    [PropertyHave<int>("RoadsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 10)]
+    [PropertyHave<int>("BuildsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 10, serializedName: "builds")]
+    [PropertyHave<int>("RoadsMax", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 10, serializedName: "roads")]
     CitySize = 17,
 
     [PropertyHave<HexMaskFlags>("Mask", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: HexMaskFlags.All)]

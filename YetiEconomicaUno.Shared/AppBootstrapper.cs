@@ -158,15 +158,11 @@ public static class AppBootstrapper
             .IgnoreReactive();
         mapper.Entity<ReactiveVector2Int>()
             .IgnoreReactive();
-        mapper.Entity<TimeTarget>()
+        mapper.Entity<BalanceConfig>()
             .IgnoreReactive();
 
         mapper.Entity<ProgressTask>()
             .IgnoreReactive();
-
-        mapper.Entity<SessionTimeRecord>()
-            .Id(static x => x.ID)
-            .Ctor(static doc => new SessionTimeRecord(doc["_id"], doc[nameof(SessionTimeRecord.Hour)]));
 
         mapper.Entity<ResourceStackForRecord>()
             .Ctor(static doc => ResourceStackForRecord.Parse(doc));
@@ -175,7 +171,7 @@ public static class AppBootstrapper
             .Id(static value => value.Index);
     }
 
-    private static ProgressTask FactoryProgressTask(BsonDocument doc)
+    public static ProgressTask FactoryProgressTask(BsonDocument doc)
     {
         var type = (ProgressType)(doc[nameof(ProgressTask.Type)].AsInt32);
         var mapper = BsonMapper.Global;
