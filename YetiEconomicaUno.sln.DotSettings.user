@@ -1,0 +1,10 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
+  &lt;Assembly Path="C:\Users\kostya\source\repos\YetiEconomicaUno\RustyDTOGenerator\bin\Debug\netstandard2.0\RustyDTOGenerator.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String>
+	
+	
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=870b1917_002D6fae_002D4caf_002D8ed1_002D409db810accd_0023YetiEconomicaUno_002ESkia_002EWpf/@EntryIndexedValue">True</s:Boolean>
+	
+	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=cce7c657_002Dc037_002D4855_002D9e4f_002D1b761b0f5be6_0023YetiEconomicaUno_002EWindows/@EntryIndexedValue">True</s:Boolean>
+	</wpf:ResourceDictionary>

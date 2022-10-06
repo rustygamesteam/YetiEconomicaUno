@@ -14,7 +14,7 @@ internal class ReactiveOwnerViewModel : ReactiveObject, IHasOwner
     public ReactiveOwnerViewModel(int index, int ownerIndex, int tear = 0)
     {
         Index = index;
-        Owner = RustyEntityService.Instance.GetEntity(new EntityID(EntityIndexType.d, ownerIndex));
+        Owner = RustyEntityService.Instance.GetEntity(ownerIndex);
         Tear = tear;
     }
 

@@ -10,8 +10,8 @@ public enum EntitySpecialMask : int
     RequiredInDependencies = 1 << 3,
     IsInstance = 1 << 4,
     HasUniqueID = 1 << 5,
-    IsUserConent = 1 << 6,
-    IsTask = Executable & ~IsInstance, 
+    IsCustomContent = 1 << 6,
+    IsTask = Executable | ~IsInstance, 
 }
 
 public static class EntitySpecialMaskEx

@@ -17,11 +17,11 @@ public interface IEntityService
 
     void Initialize(JsonDocument? database);
 
-    IRustyEntity GetEntity(EntityID id);
-    bool TryGetEntity(EntityID id, out IRustyEntity? entity);
+    IRustyEntity GetEntity(int index);
+    bool TryGetEntity(int index, out IRustyEntity? entity);
 
     IEnumerable<IRustyEntity> AllEntites();
-    IEnumerable<IRustyEntity> GetItemsFor(EntityID ownerID);
+    IEnumerable<IRustyEntity> GetItemsFor(int ownerIndex);
 
     IEnumerable<IRustyEntity> EntitesWhere(Func<IRustyEntity, bool> where);
     IEnumerable<IRustyEntity> EntitesWhereType(RustyEntityType type);

@@ -17,6 +17,7 @@ public enum DescPropertyType
     [PropertyHave<IRustyEntity>("VisibleAfter", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: int.MinValue)]
     HasDependents = 2,
 
+    [SkipCodegen(skipResolve: true)]
     [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
     Payable = 3,
 
@@ -47,6 +48,7 @@ public enum DescPropertyType
     [PropertyHave<double>("FromRate", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1)]
     HasExchange = 9,
 
+    [SkipCodegen(skipResolve: true)]
     [PropertyHave<ICollection<ResourceStack>>("Rewards", isReadOnly: true)]
     HasRewards = 10,
 
@@ -89,6 +91,7 @@ public enum DescPropertyType
     [PropertyHave<GameScopes>("Scopes", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: GameScopes.EntityExecute)]
     UsageScope = 22,
 
+    [SkipCodegen(skipResolve: true)]
     [PropertyHave<ICollection<IRustyEntity>>("Links", true, false)]
     MultiLinks = 23,
 
@@ -130,6 +133,7 @@ public enum DescPropertyType
     [PropertyHave<double>("Force", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1)]
     PveArmyImprovement = 35,
 
+    [SkipCodegen(skipResolve: true)]
     [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
     FakePayable = 36,
 }

@@ -3,28 +3,28 @@
 public struct EntityID : IEquatable<EntityID>
 { 
     public int Index { get; }
-    public EntityIndexType Type { get; }
+    public bool IsUserEntity { get; }
 
     private readonly int _hash;
     private string? _str;
 
-    public EntityID(EntityIndexType type, int index, string? str = null)
+    public EntityID(bool isUserEntity, int index, string? str = null)
     {
         Index = index;
-        Type = type;
+        IsUserEntity = isUserEntity;
 
         _str = str;
-        _hash = HashCode.Combine(type, index);
+        _hash = HashCode.Combine(isUserEntity, index);
     }
 
     public static bool operator ==(EntityID first, EntityID second)
     {
-        return first.Index == second.Index && first.Type == second.Type;
+        return first.Index == second.Index && first.IsUserEntity == second.IsUserEntity;
     }
 
     public static bool operator !=(EntityID first, EntityID second)
     {
-        return first.Index != second.Index || first.Type != second.Type;
+        return first.Index != second.Index || first.IsUserEntity != second.IsUserEntity;
     }
 
     public override string ToString()
@@ -32,7 +32,7 @@ public struct EntityID : IEquatable<EntityID>
         if (_str is null)
         {
             Span<char> chars = stackalloc char[16];
-            chars[0] = (char)Type;
+            chars[0] = IsUserEntity ? 'u' : 'e';
 
             if (Index.TryFormat(chars.Slice(1), out var length))
             {
@@ -50,7 +50,7 @@ public struct EntityID : IEquatable<EntityID>
     {
         Span<char> chars = stackalloc char[19];
         chars[0] = '[';
-        chars[1] = (char)Type;
+        chars[1] = IsUserEntity ? 'u' : 'e';
         chars[2] = ',';
 
         if (Index.TryFormat(chars.Slice(3), out var length))
@@ -69,33 +69,27 @@ public struct EntityID : IEquatable<EntityID>
 
     public static EntityID Parse(string raw)
     {
-        EntityIndexType indexType = (EntityIndexType)raw[0];
-        return new EntityID(indexType, MathHelper.ToIndexString(raw, 1), raw);
+        var isUserEntity = raw[0] == 'u';
+        return new EntityID(isUserEntity, MathHelper.ToIndexString(raw, 1), raw);
     }
 
     public bool Equals(EntityID other)
     {
-        return Index == other.Index && Type == other.Type;
+        return Index == other.Index && IsUserEntity == other.IsUserEntity;
     }
 
     public override bool Equals(object? obj)
     {
         return obj is EntityID other && Equals(other);
     }
-}
 
-public enum EntityIndexType : byte
-{
-    /// <summary>
-    /// Default
-    /// </summary>
-    d = (byte)'d',
-    /// <summary>
-    /// Multi instance
-    /// </summary>
-    m = (byte)'m',
-    /// <summary>
-    /// User or game generated
-    /// </summary>
-    u = (byte)'u'
+    public static EntityID CreateByDB(int index)
+    {
+        return new EntityID(false, index);
+    }
+    
+    public static EntityID CreateByUser(int index)
+    {
+        return new EntityID(true, index);
+    }
 }

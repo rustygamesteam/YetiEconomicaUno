@@ -3,11 +3,13 @@ using RustyDTO;
 using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
 using RustyDTO.MutableProperties;
+using RustyDTO.MutableProperties.Impl;
 
 namespace RustyEngine;
 
 public partial class User
 {
+    
     private void TryCreateInstance(IRustyEntity archetype)
     {
         TryCreateInstance(archetype, out _);
@@ -17,6 +19,8 @@ public partial class User
     {
         var typeAsIndex = archetype.TypeAsIndex;
         var mask = EntityDependencies.GetMask(typeAsIndex);
+        
+        
         if (mask.IsHas(EntitySpecialMask.IsInstance))
         {
             if (archetype.TryGetProperty(out IHasOwner ownerInfo))
@@ -35,13 +39,22 @@ public partial class User
 
             next = ResolveNextID(archetype, mask);
 
-            var mutalbe = EntityDependencies.GetMutalbeProperties(typeAsIndex);
-            if (mutalbe.Count > 0)
+            var mutable = EntityDependencies.GetMutalbeProperties(typeAsIndex);
+            if (mutable.Count > 0)
             {
-                var data = new MutableData(archetype.TypeAsIndex);
+                var data = new RustyUserEntity(archetype);
 
-                if (mutalbe.Contains(MutablePropertyType.OwnerArchetype))
-                    data.Get<IMutableOwnerArchetype>().Entity = archetype;
+                if (mutable.Contains(MutablePropertyType.OwnerArchetype))
+                    data.InjectProperty(new MutableOwnerArchetypeImpl
+                    {
+                        Entity = archetype
+                    });
+                
+                if(mutable.Contains(MutablePropertyType.Author))
+                    data.InjectProperty(new MutableAuthorImpl
+                    {
+                        ID = ID
+                    });
 
                 _mutableBag[next] = data;
             }

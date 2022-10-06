@@ -30,7 +30,7 @@ public class ConvertablesService : ReactiveObject
         ExchangesToFilter = Observable.Return<Func<IRustyEntity, bool>>(ExchangesTo.Contains);
     }
 
-    private void Exchanges_OnChange(IChangeSet<IRustyEntity> diffs)
+    private void Exchanges_OnChange(IChangeSet<IReactiveRustyEntity> diffs)
     {
         void OnAdd(IRustyEntity entity)
         {
@@ -83,7 +83,7 @@ public class ConvertablesService : ReactiveObject
         }
     }
 
-    public IObservable<IChangeSet<IRustyEntity>> ObservableExchangesToResource(int index)
+    public IObservable<IChangeSet<IReactiveRustyEntity>> ObservableExchangesToResource(int index)
     {
         return RustyEntityService.Instance.ConnectToEntity(entity =>
                 entity.Type is RustyEntityType.ExchageTask && entity.GetDescUnsafe<IHasExchange>().ToEntity.ID.Index == index)

@@ -48,11 +48,6 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
         return Entities[index];
     }
 
-    public IRustyEntity GetEntity(EntityID id)
-    {
-        return Entities[id.Index];
-    }
-
     public IRustyEntity? GetOptionEntity(int index)
     {
         var lookup = Entities.Lookup(index);
@@ -70,11 +65,6 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
 
         entity = null;
         return false;
-    }
-
-    public bool TryGetEntity(EntityID id, out IRustyEntity? entity)
-    {
-        return TryGetEntity(id.Index, out entity);
     }
 
     public IEnumerable<IRustyEntity> AllEntites()
@@ -106,12 +96,12 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
         }
     }
 
-    public IObservable<IChangeSet<IRustyEntity, int>> PreviewToEntity(Func<IRustyEntity, bool>? filter = null)
+    public IObservable<IChangeSet<IReactiveRustyEntity, int>> PreviewToEntity(Func<IRustyEntity, bool>? filter = null)
     {
         return Entities.Preview(filter);
     }
 
-    public IObservable<IChangeSet<IRustyEntity, int>> ConnectToEntity(Func<IRustyEntity, bool>? filter = null)
+    public IObservable<IChangeSet<IReactiveRustyEntity, int>> ConnectToEntity(Func<IRustyEntity, bool>? filter = null)
     {
         return Entities.Connect(filter);
     }
@@ -258,11 +248,11 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
         yield return new(DescPropertyType.PveArmyImprovement, ReactiveUniversalFactory.ReactivePveArmyImprovementFactory());
     }
 
-    public IEnumerable<IRustyEntity> GetItemsFor(EntityID id)
+    public IEnumerable<IRustyEntity> GetItemsFor(int index)
     {
         foreach (var item in ItemsOfGroup.Items)
         {
-            if (item.Owner.ID.Index != id.Index)
+            if (item.Owner.Index != index)
                 continue;
 
             yield return Entities[item.Index];
@@ -448,7 +438,7 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
     bool IDatabaseChunkConvertable<ResourceStack, ResourceStackForRecord>.TryToModel(long ID,
         ResourceStackForRecord data, out ModelByChunk<ResourceStack>? chunk)
     {
-        chunk = ModelByChunk.Create(ID, data.Owner, new ResourceStack(GetEntity(new EntityID(EntityIndexType.d, data.ResourceIndex)), data.Value));
+        chunk = ModelByChunk.Create(ID, data.Owner, new ResourceStack(GetEntity(data.ResourceIndex), data.Value));
         return true;
     }
 

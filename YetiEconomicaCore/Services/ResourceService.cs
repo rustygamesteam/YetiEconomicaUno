@@ -28,9 +28,9 @@ public class ResourceService
         ObservableResources = observable.AsObservableList();
     }
 
-    public IObservableList<IRustyEntity> ObservableResources { get; }
+    public IObservableList<IReactiveRustyEntity> ObservableResources { get; }
 
-    public IObservable<IChangeSet<IRustyEntity>> ObservableGroups { get; }
+    public IObservable<IChangeSet<IReactiveRustyEntity>> ObservableGroups { get; }
     public IReadOnlyCollection<IRustyEntity> Groups { get; }
 
     public bool CreateGroup(string newGroupName)

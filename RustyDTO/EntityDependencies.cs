@@ -3,44 +3,53 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json;
 using RustyDTO.Interfaces;
+using RustyDTO.MutableProperties;
 
 namespace RustyDTO;
 
 public static partial class EntityDependencies
 {
-    private static EntitySpecialMask[] _masks;
+    private static readonly EntitySpecialMask[] _masks;
 
     private static ICollection<DescPropertyType>[] _requiredProperties;
     private static ICollection<DescPropertyType>[] _optionalProperties;
     private static ICollection<MutablePropertyType>[] _mutableProperties;
 
-    private static Memory<int> _mutableMap;
+    private static readonly Memory<int> _mutableMap;
+    private static readonly Memory<int> _descMap;
 
-    private static int _internalMutableCount;
+    private static readonly int[] _descCountByType;
+    private static readonly int[] _mutableCountByType;
+    
+    private static readonly int _internalMutableCount;
+    private static readonly int _internalDescPropertiesCount;
+    
+    private static readonly string[] _intAsString;
 
-    public static int DescPropertiesCount { get; }
+    public static int DescPropertiesCount => _internalDescPropertiesCount;
     public static int MutablePropertiesCount => _internalMutableCount;
+    
     public static int EntityTypesCount { get; }
-
-    private static string[] _intAsString;
 
     [ThreadStatic]
     private static BitArray _entityTypeBitmask = null!;
 
     static EntityDependencies()
     {
-        DescPropertiesCount = Enum.GetValues<DescPropertyType>().Max(static type => (int)type);
+        _internalDescPropertiesCount = Enum.GetValues<DescPropertyType>().Max(static type => (int)type);
         _internalMutableCount = Enum.GetValues<MutablePropertyType>().Max(static type => (int)type);
 
         var count = EntityTypesCount = Enum.GetValues<RustyEntityType>().Max(static type => (int)type) + 1;
 
-        var maxCount = Math.Max(DescPropertiesCount, _internalMutableCount);
+        var maxCount = Math.Max(_internalDescPropertiesCount, _internalMutableCount);
         maxCount = Math.Max(count, maxCount);
         _intAsString = new string[maxCount + 1];
         for (int i = 0; i < _intAsString.Length; i++)
             _intAsString[i] = i.ToString();
 
-        _mutableMap = new int[count * MutablePropertiesCount];
+        _mutableMap = new int[count * _internalMutableCount];
+        _descMap = new int [count * _internalDescPropertiesCount];
+        _descCountByType = new int[count];
 
         _masks = new EntitySpecialMask[count];
         _requiredProperties = new ICollection<DescPropertyType>[count];
@@ -55,6 +64,7 @@ public static partial class EntityDependencies
         }
 
         Initialize();
+        Optimize();
     }
 
     private static void Initialize()
@@ -157,7 +167,34 @@ public static partial class EntityDependencies
         builder.For(RustyEntityType.Gen)
             .Required(DescPropertyType.PurposeOfGen, DescPropertyType.HasNameKey, DescPropertyType.Rarity, DescPropertyType.ChanceActivate, DescPropertyType.IconKey)
             .Optional(DescPropertyType.HasDescKey, DescPropertyType.MultiLinks);
+    }
 
+    private static void Optimize()
+    {
+        var count = _internalDescPropertiesCount;
+        var map = _descMap;
+        
+        for (int index = 0; index < count; index++)
+        {
+            int internalCount = 0;
+            
+            var slice = map.Slice(index * count, count).Span;
+            for (int i = 0; i < slice.Length; i++)
+            {
+                int result = -1;
+                
+                var type = (DescPropertyType)i + 1;
+                if (_requiredProperties[i].Contains(type) || _optionalProperties[i].Contains(type))
+                {
+                    result = i;
+                    internalCount++;
+                }
+                
+                slice[i] = result;
+            }
+
+            _descCountByType[index] = internalCount;
+        }
     }
 
     public static BitArray ToBitmask(ReadOnlySpan<RustyEntityType> types)
@@ -232,16 +269,21 @@ public static partial class EntityDependencies
         return _masks[entityTypeAsIndex];
     }
 
-    public static int ResolveTypeAsIndex<TProperty>() where TProperty : IDescProperty
+    public static int ResolveTypeAsIndex(int entityTypeIndex, DescPropertyType propertyType)
+    {
+        return _descMap.Span[entityTypeIndex * _internalDescPropertiesCount + propertyType.AsIndex()];
+    }
+    
+    public static int ResolveTypeAsIndex<TProperty>(int entityTypeIndex) where TProperty : IDescProperty
     {
         if (_propertyTypes.TryGetValue(typeof(TProperty), out var index))
-            return index;
+            return _descMap.Span[entityTypeIndex * _internalDescPropertiesCount + index];
         return -1;
     }
 
-    public static DescPropertyType ResolveType<TProperty>() where TProperty : IDescProperty
+    public static DescPropertyType ResolveType<TProperty>(int entityTypeIndex) where TProperty : IDescProperty
     {
-        return (DescPropertyType)ResolveTypeAsIndex<TProperty>();
+        return (DescPropertyType)ResolveTypeAsIndex<TProperty>(entityTypeIndex);
     }
 
     public static int ResolveMutableTypeAsIndex<TProperty>(int entityTypeIndex) where TProperty : IMutableProperty
@@ -250,8 +292,13 @@ public static partial class EntityDependencies
             return _mutableMap.Span[entityTypeIndex * _internalMutableCount + index];
         return -1;
     }
+    
+    public static int ResolveMutableTypeAsIndex(int entityTypeIndex, MutablePropertyType mutablePropertyType)
+    {
+        return _mutableMap.Span[entityTypeIndex * _internalMutableCount + mutablePropertyType.AsIndex()];
+    }
 
-    public static void MutalbeBuild(int entityType, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties)
+    public static void MutableBuild(int entityType, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties)
     {
         var types = _mutableProperties[entityType];
         mutableProperties = new IMutableProperty[types.Count];
@@ -267,7 +314,7 @@ public static partial class EntityDependencies
         }
     }
 
-    public static void MutalbeBuild(int entityType, JsonElement data, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties)
+    public static void MutableBuild(int entityType, JsonElement data, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties)
     {
         var types = _mutableProperties[entityType];
         mutableProperties = new IMutableProperty[types.Count];
@@ -283,6 +330,48 @@ public static partial class EntityDependencies
                 mutableProperties[index] = resolver.Resolve(i, propertyData);
             else
                 mutableProperties[index] = resolver.Resolve(i);
+        }
+    }
+
+    public static void MutableBuild(int entityType, JsonElement data, IMutablePropertyResolver resolver, out IMutableProperty[] mutableProperties, out IRustyEntity entity)
+    {
+        var types = _mutableProperties[entityType];
+        mutableProperties = new IMutableProperty[types.Count];
+
+        var map = _mutableMap.Slice(entityType * _internalMutableCount, _internalMutableCount).Span;
+        for (int i = 0; i < map.Length; i++)
+        {
+            var index = map[i];
+            if (index == -1)
+                continue;
+
+            if (data.TryGetProperty(_intAsString[i], out var propertyData))
+                mutableProperties[index] = resolver.Resolve(i, propertyData);
+            else
+                mutableProperties[index] = resolver.Resolve(i);
+        }
+
+        var archetypeIndex = ResolveMutableTypeAsIndex<IMutableOwnerArchetype>(entityType);
+        entity = ((IMutableOwnerArchetype)mutableProperties[archetypeIndex]).Entity;
+    }
+    
+    public static int GetDescPropertiesCountByType(int entityType)
+    {
+        return _descCountByType[entityType];
+    }
+
+    public static void DescBuild(int entityType, LazyDescProperty[] lazy, ref IDescProperty[] properties)
+    {
+        var map = _descMap.Slice(entityType * _internalDescPropertiesCount, _internalDescPropertiesCount).Span;
+        
+        foreach (var lazyRustyProperty in lazy)
+        {
+            var typeIndex = lazyRustyProperty.Type.AsIndex();
+            var index = map[typeIndex];
+            if (index == -1)
+                continue;
+
+            properties[index] = lazyRustyProperty.Value;
         }
     }
 

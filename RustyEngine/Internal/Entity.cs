@@ -7,6 +7,7 @@ namespace RustyEngine.Internal;
 internal class Entity : IRustyEntity
 {
     public EntityID ID { get; }
+    public int Index { get; }
     public RustyEntityType Type { get; }
     public int TypeAsIndex { get; }
 
@@ -26,40 +27,43 @@ internal class Entity : IRustyEntity
     private IDescProperty[] _properties;
 
     public IEnumerable<DescPropertyType> DescProperties => _properyTypes;
-
-    public Entity(EntityID id, int type, string? displayName, Span<DescPropertyType> propertyTypes, Span<LazyDescProperty> lazyProperties, Span<MutablePropertyType> mutableProperties, out IDisposable onInitalize)
+    
+    public Entity(int index, int type, string? displayName, Span<DescPropertyType> propertyTypes, Span<LazyDescProperty> lazyProperties, out IDisposable onInitialize)
     {
-        ID = id;
+        ID = EntityID.CreateByDB(index);
+        Index = index;
         Type = (RustyEntityType)type;
         TypeAsIndex = type;
         DisplayName = displayName;
 
-        var hashSet = new HashSet<MutablePropertyType>(mutableProperties.Length);
-        foreach (var mutableProperty in mutableProperties)
-            hashSet.Add(mutableProperty);
-        MutablePropertyTypes = hashSet;
+        var mutables = EntityDependencies.GetMutalbeProperties(TypeAsIndex);
+        if (mutables is IReadOnlySet<MutablePropertyType> set)
+            MutablePropertyTypes = set;
+        else
+            MutablePropertyTypes = new HashSet<MutablePropertyType>(mutables);
 
         _properyTypes = propertyTypes.ToArray();
-        _properties = new IDescProperty[EntityDependencies.DescPropertiesCount];
+        _properties = new IDescProperty[EntityDependencies.GetDescPropertiesCountByType(TypeAsIndex)];
 
-        onInitalize = new CompleteInitliaze(_properties, lazyProperties.ToArray());
+        onInitialize = new CompleteInitialize(TypeAsIndex, _properties, lazyProperties.ToArray());
     }
 
-    private struct CompleteInitliaze : IDisposable
+    private struct CompleteInitialize : IDisposable
     {
+        private int _typeAsIndex;
         private IDescProperty[] _properties;
         private LazyDescProperty[] _lazy;
 
-        public CompleteInitliaze(IDescProperty[] properties, LazyDescProperty[] lazyRustyProperties)
+        public CompleteInitialize(int typeAsIndex, IDescProperty[] properties, LazyDescProperty[] lazyRustyProperties)
         {
+            _typeAsIndex = typeAsIndex;
             _properties = properties;
             _lazy = lazyRustyProperties;
         }
 
         public void Dispose()
         {
-            foreach (var lazyRustyProperty in _lazy)
-                _properties[lazyRustyProperty.Type.AsIndex()] = lazyRustyProperty.Value;
+            EntityDependencies.DescBuild(_typeAsIndex, _lazy, ref _properties);
         }
     }
 
@@ -69,12 +73,12 @@ internal class Entity : IRustyEntity
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        return ID == other.ID;
+        return Index == other.Index;
     }
 
     public override int GetHashCode()
     {
-        return ID.GetHashCode();
+        return Index.GetHashCode();
     }
 
     public bool HasSpecialMask(EntitySpecialMask condition)
@@ -94,12 +98,20 @@ internal class Entity : IRustyEntity
 
     public bool HasProperty(DescPropertyType type)
     {
-        return _properties[type.AsIndex()] is not null;
+        var index = EntityDependencies.ResolveTypeAsIndex(TypeAsIndex, type);
+        return index != -1 && _properties[index] is not null;
     }
 
     public bool TryGetProperty<TProperty>(DescPropertyType type, out TProperty property) where TProperty : IDescProperty
     {
-        var raw = _properties[type.AsIndex()];
+        var index = EntityDependencies.ResolveTypeAsIndex(TypeAsIndex, type);
+        if (index == -1)
+        {
+            property = default!;
+            return false;
+        }
+        
+        var raw = _properties[index];
         if (raw is null)
         {
             property = default!;
@@ -112,12 +124,19 @@ internal class Entity : IRustyEntity
 
     public IDescProperty GetDescUnsafe(DescPropertyType type)
     {
-        return _properties[type.AsIndex()];
+        var index = EntityDependencies.ResolveTypeAsIndex(TypeAsIndex, type);
+        return _properties[index];
     }
 
     public bool TryGetProperty<TProperty>(out TProperty property) where TProperty : IDescProperty
     {
-        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>();
+        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>(TypeAsIndex);
+        if (index == -1)
+        {
+            property = default!;
+            return false;
+        }
+        
         var raw = _properties[index];
         if (raw is null)
         {
@@ -131,7 +150,7 @@ internal class Entity : IRustyEntity
 
     public TProperty GetDescUnsafe<TProperty>() where TProperty : IDescProperty
     {
-        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>();
+        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>(TypeAsIndex);
         return (TProperty)_properties[index];
     }
 }

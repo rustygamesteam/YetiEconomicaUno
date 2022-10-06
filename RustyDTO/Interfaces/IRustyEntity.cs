@@ -5,6 +5,7 @@ namespace RustyDTO.Interfaces;
 public interface IRustyEntity : IEquatable<IRustyEntity>
 {
     EntityID ID { get; }
+    int Index { get; }
 
     RustyEntityType Type { get; }
     int TypeAsIndex { get; }
@@ -34,7 +35,16 @@ public interface IRustyEntity : IEquatable<IRustyEntity>
     TProperty GetDescUnsafe<TProperty>() where TProperty : IDescProperty;
 
     IDescProperty GetDescUnsafe(DescPropertyType type);
+}
 
+public interface IRustyUserEntity
+{
+    public IRustyEntity Original { get; }
+    
+    public void InjectProperty<TProperty>(TProperty property) where TProperty : IMutableProperty;
+    
+    public TProperty Get<TProperty>() where TProperty : IMutableProperty;
+    public bool TryGet<TProperty>(out TProperty result) where TProperty : class, IMutableProperty;
 }
 
 #if REACTIVE

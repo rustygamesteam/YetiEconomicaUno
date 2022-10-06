@@ -1,5 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using Lepracaun;
+using RustyDTO;
+using RustyDTO.CodeGen.Impl;
 using RustyDTO.Interfaces;
 using RustyDTO.Supports;
 using RustyEngine.Interfaces;
@@ -14,19 +17,22 @@ public class Engine
     public IEntityService EntityService { get; private set; } = null!;
     public ITimeService TimeService { get; private set; } = null!;
 
-    private readonly Dictionary<string, User> _users = null!;
+    private readonly ConcurrentDictionary<string, User> _entityInUsers;
+    private readonly ConcurrentDictionary<string, User> _users;
+    
     private WorkerThreadSynchronizationContext _userContext;
 
-    internal PropertyFactory PropertyFactory { get; }
     internal IMutablePropertyResolver MutableResolver { get; }
+    internal IDescPropertyResolver DescPropertyResolver { get; }
 
     public static Engine Instance { get; private set; } = null!;
 
-    public Engine(ITimeService timeService, JsonDocument entityConfig, int userCapacity)
+    public Engine(ITimeService timeService, JsonDocument entityConfig)
     {
         Instance = this;
 
         MutableResolver = new SimpleMutablePropertyResolver();
+        DescPropertyResolver = new SimpleDescPropertyResolver();
 
         EntityService = new EntityService();
         EntityService.Initialize(entityConfig);
@@ -34,7 +40,8 @@ public class Engine
         TimeService = timeService;
         timeService.Sync();
 
-        _users = new Dictionary<string, User>(userCapacity);
+        _users = new ConcurrentDictionary<string, User>();
+        _entityInUsers = new ConcurrentDictionary<string, User>();
 
         _userContext = new WorkerThreadSynchronizationContext();
         _userContext.Run();
@@ -42,7 +49,7 @@ public class Engine
 
     public void InjectUser(string id, JsonDocument document, long timeExpiration)
     {
-        _users[id] = new User(document);
+        _users[id] = new User(document, this);
         if (timeExpiration > 0)
             UserExpiration(timeExpiration - TimeService.CurrentTime, id);
     }
@@ -62,17 +69,17 @@ public class Engine
     {
         _userContext.Post(callback, state);
     }
+    
+    public bool TryGetUserEntity(string udid, EntityID id, out IRustyUserEntity entity)
+    {
+        return _entityInUsers[udid].TryGetUserEntity(id, out entity);
+    }
 
-    private record ExpirationTask(Dictionary<string, User> users, string userId)
+    private record ExpirationTask(ConcurrentDictionary<string, User> users, string userId)
     {
         public void Complete()
         {
-            users.Remove(userId);
+            users.TryRemove(userId, out var user);
         }
-    }
-
-    public EntityID GetNextUserEntityID()
-    {
-        throw new NotImplementedException();
     }
 }

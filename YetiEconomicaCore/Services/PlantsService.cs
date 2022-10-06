@@ -25,7 +25,7 @@ public class PlantsService
 
     public IObservable<Func<IRustyEntity, bool>> PlantFilter { get; }
     public IObservable<Func<IRustyEntity, bool>> ResourceIsPlantFilter { get; }
-    public IObservable<IChangeSet<IRustyEntity>> ObservablePlants { get; }
+    public IObservable<IChangeSet<IReactiveRustyEntity>> ObservablePlants { get; }
 
     private Dictionary<IRustyEntity, IRustyEntity> _plants = new();
 
@@ -70,7 +70,7 @@ public class PlantsService
         ObservablePlants.Subscribe(Plants_OnChanged);
     }
 
-    private void Plants_OnChanged(IChangeSet<IRustyEntity> diffs)
+    private void Plants_OnChanged(IChangeSet<IReactiveRustyEntity> diffs)
     {
         void OnAdd(IRustyEntity entity)
         {

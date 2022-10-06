@@ -19,6 +19,7 @@ public class RustyGenerator : IIncrementalGenerator
     private const string MainAttribute = "RustyDTO.Generator.PropertyImpl";
     private const string PropertyInfoAttribute = "RustyDTO.Generator.PropertyHave";
     private const string OverridePropertyNameAttribute = "RustyDTO.Generator.OverridePropertyName";
+    private const string SkipCodegenAttribute = "RustyDTO.Generator.SkipCodegen";
     
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -74,6 +75,9 @@ public class RustyGenerator : IIncrementalGenerator
                     hintName: $"{info.Namespace}.{info.Name}.generated.cs",
                     text: result);
 
+                if(info.Options.IsSkipImpl)
+                    continue;
+                
                 switch (info.HelpType)
                 {
                     case PropertyType.Mutable:
@@ -123,6 +127,11 @@ public class RustyGenerator : IIncrementalGenerator
             if (sb.Length > 10)
                 context.AddTextSource(
                     hintName: $"SimpleDescPropertyResolver.g.cs",
+                    text: sb.ToString());
+            SourceGenerationHelper.GenerateSimpleMutablePropertyResolver(sb, "RustyDTO.CodeGen.Impl", classes);
+            if (sb.Length > 10)
+                context.AddTextSource(
+                    hintName: $"SimpleMutablePropertyResolver.g.cs",
                     text: sb.ToString());
 
         }
@@ -178,7 +187,11 @@ public class RustyGenerator : IIncrementalGenerator
                 string name = enumFieldSymbol.Name;
                 members.Clear();
 
-                
+                PropertyOptions options = new PropertyOptions
+                {
+                    Index = (int)enumFieldSymbol.ConstantValue! - 1
+                };
+
                 foreach (var attributeData in attributes)
                 {
                     var attributeClass = attributeData.AttributeClass!;
@@ -214,13 +227,18 @@ public class RustyGenerator : IIncrementalGenerator
                     {
                         name = (string)attributeData.ConstructorArguments[0].Value!;
                     }
+                    else if (fullname.StartsWith(SkipCodegenAttribute, StringComparison.Ordinal))
+                    {
+                        options.IsSkipImpl = (bool)attributeData.ConstructorArguments[0].Value!;
+                        options.IsSkipResolver = (bool)attributeData.ConstructorArguments[1].Value!;
+                    }
                 }
 
                 if(members.Count == 0)
                     continue;
 
                 var helpType = baseType.Contains("Mutable") ? PropertyType.Mutable : PropertyType.Desc;
-                values.Add(new PropertyEnumInfo(nameSpace, baseType, prefix, name, members.ToArray(), (int)enumFieldSymbol.ConstantValue! - 1, helpType, $"I{prefix}{name}"));
+                values.Add(new PropertyEnumInfo(nameSpace, baseType, prefix, name, members.ToArray(), helpType, $"I{prefix}{name}", options));
                 links.Add(new DependencyLink($"{nameSpace}.I{prefix}{name}", (int)enumFieldSymbol.ConstantValue!));
             }
         }

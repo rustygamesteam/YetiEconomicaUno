@@ -1,6 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using System.Text.Json;
-using RustyDTO.Impl;
 using RustyDTO.Interfaces;
 
 namespace RustyDTO;
@@ -9,10 +7,9 @@ namespace RustyDTO;
 public struct LazyDescProperty
 {
     private IDescProperty? _property;
+    private readonly ILazyDescPropertyResolver? _resolver;
 
     private readonly DescPropertyType _type;
-    private readonly ILazyDescPropertyResolver _resolver;
-
     private int _propertyPrt;
 
     public DescPropertyType Type => _type;
@@ -21,10 +18,9 @@ public struct LazyDescProperty
     public LazyDescProperty(DescPropertyType type, ILazyDescPropertyResolver resolver)
     {
         _type = type;
-
         _resolver = resolver;
         _property = null;
     }
-
-    public IDescProperty Value => _property ??= _resolver.Resolve();
+    
+    public IDescProperty Value => _property ??= _resolver!.Resolve();
 }

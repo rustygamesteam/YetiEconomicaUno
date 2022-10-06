@@ -15,7 +15,8 @@ namespace YetiEconomicaCore;
 [DebuggerDisplay("ID: {ID}; Type: {Type}; Name: {FullName}")]
 internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveRustyEntity
 {
-    public EntityID ID { get; }
+    public EntityID ID { get; }    
+    public int Index { get; }
 
     private readonly int _indexType;
     public RustyEntityType Type { get; }
@@ -113,7 +114,7 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
 
     public RustyEntity(int index, RustyEntityType type, string? displayName, IEnumerable<DescPropertyType> properties, IEnumerable<MutablePropertyType> mutablePropertyTypes)
     {
-        ID = new EntityID(EntityIndexType.d, index);
+        ID = EntityID.CreateByDB(index);
         _indexType = (int)type;
         Type = type;
         DisplayName = displayName;
@@ -187,7 +188,7 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
     public bool HasProperty(DescPropertyType type) => _properties[(int)type - 1].IsValid;
     public bool TryGetProperty<TProperty>(out TProperty property) where TProperty : IDescProperty
     {
-        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>();
+        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>(_indexType);
 
         var lazy = _properties[index];
         if (lazy.IsValid is false)
@@ -216,7 +217,7 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
 
     public TProperty GetDescUnsafe<TProperty>() where TProperty : IDescProperty
     {
-        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>();
+        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>(_indexType);
         return (TProperty)_properties[index]!.Value;
     }
 

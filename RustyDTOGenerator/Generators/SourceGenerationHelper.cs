@@ -9,10 +9,10 @@ internal class SourceGenerationHelper
 
 namespace RustyDTO.Generator;
 
-[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = false)]
-internal sealed class DefaultResolverAttribute: global::System.Attribute
+[global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = false)]
+internal sealed class SkipCodegenAttribute: global::System.Attribute
 {
-    public DefaultResolverAttribute()
+    public SkipCodegenAttribute(bool skipImpl = false, bool skipResolve = false)
     {
     }
 }
@@ -208,6 +208,7 @@ public static partial class EntityDependencies
 
 using System;
 using System.Text.Json;
+using RustyDTO.Interfaces;
 ");
         foreach (var nameSpaceInfo in classes.Select(info => info.Namespace).Distinct(StringComparer.Ordinal))
         {
@@ -225,21 +226,22 @@ public class RustyPropertyJsonSerializerContext
     private static RustyPropertyJsonSerializerContext _instance;
     public static RustyPropertyJsonSerializerContext Instance => (_instance ??= new RustyPropertyJsonSerializerContext());
 
-    private Func<JsonElement, global::RustyDTO.Interfaces.IMutableProperty>[] _mutableFromJson;
-    private Func<global::RustyDTO.Interfaces.IMutableProperty, JsonElement>[] _mutableToJson;
+    private Func<JsonElement, IMutableProperty>[] _mutableFromJson;
+    private Func<IMutableProperty, JsonElement>[] _mutableToJson;
 
-    private Func<JsonElement, int, global::RustyDTO.Interfaces.IDescProperty>[] _descFromJson;
-    private Func<global::RustyDTO.Interfaces.IDescProperty, JsonElement>[] _descToJson;
+    private Func<JsonElement, int, IDescProperty>[] _descFromJson;
+    private Func<IDescProperty, JsonElement>[] _descToJson;
 
     private Dictionary<Type, Action<Utf8JsonWriter, object, string?>> _customWriters;
+    private JsonSerializerOptions? _jsonSerializerOptions;
 
     private global::System.IO.MemoryStream _ms = new ();
-    private Utf8JsonWriter _jsonWritter;
+    private Utf8JsonWriter _jsonWriter;
 
     private RustyPropertyJsonSerializerContext()
     {
         _customWriters = new (32);
-        _jsonWritter = new (_ms);
+        _jsonWriter = new (_ms);
 ");
 
         GenerateFromTo(sb, "_mutable", "IMutableProperty", PropertyType.Mutable, classes);
@@ -248,22 +250,48 @@ public class RustyPropertyJsonSerializerContext
         sb.Append(@"
     }
 
-    public JsonElement ToJson(int type, global::RustyDTO.Interfaces.IMutableProperty property)
+    public void SetJsonSerializerOptions(JsonSerializerOptions options)
+    {
+        _jsonSerializerOptions = options;
+    }
+
+    public void SetCustomWriter<T>(Action<Utf8JsonWriter, object, string?> action)
+    {
+        _customWriters[typeof(T)] = action;
+    }
+
+    public void SetMutableResolver(int type, Func<JsonElement, IMutableProperty>? fromJson, Func<IMutableProperty, JsonElement>? toJson)
+    {
+        if(fromJson is not null)
+            _mutableFromJson[type] = fromJson;
+        if(toJson is not null)
+            _mutableToJson[type] = toJson;
+    }
+
+    public void SetDescResolver(int type, Func<JsonElement, int, IDescProperty>? fromJson, Func<IDescProperty, JsonElement>? toJson)
+    {
+        if(fromJson is not null)
+            _descFromJson[type] = fromJson;
+        if(toJson is not null)
+            _descToJson[type] = toJson;
+    }
+
+    public JsonElement ToJson(int type, IMutableProperty property)
     {
         return _mutableToJson[type](property);
     }
 
-    public JsonElement ToJson(int type, global::RustyDTO.Interfaces.IDescProperty property)
+    public JsonElement ToJson(int type, IDescProperty property)
     {
         return _descToJson[type](property);
     }
 
-    public global::RustyDTO.Interfaces.IMutableProperty MutableFromJson(int type, JsonElement json)
+    public IMutableProperty MutableFromJson(int type, JsonElement json)
     {
         return _mutableFromJson[type](json);
     }
 
-    public global::RustyDTO.Interfaces.IDescProperty DescFromJson(int type, JsonElement json, int index)
+    public IDescProperty DescFromJson(int type, JsonElement json, int index)
     {
         return _descFromJson[type](json, index);
     }
@@ -297,8 +325,10 @@ public class RustyPropertyJsonSerializerContext
         int count = 0;
         foreach (var enumInfo in classes.Where(info => info.HelpType == type))
         {
+            if(enumInfo.Options.IsSkipImpl)
+                continue;
             count++;
-            AppenedFromJson(sb, from, enumInfo);
+            AppendFromJson(sb, from, enumInfo);
         }
 
         sb.Append("\n\t\t");
@@ -312,7 +342,12 @@ public class RustyPropertyJsonSerializerContext
         sb.Append("];\n");
 
         foreach (var enumInfo in classes.Where(info => info.HelpType == type))
+        {
+            if(enumInfo.Options.IsSkipImpl)
+                continue;
+            
             AppenedToJson(sb, to, enumInfo);
+        }
 
         if (count > 0)
             sb.Length --;
@@ -320,13 +355,13 @@ public class RustyPropertyJsonSerializerContext
         sb.Append("\n");
     }
 
-    private static void AppenedFromJson(StringBuilder sb, string from, PropertyEnumInfo info)
+    private static void AppendFromJson(StringBuilder sb, string from, PropertyEnumInfo info)
     {
         sb.Append("\t\t");
         sb.Append(from);
         sb.Append('[');
-        sb.Append(info.Index);
-        sb.Append("] = static (json");
+        sb.Append(info.Options.Index);
+        sb.Append("] = (json");
 
         if(info.HelpType is PropertyType.Desc)
             sb.Append(", index");
@@ -350,7 +385,7 @@ public class RustyPropertyJsonSerializerContext
                 if(info.HelpType is PropertyType.Desc)
                     sb.Append("(index)");
 
-                sb.Append("\n\t\t{\n");
+                sb.Append(" {\n");
                 var prop = info.Members[0];
 
                 sb.Append("\t\t\t");
@@ -380,7 +415,7 @@ public class RustyPropertyJsonSerializerContext
                 if (info.HelpType is PropertyType.Desc)
                     sb.Append("(index)");
 
-                sb.Append("\n\t\t{\n");
+                sb.Append(" {\n");
 
                 foreach (var member in info.Members)
                 {
@@ -417,7 +452,7 @@ public class RustyPropertyJsonSerializerContext
         sb.Append("\t\t");
         sb.Append(property);
         sb.Append('[');
-        sb.Append(info.Index);
+        sb.Append(info.Options.Index);
         sb.Append(@"] = propertyRaw => {
             var property = ");
         sb.Append('(');
@@ -430,17 +465,17 @@ public class RustyPropertyJsonSerializerContext
         switch (info.Members.Length)
         {
             case 0:
-                sb.Append("\t\t\t_jsonWritter.WriteStartObject();\n\t\t\t_jsonWritter.WriteEndObject();\n");
+                sb.Append("\t\t\t_jsonWriter.WriteStartObject();\n\t\t\t_jsonWriter.WriteEndObject();\n");
                 break;
             case 1:
                 var prop = info.Members[0];
                 TToJson(sb, prop, "property", prop.SerializedName);
                 break;
             default:
-                sb.Append("\t\t\t_jsonWritter.WriteStartObject();\n");
+                sb.Append("\t\t\t_jsonWriter.WriteStartObject();\n");
                 foreach (var member in info.Members)
                     TToJson(sb, member, "property", member.SerializedName ?? member.Name);
-                sb.Append("\t\t\t_jsonWritter.WriteEndObject();\n");
+                sb.Append("\t\t\t_jsonWriter.WriteEndObject();\n");
                 break;
         }
 
@@ -480,7 +515,7 @@ public class RustyPropertyJsonSerializerContext
             default:
                 sb.Append("\t\t\t_customWriters[typeof(");
                 sb.Append(propertyMember.TypeName);
-                sb.Append(")].Invoke(_jsonWritter, ");
+                sb.Append(")].Invoke(_jsonWriter, ");
 
                 sb.Append(property);
                 sb.Append('.');
@@ -500,7 +535,7 @@ public class RustyPropertyJsonSerializerContext
                 return;
         }
 
-        sb.Append("\t\t\t_jsonWritter.");
+        sb.Append("\t\t\t_jsonWriter.");
         sb.Append(prefix);
 
         if (asProperty is null)
@@ -531,85 +566,84 @@ public class RustyPropertyJsonSerializerContext
             "bool" or "global::System.Boolean" => "GetBoolean()",
             "string" or "global::System.String" => "GetString()",
             "double" or "global::System.Double" => "GetDouble()",
-            _ => $"Deserialize<{typeName}>()"
+            _ => $"Deserialize<{typeName}>(_jsonSerializerOptions)"
         };
     }
 
-
-    internal static void GenerateDescDefaultResolver(StringBuilder sb, string nameSpace, string className,
-        IReadOnlyCollection<PropertyEnumInfo> classes)
+    private static bool CanResolveMembers(PropertyMember[] propertyMembers)
     {
-
+        return propertyMembers.All(member => !member.IsReadOnly || 
+                                             member.Kind is TypeKind.Struct || 
+                                             member.DefaultValue is not null || 
+                                             member.IsNulable);
     }
-
-    internal static void GenerateMutableDefaultResolver(StringBuilder sb, string nameSpace, string className,
+        
+    public static void GenerateSimpleMutablePropertyResolver(StringBuilder sb, string nameSpace,
         IReadOnlyCollection<PropertyEnumInfo> classes)
     {
+        sb.Clear();
+
         sb.Append(@"#nullable enable
+
+using System;
+using System.Text.Json;
 
 namespace ");
         sb.Append(nameSpace);
         sb.Append(@";
 
-public partial class ");
-        sb.Append(className);
-        sb.Append(@"
+public class SimpleMutablePropertyResolver : global::RustyDTO.Interfaces.IMutablePropertyResolver
 {
+    private int _count;
+    private Func<global::RustyDTO.Interfaces.IMutableProperty>[] _defaultFactory;  
 
-	private global::System.Type[] _types;
-    private global::System.Func<global::RustyDTO.Interfaces.IMutableProperty>[] _defaultFactory;
+    public bool HasResolve(int type) => type < _count;
+    public bool HasDefaultResolve(int type) => _defaultFactory[type] is not null;
 
-	public ");
-        sb.Append(className);
-        sb.Append(@"()
-	{
-	_types = new {
-");
-
-        var mutable = classes.Where(info => info.HelpType is PropertyType.Mutable).ToArray();
-        foreach (var info in mutable)
-        {
-            sb.Append("\t\ttypeof(global::");
-            sb.Append(info.Namespace);
-            sb.Append("Impl.");
-            sb.Append(info.Prefix);
-            sb.Append(info.Name);
-            sb.Append("),\n");
-        }
-
-        if (mutable.Length > 0)
-            sb.Length -= 2;
-
-        sb.Append(@"
-        };
-
-    _defaultFactory = new {
-");
-        foreach (var info in mutable)
-        {
-            sb.Append("\t\tstatic () => new global::");
-            sb.Append(info.Namespace);
-            sb.Append("Impl.");
-            sb.Append(info.Prefix);
-            sb.Append(info.Name);
-            sb.Append("(),\n");
-        }
-
-        if (mutable.Length > 0)
-            sb.Length -= 2;
-
-        sb.Append(@"
-        };
+    public void SetDefaultResolver(int type, Func<global::RustyDTO.Interfaces.IMutableProperty> resolver)
+    {
+        _defaultFactory[type] = resolver;
     }
 
-	pubic global::RustyDTO.Interfaces.IMutableProperty Resolve(int type)
-	{
-		return _defaultFactory.Invoke();
+    public SimpleMutablePropertyResolver()
+    {
+        _count = RustyDTO.EntityDependencies.MutablePropertiesCount;
+        _defaultFactory = new Func<global::RustyDTO.Interfaces.IMutableProperty>[_count];");
+
+        foreach (var info in classes.Where(info => info.HelpType is PropertyType.Mutable))
+        {
+            if(info.Options.IsSkipImpl || info.Options.IsSkipResolver)
+                continue;
+
+            var canDefault = CanResolveMembers(info.Members);
+            if(!canDefault)
+                continue;
+            
+            sb.Append("\n\t\t_defaultFactory[");
+            sb.Append(info.Options.Index);
+            sb.Append("] = static () => new global::");
+            sb.Append(info.Namespace);
+            sb.Append(".Impl.");
+            sb.Append(info.Prefix);
+            sb.Append(info.Name);
+            sb.Append("Impl {");
+
+            FillDefaultResolverMembers(sb, info.Members);
+
+            sb.Append("\n\t\t};");
+        }
+
+        sb.Append(@"
     }
 
-	pubic global::RustyDTO.Interfaces.IMutableProperty Resolve(int type, global::System.Text.Json.JsonElement dataElement)
-	{
-		return global::RustyPropertyJsonSerializerContext.Default.MutableFromJson(type, dataElement);
+    public global::RustyDTO.Interfaces.IMutableProperty Resolve(int type)
+    {
+        return _defaultFactory[type].Invoke();
+    }
+
+    public global::RustyDTO.Interfaces.IMutableProperty Resolve(int type, JsonElement dataElement)
+    {
+        return global::RustyDTO.CodeGen.Impl.RustyPropertyJsonSerializerContext.Instance.MutableFromJson(type, dataElement);
     }
 }");
     }
@@ -633,26 +667,38 @@ public class SimpleDescPropertyResolver : global::RustyDTO.Interfaces.IDescPrope
     private int _count;
     private Func<int, global::RustyDTO.Interfaces.IDescProperty>[] _defaultFactory;  
 
-    public bool HasDefaultResolve(int type) => _defaultFactory[type] is not null;
     public bool HasResolve(int type) => type < _count;
+    public bool HasDefaultResolve(int type) => _defaultFactory[type] is not null;
+
+    public void SetDefaultResolver(int type, Func<int, global::RustyDTO.Interfaces.IDescProperty> resolver)
+    {
+        _defaultFactory[type] = resolver;
+    }
 
     public SimpleDescPropertyResolver()
     {
-        _count = RustyDTO.DescPropertiesCount;
+        _count = RustyDTO.EntityDependencies.DescPropertiesCount;
         _defaultFactory = new Func<int, global::RustyDTO.Interfaces.IDescProperty>[_count];");
 
         foreach (var info in classes.Where(info => info.HelpType is PropertyType.Desc))
         {
+            if(info.Options.IsSkipImpl || info.Options.IsSkipResolver)
+                continue;
+            
+            var canDefault = CanResolveMembers(info.Members);
+            if(!canDefault)
+                continue;
+            
             sb.Append("\n\t\t_defaultFactory[");
-            sb.Append(info.Index);
-            sb.Append("] = static (index) => return new global::");
+            sb.Append(info.Options.Index);
+            sb.Append("] = static index => new global::");
             sb.Append(info.Namespace);
-            sb.Append("Impl.");
+            sb.Append(".Impl.");
             sb.Append(info.Prefix);
             sb.Append(info.Name);
-            sb.Append("(index)\n\t\t\t{\n\t\t\t");
+            sb.Append("Impl(index) {");
 
-
+            FillDefaultResolverMembers(sb, info.Members);
 
             sb.Append("\n\t\t};");
         }
@@ -660,15 +706,40 @@ public class SimpleDescPropertyResolver : global::RustyDTO.Interfaces.IDescPrope
         sb.Append(@"
     }
 
-    public global::RustyDTO.Interfaces.IDescProperty Resolve(int index, int type, JsonElement dataElement)
-    {
-        return global::RustyDTO.CodeGen.ImplRustyPropertyJsonSerializerContext.Instance.DescFromJson(type, dataElement, index);
-    }
-
     public global::RustyDTO.Interfaces.IDescProperty Resolve(int index, int type)
     {
         return _defaultFactory[type].Invoke(index);
     }
+
+    public global::RustyDTO.Interfaces.IDescProperty Resolve(int index, int type, JsonElement dataElement)
+    {
+        return global::RustyDTO.CodeGen.Impl.RustyPropertyJsonSerializerContext.Instance.DescFromJson(type, dataElement, index);
+    }
 }");
+    }
+
+    private static void FillDefaultResolverMembers(StringBuilder sb, PropertyMember[] infoMembers)
+    {
+        foreach (var member in infoMembers)
+        {   
+            sb.Append("\n\t\t\t");
+            sb.Append(member.Name);
+            sb.Append(" = ");
+            sb.Append(ValueWithTypeResolver(member.TypeName, member.DefaultValue ?? "default"));
+            sb.Append(',');
+        }
+
+        if (infoMembers.Length > 0)
+            sb.Length--;
+    }
+
+    private static string ValueWithTypeResolver(string type, string value)
+    {
+        return (type, value) switch
+        {
+            ("global::RustyDTO.Interfaces.IRustyEntity", "-2147483648") => "null",
+            ("global::RustyDTO.Interfaces.IRustyEntity", "default") => "null",
+            _ => value
+        };
     }
 }

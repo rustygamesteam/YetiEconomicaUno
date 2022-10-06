@@ -14,7 +14,7 @@ public class CraftService
     public static CraftService Instance => _instance.Value;
 
     public IObservable<Func<IRustyEntity, bool>> CraftFilter { get; }
-    public IObservable<IChangeSet<IRustyEntity>> ObservableCrafts { get; }
+    public IObservable<IChangeSet<IReactiveRustyEntity>> ObservableCrafts { get; }
 
     private Dictionary<IRustyEntity, IRustyEntity> _resourceCrafts = new();
 
@@ -29,7 +29,7 @@ public class CraftService
         ObservableCrafts.Subscribe(Crafts_OnChanged);
     }
 
-    private void Crafts_OnChanged(IChangeSet<IRustyEntity> diffs)
+    private void Crafts_OnChanged(IChangeSet<IReactiveRustyEntity> diffs)
     {
         void OnAdd(IRustyEntity entity)
         {

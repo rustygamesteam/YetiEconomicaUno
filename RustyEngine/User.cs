@@ -1,4 +1,6 @@
-﻿using RustyDTO;
+﻿using System.Buffers;
+using System.Runtime.CompilerServices;
+using RustyDTO;
 using RustyDTO.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -11,10 +13,12 @@ namespace RustyEngine;
 
 public partial class User
 {
-    private HashSet<EntityID> _instanceBag;
-    private Dictionary<EntityID, MutableData> _mutableBag;
+    public string ID { get; }
+    
+    private readonly HashSet<EntityID> _instanceBag;
+    private readonly Dictionary<EntityID, IRustyUserEntity> _mutableBag;
 
-    private Dictionary<EntityID, TaskInfo> _exucutingTask;
+    private readonly Dictionary<EntityID, TaskInfo> _exucutingTask;
 
     private JsonObject _stats;
 
@@ -25,10 +29,10 @@ public partial class User
     private Dictionary<string, string> _stringStats;
     private Dictionary<string, double> _doubleStats;
 
-    public User(JsonDocument jsonDocument)
+    public User(JsonDocument jsonDocument, Engine engine)
     {
         var json = jsonDocument.RootElement;
-
+        
         if (json.TryGetProperty("bag", out var bagNode))
         {
             _instanceBag = new HashSet<EntityID>(bagNode.GetArrayLength() + 3);
@@ -38,19 +42,27 @@ public partial class User
         else
             _instanceBag = new HashSet<EntityID>(8);
 
-        if (json.TryGetProperty("mutalbeBag", out var mutableBagNode))
+        List<IDisposable>? disposables;
+        if (json.TryGetProperty("mutableBag", out var mutableBagNode))
         {
             var values = mutableBagNode.EnumerateObject();
 
-            _mutableBag = new Dictionary<EntityID, MutableData>(values.Count() + 3);
+            var count = values.Count();
+            _mutableBag = new Dictionary<EntityID, IRustyUserEntity>(count + 3);
+            disposables = new List<IDisposable>(count);
+            
             foreach (var value in values)
             {
-                var index = EntityID.Parse(value.Name);
-                _mutableBag[index] = new MutableData(value.Value);
+                var id = EntityID.Parse(value.Name);
+                _mutableBag[id] = new RustyUserEntity(engine, id, value.Value, out var onComplete);
+                disposables.Add(onComplete);
             }
         }
         else
-            _mutableBag = new Dictionary<EntityID, MutableData>(8);
+        {
+            _mutableBag = new Dictionary<EntityID, IRustyUserEntity>(8);
+            disposables = null;
+        }
 
         if (json.TryGetProperty("tasks", out var tasks))
         {
@@ -63,10 +75,29 @@ public partial class User
         else
             _exucutingTask = new Dictionary<EntityID, TaskInfo>(8);
 
+        if (json.TryGetProperty("nextEntity", out var nextEntityJson))
+            _nextMultiIndex = nextEntityJson.GetInt32();
+
         if (json.TryGetProperty("stats", out var statsJsonElement))
             _stats = JsonObject.Create(statsJsonElement)!;
         else
             _stats = new JsonObject();
+
+        if(disposables is null)
+            return;
+        foreach (var disposable in disposables)
+            disposable.Dispose();
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private EntityID ResolveNextID(IRustyEntity archetype, EntitySpecialMask mask)
+    {
+        return mask.IsHas(EntitySpecialMask.HasUniqueID) ? EntityID.CreateByUser(++_nextMultiIndex) : archetype.ID;
+    }
+
+    public bool TryGetUserEntity(EntityID id, out IRustyUserEntity data)
+    {
+        return _mutableBag.TryGetValue(id, out data);
     }
 
     public bool OptionalHasEntity(IRustyEntity? entity)
@@ -113,14 +144,20 @@ public partial class User
 
     private void InternalIncrement(IRustyEntity resource, int count)
     {
-        ResolveMutableData(resource).Get<IMutableCount>().Count += count;
+        ResolveUserEntity(resource).Get<IMutableCount>().Count += count;
         //TODO: Сообщить серверу о изменениях
     }
 
-    private MutableData ResolveMutableData(IRustyEntity entity)
+    private IRustyUserEntity ResolveUserEntity(IRustyEntity entity)
     {
         if (!_mutableBag.TryGetValue(entity.ID, out var result))
-            _mutableBag.Add(entity.ID, result = new MutableData(entity.TypeAsIndex));
+        {
+            var isSuccess = TryCreateInstance(entity, out var id);
+            if (!isSuccess)
+                throw new NotImplementedException(); //TODO!
+
+            return _mutableBag[id];
+        }
 
         return result;
     }
@@ -145,11 +182,11 @@ public partial class User
 
         if (entity.HasSpecialMask(EntitySpecialMask.IsInstance))
         {
-            var mutalbeTypes = EntityDependencies.GetMutalbeProperties(entity.Type);
-            if (mutalbeTypes.Count == 0 && _instanceBag.Contains(entity.ID))
+            var mutableTypes = EntityDependencies.GetMutalbeProperties(entity.Type);
+            if (mutableTypes.Count == 0 && _instanceBag.Contains(entity.ID))
                 return false;
 
-            if (mutalbeTypes.Count > 0 && _mutableBag.ContainsKey(entity.ID))
+            if (mutableTypes.Count > 0 && _mutableBag.ContainsKey(entity.ID))
                 return false;
         }
 

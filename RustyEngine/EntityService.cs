@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using System.Collections;
+﻿using System.Collections;
 using System.Text.Json;
 using RustyDTO;
 using RustyDTO.Interfaces;
@@ -23,7 +22,7 @@ public class EntityService : IEntityService
         if(database is null)
             return;
 
-        var propertyFactory = Engine.Instance.PropertyFactory;
+        var propertyFactory = Engine.Instance.DescPropertyResolver;
 
         var root = database.RootElement;
         var entities = root.GetProperty("entities");
@@ -34,7 +33,6 @@ public class EntityService : IEntityService
 
         var onInitialize = new List<IDisposable>(entitiesCount);
 
-        Span<MutablePropertyType> mutableTypes = stackalloc MutablePropertyType[EntityDependencies.MutablePropertiesCount];
         Span<DescPropertyType> propertyTypes = stackalloc DescPropertyType[EntityDependencies.DescPropertiesCount];
         Span<LazyDescProperty> propertySpan = new LazyDescProperty[EntityDependencies.DescPropertiesCount];
 
@@ -42,30 +40,25 @@ public class EntityService : IEntityService
 
         foreach (var entityNode in entities.EnumerateArray())
         {
-            var id = new EntityID(EntityIndexType.d, entityNode.GetProperty("id").GetInt32());
+            var entityIndex = entityNode.GetProperty("index").GetInt32();
             var type = entityNode.GetProperty("type").GetInt32();
-            var displayName = entityNode.GetProperty("diplayName").GetString();
+            var displayName = entityNode.GetProperty("displayName").GetString();
 
             var descPropertiesRaw = entityNode.GetProperty("properties");
-            var mutablePropertiesRaw = entityNode.GetProperty("mutable");
 
             int descCount = 0;
             foreach (var propertyJson in descPropertiesRaw.EnumerateObject())
             {
                 var typeIndex = MathHelper.ToUnsignedIndexString(propertyJson.Name);
-
                 var index = descCount++;
 
+                var property = new LazyDescPropertyResolver(propertyFactory, entityIndex, typeIndex, propertyJson.Value);
                 propertyTypes[index] = (DescPropertyType)typeIndex;
-                propertySpan[index] = propertyFactory.Resolve(typeIndex, propertyJson.Value);
+                propertySpan[index] = new LazyDescProperty((DescPropertyType)(typeIndex + 1), property);
             }
 
-            int mutableCount = 0;
-            foreach (var index in mutablePropertiesRaw.EnumerateArray())
-                mutableTypes[mutableCount++] = (MutablePropertyType)index.GetInt32();
-
-            var entity = new Entity(id, type, displayName, propertyTypes.Slice(0, descCount), propertySpan.Slice(0, descCount), mutableTypes.Slice(0, mutableCount), out var onComplete);
-            _entities.Add(id.Index, entity);
+            var entity = new Entity(entityIndex, type, displayName, propertyTypes.Slice(0, descCount), propertySpan.Slice(0, descCount), out var onComplete);
+            _entities.Add(entityIndex, entity);
             onInitialize.Add(onComplete);
 
             if (entity.HasSpecialMask(EntitySpecialMask.HasParent))
@@ -75,20 +68,20 @@ public class EntityService : IEntityService
         foreach (var disposable in onInitialize)
             disposable.Dispose();
 
-        foreach (var info in entityWithParent.GroupBy(static info => info.GetDescUnsafe<IHasOwner>().Owner.ID.Index))
+        foreach (var info in entityWithParent.GroupBy(static info => info.GetDescUnsafe<IHasOwner>().Owner.Index))
             _entitiesByOwner.Add(info.Key, info.ToArray());
 
         IsInitialize = true;
     }
 
-    public IRustyEntity GetEntity(EntityID id)
+    public IRustyEntity GetEntity(int index)
     {
-        return _entities[id.Index];
+        return _entities[index];
     }
 
-    public bool TryGetEntity(EntityID id, out IRustyEntity? entity)
+    public bool TryGetEntity(int index, out IRustyEntity? entity)
     {
-        return _entities.TryGetValue(id.Index, out entity);
+        return _entities.TryGetValue(index, out entity);
     }
 
     public IEnumerable<IRustyEntity> AllEntites()
@@ -120,9 +113,9 @@ public class EntityService : IEntityService
         }
     }
 
-    public IEnumerable<IRustyEntity> GetItemsFor(EntityID ownerID)
+    public IEnumerable<IRustyEntity> GetItemsFor(int ownerIndex)
     {
-        if (_entitiesByOwner.TryGetValue(ownerID.Index, out var range))
+        if (_entitiesByOwner.TryGetValue(ownerIndex, out var range))
             return range;
         return Enumerable.Empty<IRustyEntity>();
     }
