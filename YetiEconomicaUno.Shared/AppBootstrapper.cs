@@ -8,6 +8,7 @@ using ReactiveUI;
 using RustyDTO;
 using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
+using RustyDTO.Supports;
 using Splat;
 using YetiEconomicaCore;
 using YetiEconomicaCore.Database;
@@ -111,6 +112,7 @@ public static class AppBootstrapper
     private static void ConfigureBsonMapper()
     {
         var mapper = BsonMapper.Global;
+        mapper.EnumAsInteger = true;
 
         mapper.RegisterType(
                 static value => new BsonDocument(new Dictionary<string, BsonValue> { {"Index", value.Resource.GetIndex() }, { "Value", value.Value } }),
@@ -120,16 +122,7 @@ public static class AppBootstrapper
             static value => new BsonDocument(new Dictionary<string, BsonValue> { { "Index", value.Resource.GetIndex() }, { "Value", value.Value } }),
             static doc => new ResourceStack(RustyEntityService.Instance.GetEntity(doc["Index"].AsInt32), doc["Value"].AsDouble));
 
-        mapper.RegisterType(static entity => entity?.ID.Index ?? int.MinValue, static value => RustyEntityService.Instance.GetOptionEntity(value.AsInt32));
-
-        mapper.RegisterType(
-            serialize: static s => ((int)s),
-            deserialize: static bson => (RustyEntityType)bson.AsInt32);
-
-        mapper.RegisterType(
-            serialize: static s => (int)s,
-            deserialize: static bson => (ProgressType)bson.AsInt32);
-
+        mapper.RegisterType(static entity => entity?.Index ?? int.MinValue, static value => RustyEntityService.Instance.GetOptionEntity(value.AsInt32));
 
         var reactiveMembers = new HashSet<string>
         {

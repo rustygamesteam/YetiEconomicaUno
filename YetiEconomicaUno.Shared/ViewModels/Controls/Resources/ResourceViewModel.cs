@@ -14,7 +14,7 @@ namespace YetiEconomicaUno.ViewModels
     {
         public IRustyEntity Model { get; }
 
-        public string IndexLabel => $"Index: {Model.ID}";
+        public string IndexLabel => $"Index: {Model.Index}";
 
         public IRustyEntity Group
         {

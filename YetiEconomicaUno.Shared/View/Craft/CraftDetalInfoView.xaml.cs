@@ -12,32 +12,10 @@ using RustyDTO.Interfaces;
 namespace YetiEconomicaUno.View.Craft;
 
 [ViewFor<IReactiveRustyEntity>, ViewContract("Detal")]
-public sealed partial class CraftDetalInfoView : UserControl, IDisposable
+public sealed partial class CraftDetalInfoView : UserControl
 {
-    private CompositeDisposable _viewModelDisposable;
-
     public CraftDetalInfoView()
     {
         this.InitializeComponent();
-
-        this.WhenActivated(disposables =>
-        {
-            this.WhenAnyValue(view => view.ViewModel)
-                .WhereNotNull()
-                .Subscribe(entity =>
-                {
-                    _viewModelDisposable?.Dispose();
-                    _viewModelDisposable = new CompositeDisposable();
-                    RustyEntityView.AutoInitialize(entity, _viewModelDisposable);
-                }).DisposeWith(disposables);
-
-            this.DisposeWith(disposables);
-        });
-    }
-
-    public void Dispose()
-    {
-        _viewModelDisposable?.Dispose();
-        _viewModelDisposable = null;
     }
 }

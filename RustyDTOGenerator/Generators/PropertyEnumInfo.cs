@@ -12,6 +12,7 @@ public struct PropertyOptions
     public int Index;
     public bool IsSkipImpl;
     public bool IsSkipResolver;
+    public bool IsForceResolver;
     public string EnumName;
 }
 

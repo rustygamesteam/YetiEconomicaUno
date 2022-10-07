@@ -30,20 +30,21 @@ public sealed partial class HexMaskBlobView : BaseBlobView
     public HexMaskBlobView()
     {
         this.InitializeComponent();
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel, DescPropertyType.HexMask);
+    }
 
-            ViewModel.WhenAnyValue(prop => prop.Mask)
-                .Subscribe(mask =>
-                {
-                    if (!MaskBox.IsInitialize)
-                        MaskBox.InitializeCache(typeof(HexMaskFlags), ViewModel.Mask);
-                    InfoBox.Text = $"Mask: {MaskBox.SelectedValuesAsString()}";
-                    InfoBox.FontSize = MaskBox.ResultCount > 1 ? 12 : 14;
-                })
-                .DisposeWith(disposables);
-        });
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel, DescPropertyType.HexMask);
+
+        ViewModel.WhenAnyValue(prop => prop.Mask)
+            .Subscribe(mask =>
+            {
+                if (!MaskBox.IsInitialize)
+                    MaskBox.InitializeCache(typeof(HexMaskFlags), ViewModel.Mask);
+                InfoBox.Text = $"Mask: {MaskBox.SelectedValuesAsString()}";
+                InfoBox.FontSize = MaskBox.ResultCount > 1 ? 12 : 14;
+            })
+            .DisposeWith(disposable);
     }
 
     protected override void FlyoutOpened(CompositeDisposable disposable)

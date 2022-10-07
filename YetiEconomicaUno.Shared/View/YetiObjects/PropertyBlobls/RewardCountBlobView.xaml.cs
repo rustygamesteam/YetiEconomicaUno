@@ -19,22 +19,22 @@ public sealed partial class RewardCountBlobView : BaseBlobView
     public RewardCountBlobView()
     {
         this.InitializeComponent();
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel.Index, DescPropertyType.HasSingleReward);
-            var owner = Entity;
+    }
 
-            _countLabel = owner.Type is RustyEntityType.PlantTask ? "Harvest count" : "Count";
-            CountBox.Header = _countLabel;
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel, DescPropertyType.HasSingleReward);
+        var owner = Entity;
 
-            ViewModel.WhenAnyValue(dependents => dependents.Count)
-                .Subscribe(count => InfoBox.Text = $"{_countLabel}: {count}")
-                .DisposeWith(disposables);
+        _countLabel = owner.Type is RustyEntityType.PlantTask ? "Harvest count" : "Count";
+        CountBox.Header = _countLabel;
 
-            this.WhenAnyValue(static view => view.ViewModel)
-                .BindTo(this, static view => view.DataContext)
-                .DisposeWith(disposables);
-        });
+        ViewModel.WhenAnyValue(static vm => vm.Count)
+            .Subscribe(count =>
+            {
+                InfoBox.Text = $"{_countLabel}: {count}";
+            })
+            .DisposeWith(disposable);
     }
 
     protected override void FlyoutOpened(CompositeDisposable disposable)

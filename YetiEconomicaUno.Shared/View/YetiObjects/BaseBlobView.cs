@@ -7,10 +7,11 @@ using RustyDTO;
 using RustyDTO.Interfaces;
 using YetiEconomicaCore.Services;
 using YetiEconomicaUno.View.Flyouts;
+using YetiEconomicaUno.Helpers;
 
 namespace YetiEconomicaUno.View.YetiObjects;
 
-public abstract partial class BaseBlobView : Button
+public abstract partial class BaseBlobView : Button, ICompleteViewIntialize
 {
     public bool IsRequired { get; private set; }
     private CompositeDisposable _flyoutDisposable;
@@ -128,4 +129,6 @@ public abstract partial class BaseBlobView : Button
         _flyoutDisposable?.Dispose();
         _flyoutDisposable = null;
     }
+
+    public abstract void CompleteIntialize(CompositeDisposable disposable);
 }

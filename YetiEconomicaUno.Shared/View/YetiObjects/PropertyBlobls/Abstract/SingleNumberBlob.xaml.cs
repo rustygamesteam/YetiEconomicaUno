@@ -17,10 +17,9 @@ public abstract partial class SingleNumberBlob : BaseBlobView, IActivatableView
     public SingleNumberBlob()
     {
         this.InitializeComponent();
-        this.WhenActivated(OnActivated);
     }
 
-    protected virtual void OnActivated(CompositeDisposable disposable)
+    public override void CompleteIntialize(CompositeDisposable disposable)
     {
         var range = Range;
 

@@ -18,20 +18,20 @@ public sealed partial class LongExecutionBlobView : BaseBlobView
     public LongExecutionBlobView()
     {
         this.InitializeComponent();
+    }
 
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel.Index, DescPropertyType.LongExecution);
-            
-            ViewModel.WhenAnyValue(dependents => dependents.Duration)
-                .Subscribe(duration =>
-                {
-                    var durationString = DurationLabelConverter.GetDuration(duration);
-                    DurationBox.Header = $"Duration ({durationString})";
-                    InfoBox.Text = $"Duration: {durationString}";
-                })
-                .DisposeWith(disposables);
-        });
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel.Index, DescPropertyType.LongExecution);
+
+        ViewModel.WhenAnyValue(dependents => dependents.Duration)
+            .Subscribe(duration =>
+            {
+                var durationString = DurationLabelConverter.GetDuration(duration);
+                DurationBox.Header = $"Duration ({durationString})";
+                InfoBox.Text = $"Duration: {durationString}";
+            })
+            .DisposeWith(disposable);
     }
 
     protected override void FlyoutOpened(CompositeDisposable disposable)

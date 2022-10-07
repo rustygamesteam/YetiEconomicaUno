@@ -31,6 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controls\Resources\ResourceStackView.xaml.cs">
       <DependentUpon>ResourceStackView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\ICompleteViewIntialize.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SubGroupHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\Farm\PlantObstaclesViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\Convertable\ExchangeView.xaml.cs">

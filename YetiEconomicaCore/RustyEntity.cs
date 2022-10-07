@@ -22,6 +22,13 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
     public RustyEntityType Type { get; }
     public int TypeAsIndex => _indexType;
 
+    static RustyEntity()
+    {
+        BsonMapper.Global.RegisterType(
+            serialize: entity => new BsonValue(entity.Index),
+            deserialize: value => (RustyEntity)RustyEntityService.Instance.GetEntity(value.AsInt32));
+    }
+
     public ISubject<ItemChange<(DescPropertyType Type, IDescProperty Property)>> PropertiesChangedObserver { get; } = new Subject<ItemChange<(DescPropertyType, IDescProperty)>>();
 
     [Reactive]
@@ -115,6 +122,7 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
     public RustyEntity(int index, RustyEntityType type, string? displayName, IEnumerable<DescPropertyType> properties, IEnumerable<MutablePropertyType> mutablePropertyTypes)
     {
         ID = EntityID.CreateByDB(index);
+        Index = index;
         _indexType = (int)type;
         Type = type;
         DisplayName = displayName;
@@ -126,9 +134,9 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
     public bool TryAddProperty(DescPropertyType type)
     {
         var properties = RustyEntityService.Instance.Properties;
-        if (properties.TryResolve(ID.Index, type, out var lazy) && properties.GetProperties(ID.Index).TryDefaultAttach(type))
+        if (properties.TryResolve(Index, type, out var lazy) && properties.GetProperties(Index).TryDefaultAttach(type))
         {
-            var propertyIndex = (int) type - 1;
+            var propertyIndex = type.AsIndex();
             _properties[propertyIndex] = lazy;
             this.RaisePropertyChanged(nameof(DescProperties));
             PropertiesChangedObserver.OnNext(new ItemChange<(DescPropertyType Type, IDescProperty)>(ListChangeReason.Add, (type, _properties[propertyIndex].Value), -1));
@@ -140,13 +148,13 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
 
     internal bool TryRemoveProperty(DescPropertyType type)
     {
-        ref var property = ref _properties[(int)type - 1];
+        ref var property = ref _properties[type.AsIndex()];
         if (property.IsValid)
         {
             var value = property.Value;
             property = default;
 
-            RustyEntityService.Instance.Properties.GetProperties(ID.Index).Detach(type);
+            RustyEntityService.Instance.Properties.GetProperties(Index).Detach(type);
             this.RaisePropertyChanged(nameof(DescProperties));
             PropertiesChangedObserver.OnNext(new ItemChange<(DescPropertyType Type, IDescProperty)>(ListChangeReason.Remove, (type, value), -1));
         }
@@ -157,17 +165,18 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
     internal void InjectProperty(DescPropertyType propertyType)
     {
         var service = RustyEntityService.Instance;
-        var index = ID;
+        var index = Index;
 
         var propertyIndex = propertyType.AsIndex();
 
-        if (!service.Properties.TryResolve(index.Index, propertyType, out var lazy))
+        if (!service.Properties.TryResolve(index, propertyType, out var lazy))
         {
             lazy = propertyType switch
             {
-                DescPropertyType.HasOwner => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.ItemsOfGroup[index.Index])),
-                DescPropertyType.Payable => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.GetPrices(index.Index))),
-                DescPropertyType.HasRewards => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.GetRewards(index.Index))),
+                DescPropertyType.HasOwner => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.ItemsOfGroup[index])),
+                DescPropertyType.Payable => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.GetPrices(index))),
+                DescPropertyType.FakePayable => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.GetFakePrices(index))),
+                DescPropertyType.HasRewards => new LazyDescProperty(propertyType, new ResolveByFunc(() => service.GetRewards(index))),
 
                 _ => throw new NotImplementedException(),
             };
@@ -185,10 +194,10 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
             InjectProperty(propertyType);
     }
 
-    public bool HasProperty(DescPropertyType type) => _properties[(int)type - 1].IsValid;
+    public bool HasProperty(DescPropertyType type) => _properties[type.AsIndex()].IsValid;
     public bool TryGetProperty<TProperty>(out TProperty property) where TProperty : IDescProperty
     {
-        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>(_indexType);
+        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>();
 
         var lazy = _properties[index];
         if (lazy.IsValid is false)
@@ -203,7 +212,7 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
 
     public bool TryGetProperty<TProperty>(DescPropertyType type, out TProperty property) where TProperty : IDescProperty
     {
-        var lazy = _properties[(int)type - 1];
+        var lazy = _properties[type.AsIndex()];
 
         if (lazy.IsValid is false)
         {
@@ -217,27 +226,27 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
 
     public TProperty GetDescUnsafe<TProperty>() where TProperty : IDescProperty
     {
-        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>(_indexType);
+        var index = EntityDependencies.ResolveTypeAsIndex<TProperty>();
         return (TProperty)_properties[index]!.Value;
     }
 
     public IDescProperty GetDescUnsafe(DescPropertyType type)
     {
-        return _properties[(int) type - 1].Value;
+        return _properties[type.AsIndex()].Value;
     }
 
     public bool Equals(RustyEntity? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return ID == other.ID;
+        return Index == other.Index;
     }
 
     public bool Equals(IRustyEntity? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return ID == other.ID;
+        return Index == other.Index;
     }
 
     public override bool Equals(object? obj)
@@ -250,7 +259,7 @@ internal class RustyEntity : ReactiveObject, IEquatable<RustyEntity>, IReactiveR
 
     public override int GetHashCode()
     {
-        return ID.Index;
+        return Index;
     }
 }
 
@@ -258,6 +267,6 @@ public static class RustyEntityEx
 {
     public static int GetIndex(this IRustyEntity entity)
     {
-        return entity.ID.Index;
+        return entity.Index;
     }
 }

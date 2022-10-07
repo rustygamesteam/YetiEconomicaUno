@@ -30,19 +30,20 @@ public sealed partial class PveEnemyUnitsBlobView : BaseBlobView
     public PveEnemyUnitsBlobView()
     {
         this.InitializeComponent();
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel, DescPropertyType.PveEnemyUnits);
+    }
 
-            ViewModel.WhenAnyValue(prop => prop.AvailableUnits)
-                .Subscribe(mask =>
-                {
-                    if (!MaskBox.IsInitialize)
-                        MaskBox.InitializeCache(typeof(ArmyTypeFlags), ViewModel.AvailableUnits);
-                    InfoBox.Text = $"Enemy units: {MaskBox.SelectedValuesAsString()}";
-                    InfoBox.FontSize = MaskBox.ResultCount > 1 ? 12 : 14;
-                })
-                .DisposeWith(disposables);
-        });
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel, DescPropertyType.PveEnemyUnits);
+
+        ViewModel.WhenAnyValue(prop => prop.AvailableUnits)
+            .Subscribe(mask =>
+            {
+                if (!MaskBox.IsInitialize)
+                    MaskBox.InitializeCache(typeof(ArmyTypeFlags), ViewModel.AvailableUnits);
+                InfoBox.Text = $"Enemy units: {MaskBox.SelectedValuesAsString()}";
+                InfoBox.FontSize = MaskBox.ResultCount > 1 ? 12 : 14;
+            })
+            .DisposeWith(disposable);
     }
 }

@@ -15,9 +15,9 @@ public sealed partial class CraftSpeedBlobView : SingleNumberBlob
 {
     public override (double minimum, double maximum) Range { get; } = (0.01, 100);
 
-    protected override void OnActivated(CompositeDisposable disposable)
+    public override void CompleteIntialize(CompositeDisposable disposable)
     {
-        base.OnActivated(disposable);
+        base.CompleteIntialize(disposable);
 
         Initialize(ViewModel, DescPropertyType.CraftSpeed);
 

@@ -10,7 +10,7 @@
 	<Target Name="CreateDefineConstants" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun;GenerateMSBuildEditorConfigFileCore">
 
 		<PropertyGroup>
-			<RustyDTOGenerator_DefineConstants>$(DefineConstants.Replace(';',','))</RustyDTOGenerator_DefineConstants>
+			<RustyDTOGenerator_DefineConstants>$(DefineConstants)</RustyDTOGenerator_DefineConstants>
 		</PropertyGroup>
 
 	</Target>

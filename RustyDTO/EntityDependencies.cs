@@ -181,17 +181,20 @@ public static partial class EntityDependencies
         var count = _internalDescPropertiesCount;
         var map = _descMap;
         
-        for (int index = 0; index < count; index++)
+        for (int index = 0; index < EntityTypesCount; index++)
         {
             int internalCount = 0;
-            
+
+            var required = _requiredProperties[index];
+            var optional = _optionalProperties[index];
+
             var slice = map.Slice(index * count, count).Span;
             for (int i = 0; i < slice.Length; i++)
             {
                 int result = -1;
                 
                 var type = (DescPropertyType)i + 1;
-                if (_requiredProperties[i].Contains(type) || _optionalProperties[i].Contains(type))
+                if (required.Contains(type) || optional.Contains(type))
                 {
                     result = i;
                     internalCount++;
@@ -280,7 +283,14 @@ public static partial class EntityDependencies
     {
         return _descMap.Span[entityTypeIndex * _internalDescPropertiesCount + propertyType.AsIndex()];
     }
-    
+
+    public static int ResolveTypeAsIndex<TProperty>() where TProperty : IDescProperty
+    {
+        if (_propertyTypes.TryGetValue(typeof(TProperty), out var index))
+            return index;
+        return -1;
+    }
+
     public static int ResolveTypeAsIndex<TProperty>(int entityTypeIndex) where TProperty : IDescProperty
     {
         if (_propertyTypes.TryGetValue(typeof(TProperty), out var index))
@@ -384,20 +394,6 @@ public static partial class EntityDependencies
 
     internal ref struct EntityDependenciesBuilder
     {
-        private EntitySpecialMask[] _masks;
-
-        private EntityDependenciesBuilder(EntitySpecialMask[] masks, ICollection<DescPropertyType>[] requiredProperties, ICollection<DescPropertyType>[] optionalProperties, ICollection<MutablePropertyType>[] mutableProperties)
-        {
-            _masks = masks;
-            _requiredProperties = requiredProperties;
-            _optionalProperties = optionalProperties;
-            _mutableProperties = mutableProperties;
-        }
-
-        internal static EntityDependenciesBuilder Create(EntitySpecialMask[] masks, ICollection<DescPropertyType>[] requiredProperties, ICollection<DescPropertyType>[] optionalProperties, ICollection<MutablePropertyType>[] mutableProperties)
-        {
-            return new EntityDependenciesBuilder(masks, requiredProperties, optionalProperties, mutableProperties);
-        }
 
         internal static EntityDependenciesBuilder Create()
         {
@@ -423,7 +419,7 @@ public static partial class EntityDependencies
 
             public EntityDependenceBuilder Mask(EntitySpecialMask mask)
             {
-                _builder._masks[_index] = mask;
+                _masks[_index] = mask;
                 return this;
             }
 

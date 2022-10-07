@@ -7,7 +7,9 @@ using DynamicData.Binding;
 using LiteDB;
 using RustyDTO;
 using RustyDTO.CodeGen.Impl;
+using RustyDTO.DescPropertyModels.Impl;
 using RustyDTO.Interfaces;
+using RustyDTO.Supports;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Descriptions;
 using YetiEconomicaCore.Helper;
@@ -41,7 +43,8 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
 
     public DynamicLazyPropertiesDatabase(ILiteDatabase database, string table, IEnumerable<KeyValuePair<DescPropertyType, IPropertyResolver>> resolvers)
     {
-        _resolver = new SimpleDescPropertyResolver();
+        FillResolver(out _resolver);
+
         _collection = database.GetCollection(table, BsonAutoId.Int32);
         foreach (var document in _collection.FindAll())
         {
@@ -52,9 +55,16 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
         _resolvers = new Dictionary<DescPropertyType, IPropertyResolver>(resolvers);
     }
 
+    private void FillResolver(out IDescPropertyResolver result)
+    {
+        var resolver = new SimpleDescPropertyResolver();
+
+        result = resolver;
+    }
+
     public bool HasResolve(DescPropertyType type)
     {
-        return _resolver.HasResolve(type.AsIndex());
+        return _resolver.HasDefaultResolve(type.AsIndex());
     }
 
     public bool TryResolve(int index, DescPropertyType propertyType, out LazyDescProperty property)

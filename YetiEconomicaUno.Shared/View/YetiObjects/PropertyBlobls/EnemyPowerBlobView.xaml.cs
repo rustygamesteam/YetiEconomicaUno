@@ -37,57 +37,58 @@ public sealed partial class EnemyPowerBlobView : BaseBlobView
     public EnemyPowerBlobView()
     {
         this.InitializeComponent();
-        this.WhenActivated(disposables =>
+    }
+
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        _isInitializing = true;
+        Initialize(ViewModel, DescPropertyType.PveEnemyPower);
+        if (ViewModel.Value is null)
         {
-            _isInitializing = true;
-            Initialize(ViewModel, DescPropertyType.PveEnemyPower);
-            if (ViewModel.Value is null)
+            ViewModel.Value = new ArmyPowerConfig[3]
             {
-                ViewModel.Value = new ArmyPowerConfig[3]
-                {
-                    new ArmyPowerConfig(1, 1, 1),
-                    new ArmyPowerConfig(1, 1, 1),
-                    new ArmyPowerConfig(1, 1, 1)
-                };
+                new ArmyPowerConfig(1, 1, 1),
+                new ArmyPowerConfig(1, 1, 1),
+                new ArmyPowerConfig(1, 1, 1)
+            };
+        }
+
+        var sw = ViewModel.Value[0];
+        SwDmg.Value = sw.Damage;
+        SwDef.Value = sw.Defense;
+        SwSpeed.Value = sw.Speed;
+
+        var sp = ViewModel.Value[1];
+        SpDmg.Value = sp.Damage;
+        SpDef.Value = sp.Defense;
+        SpSpeed.Value = sp.Speed;
+
+        var c = ViewModel.Value[2];
+        CDmg.Value = c.Damage;
+        CDef.Value = c.Defense;
+        CSpeed.Value = c.Speed;
+
+
+        if (Entity.TryGetProperty(out IPveEnemyUnits units))
+        {
+            _pveEnemyUnits = units;
+
+            void UnitsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                UpdateInfoBox(ViewModel.Value);
             }
 
-            var sw = ViewModel.Value[0];
-            SwDmg.Value = sw.Damage;
-            SwDef.Value = sw.Defense;
-            SwSpeed.Value = sw.Speed;
+            units.PropertyChanged += UnitsOnPropertyChanged;
+            Disposable.Create(units, units => units.PropertyChanged -= UnitsOnPropertyChanged)
+                .DisposeWith(disposable);
+        }
+        else
+            _pveEnemyUnits = null;
 
-            var sp = ViewModel.Value[1];
-            SpDmg.Value = sp.Damage;
-            SpDef.Value = sp.Defense;
-            SpSpeed.Value = sp.Speed;
-
-            var c = ViewModel.Value[2];
-            CDmg.Value = c.Damage;
-            CDef.Value = c.Defense;
-            CSpeed.Value = c.Speed;
-
-
-            if (Entity.TryGetProperty(out IPveEnemyUnits units))
-            {
-                _pveEnemyUnits = units;
-
-                void UnitsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-                {
-                    UpdateInfoBox(ViewModel.Value);
-                }
-
-                units.PropertyChanged += UnitsOnPropertyChanged;
-                Disposable.Create(units, units => units.PropertyChanged -= UnitsOnPropertyChanged)
-                    .DisposeWith(disposables);
-            }
-            else
-                _pveEnemyUnits = null;
-
-            _isInitializing = false;
-            ViewModel.WhenAnyValue(static power => power.Value)
-                .Subscribe(UpdateInfoBox)
-                .DisposeWith(disposables);
-        });
+        _isInitializing = false;
+        ViewModel.WhenAnyValue(static power => power.Value)
+            .Subscribe(UpdateInfoBox)
+            .DisposeWith(disposable);
     }
 
     private void UpdateInfoBox(ArmyPowerConfig[] value)

@@ -21,20 +21,20 @@ public sealed partial class DependentsBlobView : BaseBlobView
     public DependentsBlobView()
     {
         this.InitializeComponent();
+    }
 
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel.Index, DescPropertyType.HasDependents);
-            MakeSmallInfo();
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel.Index, DescPropertyType.HasDependents);
+        MakeSmallInfo();
 
-            _filter = new DeepFilter(ViewModel);
+        _filter = new DeepFilter(ViewModel);
 
-            ViewModel.WhenAnyValue(dependents => dependents.Required)
-                .CombineLatest(ViewModel.WhenAnyValue(dependents => dependents.VisibleAfter))
-                .Select(tuple => $"Required: {tuple.First?.FullName ?? "None"} | VisibleAfter: {tuple.Second?.FullName ?? "None"}")
-                .BindTo(this, static view => view.InfoBox.Text)
-                .DisposeWith(disposables);
-        });
+        ViewModel.WhenAnyValue(dependents => dependents.Required)
+            .CombineLatest(ViewModel.WhenAnyValue(dependents => dependents.VisibleAfter))
+            .Select(tuple => $"Required: {tuple.First?.FullName ?? "None"} | VisibleAfter: {tuple.Second?.FullName ?? "None"}")
+            .BindTo(this, static view => view.InfoBox.Text)
+            .DisposeWith(disposable);
     }
 
     private record struct DeepFilter(IHasDependents Owner) : IObservable<Func<IRustyEntity, bool>>

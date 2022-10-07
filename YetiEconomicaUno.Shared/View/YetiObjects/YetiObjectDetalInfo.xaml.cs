@@ -72,6 +72,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
         Initialize(viewModel, service, _reInitialize)
             .Subscribe(changeSet =>
         {
+            
             _lastTear = 0;
             foreach (var change in changeSet)
             {

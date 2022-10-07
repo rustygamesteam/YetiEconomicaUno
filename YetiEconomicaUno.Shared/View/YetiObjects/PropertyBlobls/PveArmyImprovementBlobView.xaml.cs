@@ -36,29 +36,30 @@ public sealed partial class PveArmyImprovementBlobView : BaseBlobView
         this.InitializeComponent();
 
         InfoBox.FontSize = 12;
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel, DescPropertyType.PveArmyImprovement);
-            this.WhenAnyValue(static view => view.ViewModel)
-                .Subscribe(viewModel =>
+    }
+
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel, DescPropertyType.PveArmyImprovement);
+        this.WhenAnyValue(static view => view.ViewModel)
+            .Subscribe(viewModel =>
+            {
+                _lastDisposable?.Dispose();
+
+                void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
                 {
-                    _lastDisposable?.Dispose();
-
-                    void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-                    {
-                        OnViewModelUpdated();
-                    }
-
-                    viewModel.PropertyChanged += ViewModelOnPropertyChanged;
-                    _lastDisposable = Disposable.Create(viewModel, improvement => improvement.PropertyChanged -= ViewModelOnPropertyChanged);
-
                     OnViewModelUpdated();
-                })
-                .DisposeWith(disposables);
+                }
 
-            Disposable.Create(this, static view => view._lastDisposable?.Dispose())
-                .DisposeWith(disposables);
-        });
+                viewModel.PropertyChanged += ViewModelOnPropertyChanged;
+                _lastDisposable = Disposable.Create(viewModel, improvement => improvement.PropertyChanged -= ViewModelOnPropertyChanged);
+
+                OnViewModelUpdated();
+            })
+            .DisposeWith(disposable);
+
+        Disposable.Create(this, static view => view._lastDisposable?.Dispose())
+            .DisposeWith(disposable);
     }
 
     private void OnViewModelUpdated()

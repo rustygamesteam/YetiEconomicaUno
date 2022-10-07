@@ -17,6 +17,7 @@ using DynamicData;
 using RustyDTO;
 using RustyDTO.DescPropertyModels;
 using RustyDTO.Interfaces;
+using YetiEconomicaUno.Helpers;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -85,8 +86,15 @@ public sealed partial class YetiGradeObjectView : UserControl
         _attachPropertyBlob = null;
         ViewModel = data;
 
-        var properties = new ObservableCollectionExtended<IViewFor>();
+        var source = PropertiesRepeater.ItemsSource;
 
+        ObservableCollectionExtended<IViewFor> properties;
+        if (source is ObservableCollectionExtended<IViewFor> lastProperties)
+            properties = lastProperties;
+        else 
+            properties = new ObservableCollectionExtended<IViewFor>();
+
+        properties.Clear();
         foreach (var type in data.DescProperties.OrderBy(static type => (int)type))
         {
             switch (type)
@@ -130,11 +138,18 @@ public sealed partial class YetiGradeObjectView : UserControl
                 }
             }).DisposeWith(disposable);
         }
+
+        foreach (var viewFor in properties)
+        {
+            if (viewFor is ICompleteViewIntialize completeViewIntialize)
+                completeViewIntialize.CompleteIntialize(disposable);
+        }
         
         PropertiesRepeater.ItemsSource = properties;
         PropertiesRepeater.ItemsSourceView.WhenAnyValue(static view => view.Count)
             .Select(static count => count == 0 ? Visibility.Collapsed : Visibility.Visible)
-            .BindTo(this, static view => view.PropertiesBlockHeader.Visibility);
+            .BindTo(this, static view => view.PropertiesBlockHeader.Visibility)
+            .DisposeWith(disposable);
         return this;
     }
 
@@ -145,6 +160,7 @@ public sealed partial class YetiGradeObjectView : UserControl
         {
             viewFor.ViewModel = viewModel;
             view = viewFor;
+
             return true;
         }
 

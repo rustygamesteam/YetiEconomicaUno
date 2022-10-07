@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using System.Text.Json;
 using DynamicData;
+using DynamicData.Kernel;
 using LiteDB;
 using ReactiveUI;
 using RustyDTO;
@@ -51,12 +52,21 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
 
     public IRustyEntity? GetOptionEntity(int index)
     {
+        if (index == Int32.MinValue)
+            return null;
+
         var lookup = Entities.Lookup(index);
         return lookup.HasValue ? lookup.Value : null;
     }
 
     public bool TryGetEntity(int index, out IRustyEntity? entity)
     {
+        if (index == Int32.MinValue)
+        {
+            entity = null;
+            return false;
+        }
+
         var lookup = Entities.Lookup(index);
         if (lookup.HasValue)
         {
@@ -264,13 +274,10 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
 
     public IObservable<IChangeSet<IRustyEntity>> GetObservableEntitiesForOwner(int index)
     {
-        return ItemsOfGroup.Connect(owner => owner.Owner.ID.Index == index)
+        return ItemsOfGroup.Connect(owner => owner.Owner.Index == index)
             .RemoveKey()
-            .Throttle(TimeSpan.FromMilliseconds(100))
-            .AutoRefresh(static owner => owner.Owner.ID)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Transform(owner => Entities[owner.Index])
-            .RefCount(); //TODO?;
+            .AutoRefresh(static owner => owner.Owner, propertyChangeThrottle: TimeSpan.FromMilliseconds(100))
+            .Transform(owner => Entities[owner.Index]);
     }
 
     public void ValidateEntities()

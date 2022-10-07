@@ -7,6 +7,7 @@ using ReactiveUIGenerator;
 using System.Reactive.Linq;
 using RustyDTO;
 using RustyDTO.DescPropertyModels;
+using System;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -24,16 +25,16 @@ public sealed partial class TearBlobView : BaseBlobView
     public TearBlobView()
     {
         this.InitializeComponent();
+    }
 
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel.Index, DescPropertyType.HasOwner);
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel.Index, DescPropertyType.HasOwner);
 
-            ViewModel.WhenAnyValue(static x => x.Tear)
-                .Select(static tear => $"Tear: {tear + 1}")
-                .BindTo(this, static view => view.InfoBox.Text)
-                .DisposeWith(disposables);
-        });
+        ViewModel.WhenAnyValue(static x => x.Tear)
+            .Select(static tear => $"Tear: {tear + 1}")
+            .BindTo(this, static view => view.InfoBox.Text)
+            .DisposeWith(disposable);
     }
 
     protected override void FlyoutOpened(CompositeDisposable disposable)

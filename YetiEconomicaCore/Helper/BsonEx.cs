@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.Json.Serialization;
+using DynamicData.Binding;
 using LiteDB;
 using ReactiveUI;
 using RustyDTO.Interfaces;
@@ -11,7 +12,7 @@ public static class BsonEx
     private static readonly Dictionary<Type, BsonCacheConverter> _converters = new();
     private static Dictionary<Type, Func<int, BsonValue, BsonCacheConverter, IDescProperty>> _factory = new();
     
-    private static Dictionary<Type, Func<object, BsonValue>> _mapTo = new();
+    private static Dictionary<Type, Func<object?, BsonValue>> _mapTo = new();
     private static Dictionary<Type, Func<BsonValue, object>> _mapFrom = new();
 
     static BsonEx()
@@ -45,7 +46,7 @@ public static class BsonEx
             if (typeInfo.ImplementedInterfaces.All(type => type != baseType))
                 continue;
 
-            var info = typeInfo.CustomAttributes.First(static data => data.AttributeType.Name.StartsWith("RustyDTO.Supports.PropertyImplInfo", StringComparison.Ordinal));
+            var info = typeInfo.CustomAttributes.First(static data => data.AttributeType.FullName!.StartsWith("RustyDTO.Supports.PropertyImplInfo", StringComparison.Ordinal));
             
             cacheMembers.Clear();
 
@@ -109,7 +110,7 @@ public static class BsonEx
             var propertyValue = info.Members[0].Property.GetValue(value);
             return _mapTo.TryGetValue(info.Members[0].Type, out var factory) ? 
                 factory.Invoke(propertyValue) :
-                new BsonValue(propertyValue);
+                ToBsonValue(propertyValue);
         }
         
         var result = new BsonDocument(new Dictionary<string, BsonValue>(info.Members.Length));
@@ -118,10 +119,15 @@ public static class BsonEx
             var propertyValue = infoMember.Property.GetValue(value);
             result[infoMember.AsName] = _mapTo.TryGetValue(infoMember.Type, out var factory) ? 
                 factory.Invoke(propertyValue) :
-                new BsonValue(propertyValue);
+                ToBsonValue(propertyValue);
         }
         
         return result;
+    }
+
+    private static BsonValue ToBsonValue(object? value)
+    {
+        return value is null ? BsonValue.Null : BsonMapper.Global.Serialize(value);
     }
     
     public static BsonValue ToBson<T>(this T value) where T : IDescProperty

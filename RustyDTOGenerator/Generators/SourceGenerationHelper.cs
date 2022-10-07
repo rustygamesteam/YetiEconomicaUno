@@ -13,7 +13,16 @@ namespace RustyDTO.Generator;
 [global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = false)]
 internal sealed class SkipCodegenAttribute: global::System.Attribute
 {
-    public SkipCodegenAttribute(bool skipImpl = false, bool skipResolve = false)
+    public SkipCodegenAttribute(bool skipImpl = false, bool skipResolver = false)
+    {
+    }
+}
+
+
+[global::System.AttributeUsage(global::System.AttributeTargets.Field, AllowMultiple = false)]
+internal sealed class ForceCodegenAttribute: global::System.Attribute
+{
+    public ForceCodegenAttribute(bool writeResolver = false)
     {
     }
 }
@@ -600,8 +609,7 @@ public class RustyPropertyJsonSerializer
 
     private static bool CanResolveMembers(PropertyMember[] propertyMembers)
     {
-        return propertyMembers.All(member => !member.IsReadOnly || 
-                                             member.Kind is TypeKind.Struct || 
+        return propertyMembers.All(member => member.Kind is TypeKind.Struct || 
                                              member.DefaultValue is not null || 
                                              member.IsNulable);
     }
@@ -643,7 +651,7 @@ public class SimpleMutablePropertyResolver : global::RustyDTO.Interfaces.IMutabl
             if(info.Options.IsSkipImpl || info.Options.IsSkipResolver)
                 continue;
 
-            var canDefault = CanResolveMembers(info.Members);
+            var canDefault = info.Options.IsForceResolver || CanResolveMembers(info.Members);
             if(!canDefault)
                 continue;
             
@@ -713,7 +721,7 @@ public class SimpleDescPropertyResolver : global::RustyDTO.Interfaces.IDescPrope
             if(info.Options.IsSkipImpl || info.Options.IsSkipResolver)
                 continue;
             
-            var canDefault = CanResolveMembers(info.Members);
+            var canDefault = info.Options.IsForceResolver || CanResolveMembers(info.Members);
             if(!canDefault)
                 continue;
             
@@ -754,6 +762,8 @@ public class SimpleDescPropertyResolver : global::RustyDTO.Interfaces.IDescPrope
             sb.Append(member.Name);
             sb.Append(" = ");
             sb.Append(ValueWithTypeResolver(member.TypeName, member.DefaultValue ?? "default"));
+            if (!member.IsNulable && member.Kind is not TypeKind.Structure)
+                sb.Append('!');
             sb.Append(',');
         }
 

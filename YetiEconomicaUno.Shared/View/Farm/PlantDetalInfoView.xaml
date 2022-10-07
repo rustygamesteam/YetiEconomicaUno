@@ -6,5 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:yetiobjects="using:YetiEconomicaUno.View.YetiObjects"
     mc:Ignorable="d">
-    <yetiobjects:YetiGradeObjectView Margin="10" x:Name="RustyEntityView" />
+    <yetiobjects:YetiGradeObjectView Margin="10" x:Name="RustyEntityView"
+                                     IsAutoInitialize="true"
+                                     ViewModel="{x:Bind ViewModel.Entity, Mode=OneWay}" />
 </UserControl>

@@ -28,22 +28,22 @@ public sealed partial class CitySizeBlobView : BaseBlobView
     public CitySizeBlobView()
     {
         this.InitializeComponent();
+    }
 
-        this.WhenActivated(disposables =>
-        {
-            Initialize(ViewModel.Index, DescPropertyType.CitySize);
-            MakeSmallInfo();
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel.Index, DescPropertyType.CitySize);
+        MakeSmallInfo();
 
-            ViewModel.WhenAnyValue(static x => x.BuildsMax)
-                .CombineLatest(ViewModel.WhenAnyValue(static x => x.RoadsMax))
-                .Select(static tuple => $"City size: {{ Builds: {tuple.First}, Roads: {tuple.Second} }}")
-                .BindTo(this, static view => view.InfoBox.Text)
-                .DisposeWith(disposables);
+        ViewModel.WhenAnyValue(static x => x.BuildsMax)
+            .CombineLatest(ViewModel.WhenAnyValue(static x => x.RoadsMax))
+            .Select(static tuple => $"City size: {{ Builds: {tuple.First}, Roads: {tuple.Second} }}")
+            .BindTo(this, static view => view.InfoBox.Text)
+            .DisposeWith(disposable);
 
-            this.WhenAnyValue(static view => view.ViewModel)
-                .BindTo(this, static view => view.DataContext)
-                .DisposeWith(disposables);
-        });
+        this.WhenAnyValue(static view => view.ViewModel)
+            .BindTo(this, static view => view.DataContext)
+            .DisposeWith(disposable);
     }
 
     protected override void FlyoutOpened(CompositeDisposable disposable)

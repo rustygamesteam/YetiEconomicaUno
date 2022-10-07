@@ -17,7 +17,7 @@ public enum DescPropertyType
     [PropertyHave<IRustyEntity>("VisibleAfter", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: int.MinValue)]
     HasDependents = 2,
 
-    [SkipCodegen(skipResolve: true)]
+    [SkipCodegen(skipResolver: true)]
     [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
     Payable = 3,
 
@@ -39,16 +39,19 @@ public enum DescPropertyType
     [PropertyHave<IRustyEntity>("Build", isReadOnly: DescPropertyTypeEx.IsNotReactive, isNullable: true, defaultValue: int.MinValue)]
     InBuildProcess = 7,
 
+    [ForceCodegen(writeResolver: true)]
     [PropertyHave<IRustyEntity>("Entity", isReadOnly: true)]
     [PropertyHave<int>("Count", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1)]
     HasSingleReward = 8,
 
+
+    [ForceCodegen(writeResolver: true)]
     [PropertyHave<IRustyEntity>("ToEntity", isReadOnly: true)]
     [PropertyHave<IRustyEntity>("FromEntity", isReadOnly: true)]
     [PropertyHave<double>("FromRate", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1)]
     HasExchange = 9,
 
-    [SkipCodegen(skipResolve: true)]
+    [SkipCodegen(skipResolver: true)]
     [PropertyHave<ICollection<ResourceStack>>("Rewards", isReadOnly: true)]
     HasRewards = 10,
 
@@ -59,6 +62,7 @@ public enum DescPropertyType
     [PropertyHave<int>("Count", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
     FarmExpansion = 12,
 
+    [ForceCodegen(writeResolver: true)]
     [PropertyHave<IRustyEntity>("Entity", isReadOnly: true)]
     Link = 13,
 
@@ -91,7 +95,7 @@ public enum DescPropertyType
     [PropertyHave<GameScopes>("Scopes", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: GameScopes.EntityExecute)]
     UsageScope = 22,
 
-    [SkipCodegen(skipResolve: true)]
+    [SkipCodegen(skipResolver: true)]
     [PropertyHave<ICollection<IRustyEntity>>("Links", true, false)]
     MultiLinks = 23,
 
@@ -125,6 +129,7 @@ public enum DescPropertyType
     [PropertyHave<ArmyTypeFlags>("AvailableUnits", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: ArmyTypeFlags.All)]
     PveEnemyUnits = 33,
 
+    [ForceCodegen(writeResolver: true)]
     [PropertyHave<ArmyPowerConfig[]>("Value", isReadOnly: DescPropertyTypeEx.IsNotReactive)]
     PveEnemyPower = 34,
 
@@ -133,7 +138,7 @@ public enum DescPropertyType
     [PropertyHave<double>("Force", isReadOnly: DescPropertyTypeEx.IsNotReactive, defaultValue: 1)]
     PveArmyImprovement = 35,
 
-    [SkipCodegen(skipResolve: true)]
+    [SkipCodegen(skipResolver: true)]
     [PropertyHave<ICollection<ResourceStack>>("Price", isReadOnly: true)]
     FakePayable = 36,
 }

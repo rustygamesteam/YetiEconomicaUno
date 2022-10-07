@@ -20,7 +20,10 @@ public class RustyGenerator : IIncrementalGenerator
     private const string PropertyInfoAttribute = "RustyDTO.Generator.PropertyHave";
     private const string OverridePropertyNameAttribute = "RustyDTO.Generator.OverridePropertyName";
     private const string SkipCodegenAttribute = "RustyDTO.Generator.SkipCodegen";
-    
+    private const string ForceCodegenAttribute = "RustyDTO.Generator.ForceCodegen";
+
+    public static bool IS_REACTIVE { get; private set; }
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
@@ -61,6 +64,9 @@ public class RustyGenerator : IIncrementalGenerator
     {
         if (!options.IsDesignTime() && options.GetGlobalOption("DebuggerBreak", prefix: Name) != null)
             Debugger.Launch();
+
+        var isDef = options.GlobalOptions.TryGetValue("RustyDTOGenerator_DefineConstants", out var def);
+        //IS_REACTIVE = define?.Contains("REACTIVE") ?? false;
 
         if (enumDeclaration.IsDefaultOrEmpty)
             return;
@@ -236,9 +242,18 @@ public class RustyGenerator : IIncrementalGenerator
                         options.IsSkipImpl = (bool)attributeData.ConstructorArguments[0].Value!;
                         options.IsSkipResolver = (bool)attributeData.ConstructorArguments[1].Value!;
                     }
+                    else if (fullname.StartsWith(ForceCodegenAttribute, StringComparison.Ordinal))
+                    {
+                        options.IsForceResolver = (bool)attributeData.ConstructorArguments[0].Value!;
+                    }
                 }
 
-                if(members.Count == 0)
+                if (options.IsSkipImpl)
+                    options.IsForceResolver = false;
+                else if (options.IsForceResolver)
+                    options.IsSkipResolver = false;
+
+                if (members.Count == 0)
                     continue;
 
                 var helpType = baseType.Contains("Mutable") ? PropertyType.Mutable : PropertyType.Desc;

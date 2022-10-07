@@ -14,9 +14,9 @@ public sealed partial class TakeSpaceBlob : SingleNumberBlob
 {
     public override (double minimum, double maximum) Range => (1, 1000);
 
-    protected override void OnActivated(CompositeDisposable disposable)
+    public override void CompleteIntialize(CompositeDisposable disposable)
     {
-        base.OnActivated(disposable);
+        base.CompleteIntialize(disposable);
         
         Initialize(ViewModel, DescPropertyType.TakeSpace);
 

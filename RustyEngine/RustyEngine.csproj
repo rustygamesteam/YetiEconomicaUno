@@ -12,7 +12,9 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RustyDTO\RustyDTO.csproj" />
+    <ProjectReference Include="..\RustyDTO\RustyDTO.csproj">
+      <ExcludeAssets></ExcludeAssets>
+    </ProjectReference>
 <!--
 <ProjectReference Include="..\RustyEngineGenerator\RustyEngineGenerator.csproj" PrivateAssets="contentfiles;build" OutputItemType="Analyzer" SetTargetFramework="TargetFramework=netstandard2.0" />
 -->

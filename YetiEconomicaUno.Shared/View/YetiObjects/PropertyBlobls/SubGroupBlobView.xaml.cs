@@ -18,12 +18,13 @@ public sealed partial class SubGroupBlobView : BaseBlobView
     public SubGroupBlobView()
     {
         this.InitializeComponent();
-        this.WhenActivated(disposable =>
-        {
-            Initialize(ViewModel, DescPropertyType.SubGroup);
-            SubGroupBox.ItemsSource = SubGroupHelper.ResolveByType(Entity.Type);
-            InfoBox.Text = $"SubGroup: {ViewModel.Group ?? "NONE"}";
-        });
+    }
+
+    public override void CompleteIntialize(CompositeDisposable disposable)
+    {
+        Initialize(ViewModel, DescPropertyType.SubGroup);
+        SubGroupBox.ItemsSource = SubGroupHelper.ResolveByType(Entity.Type);
+        InfoBox.Text = $"SubGroup: {ViewModel.Group ?? "NONE"}";
     }
 
     private string _lastText;
