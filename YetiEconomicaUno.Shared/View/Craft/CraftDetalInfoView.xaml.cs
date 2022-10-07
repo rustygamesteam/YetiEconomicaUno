@@ -11,7 +11,7 @@ using RustyDTO.Interfaces;
 
 namespace YetiEconomicaUno.View.Craft;
 
-[ViewFor<IRustyEntity>, ViewContract("Detal")]
+[ViewFor<IReactiveRustyEntity>, ViewContract("Detal")]
 public sealed partial class CraftDetalInfoView : UserControl, IDisposable
 {
     private CompositeDisposable _viewModelDisposable;

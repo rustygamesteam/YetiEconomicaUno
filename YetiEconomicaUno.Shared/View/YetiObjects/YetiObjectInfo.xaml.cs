@@ -18,7 +18,7 @@ using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.View.YetiObjects;
 
-[ViewFor<IRustyEntity>]
+[ViewFor<IReactiveRustyEntity>]
 public sealed partial class YetiObjectInfo : UserControl
 {
     private CompositeDisposable _disposables;

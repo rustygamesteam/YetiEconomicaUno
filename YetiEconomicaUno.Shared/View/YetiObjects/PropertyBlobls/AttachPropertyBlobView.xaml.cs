@@ -15,7 +15,7 @@ using YetiEconomicaCore.Services;
 
 namespace YetiEconomicaUno.View.YetiObjects.PropertyBlobls;
 
-[ViewFor<IRustyEntity>]
+[ViewFor<IReactiveRustyEntity>]
 public sealed partial class AttachPropertyBlobView : Button
 {
     private readonly ReactiveCommand<DescPropertyType, Unit> _command;

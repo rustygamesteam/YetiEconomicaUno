@@ -89,12 +89,12 @@
                 </DataTemplate>
             </controls:ListDetailsView.ListHeaderTemplate>
             <controls:ListDetailsView.ItemTemplate>
-                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                <DataTemplate x:DataType="dataCore:IReactiveRustyEntity">
                     <local:YetiObjectInfo ViewModel="{x:Bind}" />
                 </DataTemplate>
             </controls:ListDetailsView.ItemTemplate>
             <controls:ListDetailsView.DetailsTemplate>
-                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                <DataTemplate x:DataType="dataCore:IReactiveRustyEntity">
                     <local:YetiObjectDetalInfo Name="Detals" ViewModel="{x:Bind}" />
                 </DataTemplate>
             </controls:ListDetailsView.DetailsTemplate>

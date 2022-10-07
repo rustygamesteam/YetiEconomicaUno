@@ -29,7 +29,7 @@ public class SelectResourceFlyoutViewModel : ReactiveObject, IObservable<Func<IR
     private Func<IRustyEntity, bool> _lastFilter;
     private IObserver<Func<IRustyEntity, bool>> _filterObserver;
 
-    private readonly ObservableCollectionExtended<IRustyEntity> _sourceFirst = new();
+    private readonly ObservableCollectionExtended<IReactiveRustyEntity> _sourceFirst = new();
 
     public SelectResourceFlyoutViewModel(CompositeDisposable disposable)
     {
@@ -48,7 +48,7 @@ public class SelectResourceFlyoutViewModel : ReactiveObject, IObservable<Func<IR
             .DisposeWith(disposable);
     }
 
-    private void OnChangeFilter(IChangeSet<IRustyEntity> obj)
+    private void OnChangeFilter(IChangeSet<IReactiveRustyEntity> obj)
     {
         var result = _sourceFirst.GroupBy(static resource => resource.GetDescUnsafe<IHasOwner>().Owner.GetIndex())
             .Select(static entities => new ResourcesByGroup(RustyEntityService.Instance.GetEntity(entities.Key), entities));

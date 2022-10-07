@@ -17,7 +17,7 @@ using YetiEconomicaUno.Converters;
 
 namespace YetiEconomicaUno.View.Craft;
 
-[ViewFor<IRustyEntity>]
+[ViewFor<IReactiveRustyEntity>]
 public sealed partial class CraftInfoView : UserControl, IDisposable
 {
     private CompositeDisposable _disposables;

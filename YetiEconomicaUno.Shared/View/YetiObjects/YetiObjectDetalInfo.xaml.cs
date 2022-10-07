@@ -22,7 +22,7 @@ using YetiEconomicaCore;
 
 namespace YetiEconomicaUno.View.YetiObjects;
 
-[ViewFor<IRustyEntity>, ViewContract("Detal")]
+[ViewFor<IReactiveRustyEntity>, ViewContract("Detal")]
 public sealed partial class YetiObjectDetalInfo : UserControl
 {
     private CompositeDisposable _disposable;
@@ -57,7 +57,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
             ViewModel_OnInitialize(ViewModel);
     }
 
-    private void ViewModel_OnInitialize(IRustyEntity viewModel)
+    private void ViewModel_OnInitialize(IReactiveRustyEntity viewModel)
     {
         var service = RustyEntityService.Instance;
 
@@ -111,7 +111,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
         Disposable.Create(ItemsList, static list => list.Items.Clear()).DisposeWith(_reInitialize);
     }
 
-    private static IObservable<IChangeSet<YetiGradeObjectView>> Initialize(IRustyEntity viewModel, RustyEntityService service, CompositeDisposable disposables)
+    private static IObservable<IChangeSet<YetiGradeObjectView>> Initialize(IReactiveRustyEntity viewModel, RustyEntityService service, CompositeDisposable disposables)
     {
         var sort = ComparerBuilder.For<IRustyEntity>()
             .OrderBy(static data => data.GetDescUnsafe<IHasOwner>().Tear)
@@ -124,7 +124,7 @@ public sealed partial class YetiObjectDetalInfo : UserControl
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Transform(entity => new YetiGradeObjectView(entity)
                     .InjectName(entity, disposables)
-                    .AutoInitialize(entity, disposables));
+                    .AutoInitialize((IReactiveRustyEntity)entity, disposables));
         }
         else
         {

@@ -26,6 +26,9 @@ public class RustyGenerator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
             "DTOGenerator.g.cs",
             SourceText.From(SourceGenerationHelper.Attribute, Encoding.UTF8)));
+        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
+            "DTOSupport.g.cs",
+            SourceText.From(SourceGenerationHelper.SupportAttribute, Encoding.UTF8)));
 
         var classes = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -189,7 +192,8 @@ public class RustyGenerator : IIncrementalGenerator
 
                 PropertyOptions options = new PropertyOptions
                 {
-                    Index = (int)enumFieldSymbol.ConstantValue! - 1
+                    Index = (int)enumFieldSymbol.ConstantValue! - 1,
+                    EnumName = fullClassName
                 };
 
                 foreach (var attributeData in attributes)
@@ -239,7 +243,7 @@ public class RustyGenerator : IIncrementalGenerator
 
                 var helpType = baseType.Contains("Mutable") ? PropertyType.Mutable : PropertyType.Desc;
                 values.Add(new PropertyEnumInfo(nameSpace, baseType, prefix, name, members.ToArray(), helpType, $"I{prefix}{name}", options));
-                links.Add(new DependencyLink($"{nameSpace}.I{prefix}{name}", (int)enumFieldSymbol.ConstantValue!));
+                links.Add(new DependencyLink($"{nameSpace}.I{prefix}{name}", (int)enumFieldSymbol.ConstantValue!, fullClassName));
             }
         }
 

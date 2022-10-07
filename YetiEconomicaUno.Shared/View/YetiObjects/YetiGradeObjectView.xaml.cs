@@ -23,7 +23,7 @@ using RustyDTO.Interfaces;
 
 namespace YetiEconomicaUno.View.YetiObjects;
 
-[ViewFor<IRustyEntity>]
+[ViewFor<IReactiveRustyEntity>]
 [DependencyProperty<bool>("IsAutoInitialize", DefaultValue = false)]
 public sealed partial class YetiGradeObjectView : UserControl
 {
@@ -62,7 +62,7 @@ public sealed partial class YetiGradeObjectView : UserControl
         }
     }
 
-    public YetiGradeObjectView AutoInitialize(IRustyEntity entity, CompositeDisposable disposable)
+    public YetiGradeObjectView AutoInitialize(IReactiveRustyEntity entity, CompositeDisposable disposable)
     {
         Initialize(entity, disposable);
         if (entity.HasProperty(DescPropertyType.Payable) || entity.HasProperty(DescPropertyType.FakePayable))
@@ -80,7 +80,7 @@ public sealed partial class YetiGradeObjectView : UserControl
         ContextFlyout = viewModel.HasSpecialMask(EntitySpecialMask.HasParent) ? ActionMenuFlyout : null;
     }
 
-    public YetiGradeObjectView Initialize(IRustyEntity data, CompositeDisposable disposable)
+    public YetiGradeObjectView Initialize(IReactiveRustyEntity data, CompositeDisposable disposable)
     {
         _attachPropertyBlob = null;
         ViewModel = data;

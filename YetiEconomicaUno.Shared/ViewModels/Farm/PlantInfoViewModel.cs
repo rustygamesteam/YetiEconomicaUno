@@ -9,7 +9,7 @@ public class PlantInfoViewModel : ReactiveObject
     private readonly IHasSingleReward _singleReward;
     private readonly ILongExecution _longExecution;
 
-    public IRustyEntity Entity { get; }
+    public IReactiveRustyEntity Entity { get; }
     public IRustyEntity Resource => _singleReward.Entity;
 
     public int Harvest
@@ -24,7 +24,7 @@ public class PlantInfoViewModel : ReactiveObject
         set => _longExecution.Duration = value;
     }
 
-    public PlantInfoViewModel(IRustyEntity entity)
+    public PlantInfoViewModel(IReactiveRustyEntity entity)
     {
         Entity = entity;
         _singleReward = entity.GetDescUnsafe<IHasSingleReward>();

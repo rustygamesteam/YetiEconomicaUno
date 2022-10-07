@@ -75,7 +75,7 @@ internal class SimpleResources
         }
     }
 
-    private void OnUpdateResources(IChangeSet<IRustyEntity> diffs)
+    private void OnUpdateResources(IChangeSet<IReactiveRustyEntity> diffs)
     {
         foreach(var changes in diffs)
         {

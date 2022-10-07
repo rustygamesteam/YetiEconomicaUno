@@ -30,7 +30,7 @@ public class ResourcesViewModel : BaseViewModel
 
 
     internal IList Groups { get; }
-    internal ObservableCollectionExtended<IRustyEntity> Resources { get; } = new();
+    internal ObservableCollectionExtended<IReactiveRustyEntity> Resources { get; } = new();
 
     internal ObservableCollectionExtended<IRustyEntity> GroupsFilter { get; } = new();
 

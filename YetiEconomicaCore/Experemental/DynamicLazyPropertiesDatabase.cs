@@ -6,9 +6,11 @@ using DynamicData;
 using DynamicData.Binding;
 using LiteDB;
 using RustyDTO;
+using RustyDTO.CodeGen.Impl;
 using RustyDTO.Interfaces;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Descriptions;
+using YetiEconomicaCore.Helper;
 
 namespace YetiEconomicaCore.Experemental;
 
@@ -18,12 +20,13 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
     private readonly SourceCache<Properties, int> _data = new(property => property.Index);
 
     private readonly Dictionary<DescPropertyType, IPropertyResolver> _resolvers;
+    private readonly IDescPropertyResolver _resolver;
 
     private CompositeDisposable _disposable = new();
 
     private static string GetKey(DescPropertyType type)
     {
-        return ((int)type).ToString(NumberFormatInfo.InvariantInfo);
+        return EntityDependencies.IntAsString((int)type);
     }
 
     public IDescProperty ResolveProperty(int index, DescPropertyType type)
@@ -38,6 +41,7 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
 
     public DynamicLazyPropertiesDatabase(ILiteDatabase database, string table, IEnumerable<KeyValuePair<DescPropertyType, IPropertyResolver>> resolvers)
     {
+        _resolver = new SimpleDescPropertyResolver();
         _collection = database.GetCollection(table, BsonAutoId.Int32);
         foreach (var document in _collection.FindAll())
         {
@@ -50,7 +54,7 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
 
     public bool HasResolve(DescPropertyType type)
     {
-        return _resolvers.ContainsKey(type);
+        return _resolver.HasResolve(type.AsIndex());
     }
 
     public bool TryResolve(int index, DescPropertyType propertyType, out LazyDescProperty property)
@@ -102,7 +106,7 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
 
     private IDescProperty ResolveProperty(int index, BsonValue data, DescPropertyType type)
     {
-        return _resolvers[type].Deserialize(index, data);
+        return BsonEx.FromBson(EntityDependencies.EnumToType(type), index, data);
     }
 
     private bool TryPropertyUpdate(BsonDocument document, int index, DescPropertyType type, IDescProperty? property)
@@ -110,12 +114,12 @@ internal class DynamicLazyPropertiesDatabase : IDisposable
         BsonValue? value;
         if (property is null)
         {
-            value = _resolvers[type].SerializeDefault();
+            value = _resolver.Resolve(index, type.AsIndex()).ToBson(EntityDependencies.EnumToType(type));
             if (value is null)
                 return false;
         }
         else
-            value = _resolvers[type].Serialize(property);
+            value = property.ToBson(EntityDependencies.EnumToType(type));
 
         var key = GetKey(type);
         document[key] = value;

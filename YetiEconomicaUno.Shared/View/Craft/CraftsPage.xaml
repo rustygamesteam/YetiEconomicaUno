@@ -62,12 +62,12 @@
                 </DataTemplate>
             </controls:ListDetailsView.ListHeaderTemplate>
             <controls:ListDetailsView.ItemTemplate>
-                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                <DataTemplate x:DataType="dataCore:IReactiveRustyEntity">
                     <craftControls:CraftInfoView ViewModel="{x:Bind}" />
                 </DataTemplate>
             </controls:ListDetailsView.ItemTemplate>
             <controls:ListDetailsView.DetailsTemplate>
-                <DataTemplate x:DataType="dataCore:IRustyEntity">
+                <DataTemplate x:DataType="dataCore:IReactiveRustyEntity">
                     <craftControls:CraftDetalInfoView ViewModel="{x:Bind}" />
                 </DataTemplate>
             </controls:ListDetailsView.DetailsTemplate>

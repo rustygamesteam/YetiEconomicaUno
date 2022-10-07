@@ -13,7 +13,7 @@ using RustyDTO.Interfaces;
 
 namespace YetiEconomicaUno.View.Convertable;
 
-[ViewFor<IRustyEntity>]
+[ViewFor<IReactiveRustyEntity>]
 public sealed partial class ExchangeView : UserControl, IDisposable
 {
     private CompositeDisposable _disposables;

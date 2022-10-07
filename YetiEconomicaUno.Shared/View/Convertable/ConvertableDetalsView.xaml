@@ -6,13 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:userControls="using:YetiEconomy.Controls" 
-    xmlns:dataCore="using:RustyDTO.Interfaces" xmlns:resourceControls="using:YetiEconomicaUno.Controls.Resources"
+    xmlns:dataCore="using:RustyDTO.Interfaces" 
+    xmlns:resourceControls="using:YetiEconomicaUno.Controls.Resources"
     mc:Ignorable="d">
     <userControls:AdvancedListView Header="Exchanges" 
                                    x:Name="AdvancedList"
                                    VisibleAddPanel="Collapsed">
         <userControls:AdvancedListView.ItemTemplate>
-            <DataTemplate x:DataType="dataCore:IRustyEntity">
+            <DataTemplate x:DataType="dataCore:IReactiveRustyEntity">
                 <local:ExchangeView ViewModel="{x:Bind}" />
             </DataTemplate>
         </userControls:AdvancedListView.ItemTemplate>

@@ -22,7 +22,7 @@ public class CraftsViewModel : BaseViewModel
     [Reactive]
     public string SearchMask { get; set; }
 
-    internal ObservableCollectionExtended<IRustyEntity> ItemSource { get; } = new();
+    internal ObservableCollectionExtended<IReactiveRustyEntity> ItemSource { get; } = new();
 
     public CraftsViewModel()
     {

@@ -90,7 +90,7 @@ public class YetiObjectsPageViewModel : BaseViewModel
         }
     }
 
-    internal ObservableCollectionExtended<IRustyEntity> ItemSource { get; } = new();
+    internal ObservableCollectionExtended<IReactiveRustyEntity> ItemSource { get; } = new();
 
     public void Initialize(CompositeDisposable disposable)
     {

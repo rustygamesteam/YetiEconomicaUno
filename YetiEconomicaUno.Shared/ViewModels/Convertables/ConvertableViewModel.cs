@@ -14,7 +14,7 @@ public record ConvertableViewModel(IRustyEntity ConvertableToResource) : Reactiv
 {
     public IHasOwner ResourceOwner => ConvertableToResource.GetDescUnsafe<IHasOwner>();
 
-    public IObservable<IChangeSet<IRustyEntity>> ObservableExchanges { get; } = ConvertablesService.Instance.ObservableExchangesToResource(ConvertableToResource.GetIndex());
+    public IObservable<IChangeSet<IReactiveRustyEntity>> ObservableExchanges { get; } = ConvertablesService.Instance.ObservableExchangesToResource(ConvertableToResource.GetIndex());
     public IReadOnlyCollection<IRustyEntity> Exchanges { get; private set; }
 
     public IRustyEntity SelectedExchange { get; set; }

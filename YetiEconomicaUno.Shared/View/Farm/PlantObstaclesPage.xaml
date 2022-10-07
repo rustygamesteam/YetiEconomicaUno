@@ -29,7 +29,7 @@
                                        VisibleAddPanel="Collapsed"
                                        Header="Obstacles">
 	        <userControls:AdvancedListView.ItemTemplate>
-		        <DataTemplate x:DataType="dataCore:IRustyEntity">
+                <DataTemplate x:DataType="dataCore:IReactiveRustyEntity">
                     <yetiobjects:YetiGradeObjectView ViewModel="{x:Bind}" IsAutoInitialize="True" />
 		        </DataTemplate>
 	        </userControls:AdvancedListView.ItemTemplate>

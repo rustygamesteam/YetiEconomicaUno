@@ -82,7 +82,7 @@ public class YetiGroupSelectorViewModel : ReactiveObject, IObservable<Func<IRust
         lastDisposable?.Dispose();
     }
 
-    private void OnSourceUpdated(IChangeSet<IRustyEntity, int> changes)
+    private void OnSourceUpdated(IChangeSet<IReactiveRustyEntity, int> changes)
     {
         using var notifyDisposable = _source.SuspendNotifications();
         var service = RustyEntityService.Instance;

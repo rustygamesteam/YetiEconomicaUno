@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using RustyDTO.Interfaces;
 using RustyDTO.MutableProperties;
@@ -169,6 +170,12 @@ public static partial class EntityDependencies
             .Optional(DescPropertyType.HasDescKey, DescPropertyType.MultiLinks);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string IntAsString(int value)
+    {
+        return _intAsString[value];
+    }
+
     private static void Optimize()
     {
         var count = _internalDescPropertiesCount;
@@ -326,7 +333,7 @@ public static partial class EntityDependencies
             if (index == -1)
                 continue;
 
-            if (data.TryGetProperty(_intAsString[i], out var propertyData))
+            if (data.TryGetProperty(IntAsString(i), out var propertyData))
                 mutableProperties[index] = resolver.Resolve(i, propertyData);
             else
                 mutableProperties[index] = resolver.Resolve(i);
@@ -345,7 +352,7 @@ public static partial class EntityDependencies
             if (index == -1)
                 continue;
 
-            if (data.TryGetProperty(_intAsString[i], out var propertyData))
+            if (data.TryGetProperty(IntAsString(i), out var propertyData))
                 mutableProperties[index] = resolver.Resolve(i, propertyData);
             else
                 mutableProperties[index] = resolver.Resolve(i);

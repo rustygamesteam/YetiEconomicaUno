@@ -11,6 +11,7 @@ using RustyDTO.Supports;
 using YetiEconomicaCore.Database;
 using YetiEconomicaCore.Descriptions;
 using YetiEconomicaCore.Experemental;
+using YetiEconomicaCore.Helper;
 using YetiEconomicaCore.ReactiveImpl;
 
 namespace YetiEconomicaCore.Services;
@@ -156,6 +157,8 @@ public class RustyEntityService : IEntityService, IDatabaseChunkConvertable<Reso
 
     public void Initialize(JsonDocument? _)
     {
+        BsonEx.Initialize();
+        
         var database = DatabaseRepository.Instance.Database;
 
         Properties = new DynamicLazyPropertiesDatabase(database, "properties", GetPropertyResolvers());

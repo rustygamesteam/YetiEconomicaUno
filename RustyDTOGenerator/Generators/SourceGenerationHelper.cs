@@ -1,9 +1,10 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using Microsoft.CodeAnalysis;
 
 namespace RustyDTOGenerator.Generators;
 
-internal class SourceGenerationHelper
+internal static partial class SourceGenerationHelper
 {
     public const string Attribute = @"#nullable enable
 
@@ -38,6 +39,22 @@ internal sealed class PropertyHaveAttribute<TType> : global::System.Attribute
 {
     public PropertyHaveAttribute(string name, bool isReadOnly = false, bool isNullable = false, object? defaultValue = null, string? serializedName = null)
     {
+    }
+}";
+
+    public const string SupportAttribute = @"#nullable enable
+
+namespace RustyDTO.Supports;
+
+[global::System.AttributeUsage(global::System.AttributeTargets.Class, AllowMultiple = false)]
+internal sealed class PropertyImplInfoAttribute<TEnum, TBase> : global::System.Attribute
+    where TEnum : Enum
+{
+    public int Value { get; }
+
+    public PropertyImplInfoAttribute(int value)
+    {
+        Value = value;
     }
 }";
 
@@ -154,6 +171,7 @@ using ReactiveUI;
 
 namespace {enumInfo.Namespace}.Impl;
 
+[global::RustyDTO.Supports.PropertyImplInfo<global::{enumInfo.Options.EnumName}, global::{enumInfo.Namespace}.{enumInfo.InterfaceName}>({enumInfo.Options.Index + 1})]
 public class {enumInfo.Prefix}{enumInfo.Name}Impl : 
 #if REACTIVE
     ReactiveUI.ReactiveObject,
@@ -197,6 +215,16 @@ public static partial class EntityDependencies
     {{
 {string.Join(",\n", links.Select(link => $@"      {{ typeof(global::{link.TypeName}), {link.Value-1} }}"))}
     }};
+
+    private static IReadOnlyDictionary<Enum, Type> _enumToType = new Dictionary<Enum, Type>
+    {{
+{string.Join(",\n", links.Select(link => $@"      {{ (global::{link.EnumName}){link.Value}, typeof(global::{link.TypeName}) }}"))}
+    }};
+
+    public static global::System.Type EnumToType(global::System.Enum @enum)
+    {{
+        return _enumToType[@enum];
+    }}
 }}";
     }
 
@@ -221,10 +249,10 @@ using RustyDTO.Interfaces;
         sb.Append(nameSpace);
         sb.Append(@";
 
-public class RustyPropertyJsonSerializerContext
+public class RustyPropertyJsonSerializer
 {
-    private static RustyPropertyJsonSerializerContext _instance;
-    public static RustyPropertyJsonSerializerContext Instance => (_instance ??= new RustyPropertyJsonSerializerContext());
+    private static RustyPropertyJsonSerializer _instance;
+    public static RustyPropertyJsonSerializer Instance => (_instance ??= new RustyPropertyJsonSerializer());
 
     private Func<JsonElement, IMutableProperty>[] _mutableFromJson;
     private Func<IMutableProperty, JsonElement>[] _mutableToJson;
@@ -238,7 +266,7 @@ public class RustyPropertyJsonSerializerContext
     private global::System.IO.MemoryStream _ms = new ();
     private Utf8JsonWriter _jsonWriter;
 
-    private RustyPropertyJsonSerializerContext()
+    private RustyPropertyJsonSerializer()
     {
         _customWriters = new (32);
         _jsonWriter = new (_ms);
@@ -346,7 +374,7 @@ public class RustyPropertyJsonSerializerContext
             if(enumInfo.Options.IsSkipImpl)
                 continue;
             
-            AppenedToJson(sb, to, enumInfo);
+            AppendToJson(sb, to, enumInfo);
         }
 
         if (count > 0)
@@ -447,7 +475,7 @@ public class RustyPropertyJsonSerializerContext
         sb.Append("\n\t\t};\n");
     }
 
-    private static void AppenedToJson(StringBuilder sb, string property, PropertyEnumInfo info)
+    private static void AppendToJson(StringBuilder sb, string property, PropertyEnumInfo info)
     {
         sb.Append("\t\t");
         sb.Append(property);
@@ -643,7 +671,7 @@ public class SimpleMutablePropertyResolver : global::RustyDTO.Interfaces.IMutabl
 
     public global::RustyDTO.Interfaces.IMutableProperty Resolve(int type, JsonElement dataElement)
     {
-        return global::RustyDTO.CodeGen.Impl.RustyPropertyJsonSerializerContext.Instance.MutableFromJson(type, dataElement);
+        return global::RustyDTO.CodeGen.Impl.RustyPropertyJsonSerializer.Instance.MutableFromJson(type, dataElement);
     }
 }");
     }
@@ -713,7 +741,7 @@ public class SimpleDescPropertyResolver : global::RustyDTO.Interfaces.IDescPrope
 
     public global::RustyDTO.Interfaces.IDescProperty Resolve(int index, int type, JsonElement dataElement)
     {
-        return global::RustyDTO.CodeGen.Impl.RustyPropertyJsonSerializerContext.Instance.DescFromJson(type, dataElement, index);
+        return global::RustyDTO.CodeGen.Impl.RustyPropertyJsonSerializer.Instance.DescFromJson(type, dataElement, index);
     }
 }");
     }
